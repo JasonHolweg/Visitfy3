@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "title": "Flora Kaffee & Eisbar",
+    "tag": "Gastronomie",
+    "description": "Zwei Standorte, ein stimmungsvolles Erlebnis. Der virtuelle Rundgang lädt Gäste ein, bevor sie die Tür öffnen – Atmosphäre, Möbel, Licht.",
+    "matterportUrl": "https://my.matterport.com/show/?m=ZvsmkQVy6qB"
+  },
+  {
+    "id": 2,
+    "title": "Danbo Flensburg",
+    "tag": "Einzelhandel",
+    "description": "Digitale Möbelpräsentation auf höchstem Niveau. Kunden erkunden das Sortiment virtuell und kommen bereits mit konkreten Kaufentscheidungen.",
+    "matterportUrl": "https://my.matterport.com/show/?m=2s8oXwSFrPC"
+  },
+  {
+    "id": 3,
+    "title": "Buddha Lounge",
+    "tag": "Hotel & Gastronomie",
+    "description": "360° Rundgang durch einen exklusiven Gastbereich. Gäste reservieren gezielter, weil sie die Atmosphäre bereits online erlebt haben.",
+    "matterportUrl": "https://my.matterport.com/show/?m=1VKyHfuxX8J"
+  }
+]
