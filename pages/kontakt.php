@@ -43,12 +43,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $to      = 'info@visitfy.de'; /* TODO: verify recipient */
             $subject = 'Neue Anfrage von ' . $name;
             $body    = "Name: $name\nFirma: $firma\nE-Mail: $email\nTelefon: $telefon\nBranche: $branche\n\nNachricht:\n$nachricht";
-            $headers = 'From: noreply@visitfy.de' . "\r\n" . 'Reply-To: ' . $email;
-
-            /* @mail() – server must be configured for mail delivery */
-            /* $sent = mail($to, $subject, $body, $headers); */
-            /* For now, always treat as sent (TODO: enable mail() on server) */
-            $formSent = true;
+            /* Sanitize email to prevent header injection: reject newlines */
+            if (preg_match('/[\r\n]/', $email)) {
+                $formError = 'Ungültige E-Mail-Adresse.';
+            } else {
+                $headers = 'From: noreply@visitfy.de' . "\r\n" . 'Reply-To: ' . $email;
+                /* @mail() – server must be configured for mail delivery */
+                /* $sent = mail($to, $subject, $body, $headers); */
+                /* For now, always treat as sent (TODO: enable mail() on server) */
+                $formSent = true;
+            }
         }
     }
 }

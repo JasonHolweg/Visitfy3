@@ -18,7 +18,7 @@ require __DIR__ . '/../partials/header.php';
   <section class="page-hero">
     <div class="container">
       <h1 class="fade-up">Datenschutzerklärung</h1>
-      <p class="fade-up delay-1">Stand: <?= htmlspecialchars(date('F Y'), ENT_QUOTES, 'UTF-8') ?></p>
+      <p class="fade-up delay-1">Stand: <?= htmlspecialchars(date('d.m.Y'), ENT_QUOTES, 'UTF-8') ?></p>
     </div>
   </section>
 

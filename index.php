@@ -177,7 +177,7 @@ if (!is_array($tours)) $tours = [];
   $url    = $tour['matterportUrl'] ?? '';
   /* Validate: only allow matterport.com URLs */
   $safeUrl = '';
-  if (preg_match('#^https://my\.matterport\.com/show/\?#', $url)) {
+  if (preg_match('#^https://my\.matterport\.com/show/\?m=[a-zA-Z0-9]+$#', $url)) {
       $safeUrl = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
   }
   $num = $i + 1;

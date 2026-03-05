@@ -660,7 +660,7 @@
     });
 
     const emailEl = form.querySelector('input[type="email"]');
-    if (emailEl && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value)) {
+    if (emailEl && !emailEl.validity.valid) {
       emailEl.style.borderColor = 'rgba(255,100,100,0.5)';
       valid = false;
     }
