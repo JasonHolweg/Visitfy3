@@ -15,6 +15,7 @@ if (!isset($root)) $root = '';
 
   <ul class="nav-links" role="list">
     <li><a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>index.php">Start</a></li>
+    <li><a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/about.php">Über uns</a></li>
     <li><a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/partner.php">Partner werden</a></li>
     <li><a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/faq.php">FAQ</a></li>
     <li><a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/kontakt.php">Kontakt</a></li>
@@ -31,6 +32,7 @@ if (!isset($root)) $root = '';
 <!-- Mobile nav drawer -->
 <nav class="nav-mobile" id="nav-mobile" role="navigation" aria-label="Mobilnavigation">
   <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>index.php">Start</a>
+  <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/about.php">Über uns</a>
   <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/partner.php">Partner werden</a>
   <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/faq.php">FAQ</a>
   <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/kontakt.php">Kontakt</a>

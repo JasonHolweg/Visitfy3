@@ -204,7 +204,7 @@
     /* ── Logo Marquee ──────────────────────────────────────── */
     initMarquee();
 
-    /* ── Scroll-Stack + iFrame lazy-load ───────────────────── */
+    /* ── Scroll-Stack ─────────────────────────────────────── */
     initScrollStack();
 
     /* ── FAQ Accordion ─────────────────────────────────────── */
@@ -338,24 +338,17 @@
 
   /* ═══════════════════════════════════════════════════════════
      LOGO MARQUEE  [from Visitfy-Website]
-     Duplicates the track for seamless infinite scroll.
+     Runs marquee track animation.
   ═══════════════════════════════════════════════════════════ */
   function initMarquee() {
-    const tracks = document.querySelectorAll('.marquee-track');
     if (prefersReduced) return;
-    tracks.forEach(track => {
-      /* Clone content for seamless loop */
-      const clone = track.cloneNode(true);
-      track.parentNode.appendChild(clone);
-    });
   }
 
 
   /* ═══════════════════════════════════════════════════════════
-     SCROLL-STACK + IFRAME LAZY-LOAD
+      SCROLL-STACK
      Each .stack-item is CSS sticky; JS adds subtle rotation
      transform as items accumulate at top.
-     iFrames use IntersectionObserver for lazy loading.
   ═══════════════════════════════════════════════════════════ */
   function initScrollStack() {
     const items = document.querySelectorAll('.stack-item');
@@ -394,29 +387,6 @@
       }, { passive: true });
     }
 
-    /* iFrame lazy-load via IntersectionObserver */
-    const lazyIO = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        const placeholder = entry.target;
-        const src         = placeholder.getAttribute('data-src');
-        if (!src) return;
-        lazyIO.unobserve(placeholder);
-
-        /* Replace placeholder with iframe */
-        const wrap    = placeholder.parentNode;
-        const iframe  = document.createElement('iframe');
-        iframe.src    = src;
-        iframe.title  = placeholder.getAttribute('data-title') || '360° Rundgang';
-        iframe.allow  = 'fullscreen; xr-spatial-tracking;';
-        iframe.setAttribute('allowfullscreen', '');
-        iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
-        iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation');
-        wrap.replaceChild(iframe, placeholder);
-      });
-    }, { rootMargin: '200px' });
-
-    document.querySelectorAll('.iframe-placeholder[data-src]').forEach(el => lazyIO.observe(el));
   }
 
 

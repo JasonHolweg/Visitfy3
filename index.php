@@ -7,6 +7,7 @@
 
 /* ── Security: whitelisted pages ────────────────────────── */
 $allowed = [
+  'about'       => 'pages/about.php',
     'partner'     => 'pages/partner.php',
     'faq'         => 'pages/faq.php',
     'kontakt'     => 'pages/kontakt.php',
@@ -41,6 +42,11 @@ if (!is_array($clientLogoFiles)) {
 }
 natsort($clientLogoFiles);
 $clientLogoFiles = array_values($clientLogoFiles);
+
+$marqueeLogoFiles = $clientLogoFiles;
+if (count($clientLogoFiles) > 0 && count($clientLogoFiles) < 10) {
+  $marqueeLogoFiles = array_merge($clientLogoFiles, $clientLogoFiles);
+}
 ?>
 
 <!-- ══════════════════════════════════════════════════════════
@@ -205,16 +211,18 @@ $clientLogoFiles = array_values($clientLogoFiles);
 <?php if ($desc): ?>
             <p class="stack-card-desc"><?= $desc ?></p>
 <?php endif; ?>
-            <!-- 16:9 iFrame with lazy-load -->
+            <!-- 16:9 iFrame -->
             <div class="iframe-wrap">
 <?php if ($safeUrl): ?>
-              <div class="iframe-placeholder"
-                   data-src="<?= $safeUrl ?>"
-                   data-title="360° Rundgang – <?= $title ?>"
-                   role="button"
-                   tabindex="0"
-                   aria-label="<?= $title ?> laden">
-              </div>
+              <iframe
+                src="<?= $safeUrl ?>"
+                title="360° Rundgang – <?= $title ?>"
+                allow="fullscreen; xr-spatial-tracking;"
+                allowfullscreen
+                referrerpolicy="strict-origin-when-cross-origin"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation"
+                loading="eager"
+              ></iframe>
 <?php else: ?>
               <div class="iframe-placeholder" aria-label="Kein Rundgang verfügbar"></div>
 <?php endif; ?>
@@ -232,8 +240,8 @@ $clientLogoFiles = array_values($clientLogoFiles);
     <p class="marquee-label">Vertrauen von führenden Unternehmen</p>
     <div class="marquee-track-wrap">
       <div class="marquee-track" aria-hidden="true">
-<?php if ($clientLogoFiles): ?>
-<?php foreach ($clientLogoFiles as $logoPath):
+<?php if ($marqueeLogoFiles): ?>
+<?php foreach ($marqueeLogoFiles as $logoPath):
   $fileName = basename($logoPath);
   $baseName = pathinfo($fileName, PATHINFO_FILENAME);
   $prettyName = preg_replace('/[-_]+/', ' ', $baseName);

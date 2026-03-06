@@ -32,6 +32,7 @@ if (!isset($root)) $root = '';
       <div class="footer-links-group">
         <h4>Navigation</h4>
         <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>index.php">Startseite</a>
+        <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/about.php">Über uns</a>
         <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/partner.php">Partner werden</a>
         <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/faq.php">FAQ</a>
         <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/kontakt.php">Kontakt</a>
@@ -59,6 +60,10 @@ if (!isset($root)) $root = '';
         <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/impressum.php">Impressum</a>
         &nbsp;·&nbsp;
         <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/datenschutz.php">Datenschutz</a>
+      </span>
+      <span>
+        Webseite von
+        <a class="jason-gradient-link" href="https://jasonholweg.de" target="_blank" rel="noopener noreferrer">Jason Holweg</a>
       </span>
     </div>
   </div><!-- /.container -->
