@@ -181,17 +181,17 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: var(--bg);
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--bg);
   overflow: hidden;
-  transition: opacity 0.9s var(--ease-out);
+  transition: opacity 0.9s ease, visibility 0.9s ease;
 }
 
 #intro.hide {
   opacity: 0;
-  pointer-events: none;
+  visibility: hidden;
 }
 
 #intro-canvas {
@@ -206,65 +206,77 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   z-index: 2;
   text-align: center;
   opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+  transform: scale(0.92) translateY(12px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
   pointer-events: none;
 }
 
 #intro-text.show {
   opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
+  transform: scale(1) translateY(0);
 }
 
-#intro-text .intro-logo {
-  width: 200px;
-  margin: 0 auto 1.5rem;
-  filter: brightness(0) invert(1);
-}
-
-#intro-text h1 {
-  font-size: clamp(2.5rem, 7vw, 5rem);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  margin-bottom: 0.5rem;
+#intro-text .intro-logo-mark {
+  width: clamp(180px, 26vw, 300px);
+  margin-inline: auto;
+  filter: brightness(0) invert(1) opacity(0.95) drop-shadow(0 0 30px rgba(171, 196, 236, 0.24));
 }
 
 #intro-text p {
-  color: var(--text-dim);
-  font-size: 1.1rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  margin-top: 16px;
+  font-size: clamp(1rem, 2vw, 1.35rem);
+  font-weight: 400;
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.6s ease 0.4s, transform 0.6s ease 0.4s;
+}
+
+#intro-text.show p {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 #intro-text .scroll-hint {
-  margin-top: 2rem;
-  font-size: 0.78rem;
-  letter-spacing: 0.15em;
-  color: var(--text-muted);
-  animation: pulse-hint 2s ease-in-out infinite;
+  margin-top: 40px;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 0.6s ease 0.9s;
+  animation: pulse-hint 2s ease infinite 1.5s;
+}
+
+#intro-text.show .scroll-hint {
+  opacity: 1;
 }
 
 @keyframes pulse-hint {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.8; }
 }
 
 #skip-btn {
   position: absolute;
-  bottom: 2rem;
-  right: 2rem;
+  bottom: 32px;
+  right: 32px;
   z-index: 3;
-  padding: 0.5em 1.25em;
-  font-size: 0.82rem;
-  letter-spacing: 0.1em;
-  color: var(--text-muted);
-  border: 1px solid var(--line);
+  padding: 10px 22px;
   border-radius: 50px;
-  transition: color 0.2s, border-color 0.2s;
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--text-muted);
+  backdrop-filter: blur(12px);
+  transition: var(--transition);
 }
-#skip-btn:hover { color: var(--text); border-color: var(--line-strong); }
+#skip-btn:hover {
+  background: rgba(255,255,255,0.14);
+  color: var(--text);
+}
 
 /* ── Reduced motion: skip intro ─────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
@@ -312,6 +324,7 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 .nav-logo img {
   height: 30px;
   width: auto;
+  filter: brightness(0) invert(1);
 }
 
 .nav-logo-text {

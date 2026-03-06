@@ -41,8 +41,7 @@ if (!is_array($tours)) $tours = [];
 <div id="intro" role="presentation" aria-hidden="true">
   <canvas id="intro-canvas"></canvas>
   <div id="intro-text">
-    <img class="intro-logo" src="assets/img/logo.svg" alt="Visitfy">
-    <h1>Visitfy</h1>
+    <img src="assets/img/visitfy-logo.svg" alt="Visitfy" class="intro-logo-mark">
     <p>360° Rundgänge die begeistern</p>
     <p class="scroll-hint">Klicken zum Fortfahren</p>
   </div>
@@ -61,16 +60,16 @@ if (!is_array($tours)) $tours = [];
 
     <div class="container hero-content">
       <div class="hero-panel fade-up">
-        <p class="hero-eyebrow">Virtuelle 360° Erlebnisse</p>
-        <h1 id="hero-heading">360° RUNDGÄNGE<br>FÜR MODERNE<br>UNTERNEHMEN</h1>
+        <p class="hero-eyebrow">360° Rundgänge für moderne Unternehmen</p>
+        <h1 id="hero-heading">MEHR SICHTBARKEIT.<br>MEHR VERTRAUEN.<br>MEHR ANFRAGEN.</h1>
         <p class="hero-subline">Mehr Sichtbarkeit. Mehr Vertrauen. Mehr Anfragen.</p>
         <p class="hero-desc">
-          Visitfy entwickelt professionelle 360° virtuelle Rundgänge für Unternehmen jeder Branche –
+          Visitfy entwickelt hochwertige 360° Erlebnisse für Unternehmen jeder Branche –
           realistisch, hochwertig und sofort einsatzbereit für Website und Google&nbsp;Business.
         </p>
         <div class="hero-actions">
-          <a href="pages/kontakt.php" class="btn btn-primary">Angebot anfragen</a>
-          <a href="#tours" class="btn btn-secondary">Beispiele ansehen</a>
+          <a href="pages/kontakt.php" class="btn btn-primary">Beratung anfragen</a>
+          <a href="#tours" class="btn btn-secondary">Unsere Ergebnisse</a>
         </div>
       </div>
     </div>

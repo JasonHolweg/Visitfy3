@@ -1,0 +1,19 @@
+# Dependencies & build artifacts
+node_modules/
+vendor/
+dist/
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+*.env
+deploy
+deploy.sh
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

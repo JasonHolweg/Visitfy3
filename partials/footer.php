@@ -65,5 +65,6 @@ if (!isset($root)) $root = '';
 </footer>
 
 <script src="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>assets/js/main.js"></script>
+<script src="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>assets/js/intro.js"></script>
 </body>
 </html>
