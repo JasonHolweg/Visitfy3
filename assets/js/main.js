@@ -192,6 +192,9 @@
       if (href && path.endsWith(href)) a.classList.add('active');
     });
 
+    /* ── Hero rotating text ────────────────────────────────── */
+    initHeroRotatingText();
+
     /* ── Scroll Reveal (IntersectionObserver) ──────────────── */
     initFadeUps();
 
@@ -246,6 +249,40 @@
       });
     }, { threshold: 0.1 });
     items.forEach(el => io.observe(el));
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     HERO ROTATING TEXT
+  ═══════════════════════════════════════════════════════════ */
+  function initHeroRotatingText() {
+    const wordEl = document.querySelector('[data-hero-rotate-word]');
+    if (!wordEl) return;
+
+    const words = ['SICHTBARKEIT.', 'VERTRAUEN.', 'ANFRAGEN.'];
+    let index = 0;
+    const fadeDuration = 420;
+    const holdDuration = 1900;
+
+    if (prefersReduced) {
+      wordEl.textContent = words[0];
+      return;
+    }
+
+    window.setInterval(() => {
+      wordEl.classList.add('is-exiting');
+
+      window.setTimeout(() => {
+        index = (index + 1) % words.length;
+        wordEl.textContent = words[index];
+        wordEl.classList.remove('is-exiting');
+        wordEl.classList.add('is-entering');
+
+        requestAnimationFrame(() => {
+          wordEl.classList.remove('is-entering');
+        });
+      }, fadeDuration);
+    }, holdDuration + fadeDuration);
   }
 
 

@@ -515,6 +515,37 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   margin-bottom: 1.25rem;
 }
 
+.hero-rotating-prefix,
+.hero-rotating-word {
+  display: inline-block;
+}
+
+.hero-rotating-word {
+  min-width: 12ch;
+  transition: opacity 0.42s var(--ease-in-out), transform 0.42s var(--ease-in-out), filter 0.42s var(--ease-in-out);
+  will-change: opacity, transform, filter;
+}
+
+.hero-rotating-word.is-exiting {
+  opacity: 0;
+  transform: translateY(16px) scale(0.97);
+  filter: blur(8px);
+}
+
+.hero-rotating-word.is-entering {
+  opacity: 0;
+  transform: translateY(-16px) scale(1.03);
+  filter: blur(8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-rotating-word {
+    transition: none;
+    transform: none;
+    filter: none;
+  }
+}
+
 .hero-subline {
   font-size: clamp(1.15rem, 2vw, 1.4rem);
   font-weight: 500;
@@ -831,7 +862,8 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 44px;
+  height: 52px;
+  min-width: 130px;
   padding: 0.6rem 1.5rem;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
@@ -847,6 +879,21 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   transition: border-color 0.25s, color 0.25s;
 }
 .marquee-logo:hover { border-color: var(--line-strong); color: var(--text); }
+
+.marquee-logo img {
+  display: block;
+  max-height: 28px;
+  max-width: 140px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.marquee-logo--empty {
+  min-width: auto;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+}
 
 /* Reduced motion: static grid */
 @media (prefers-reduced-motion: reduce) {

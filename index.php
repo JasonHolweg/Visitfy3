@@ -33,6 +33,14 @@ require __DIR__ . '/partials/header.php';
 $toursJson = file_get_contents(__DIR__ . '/assets/data/tours.json');
 $tours     = $toursJson ? json_decode($toursJson, true) : [];
 if (!is_array($tours)) $tours = [];
+
+/* Load client logos for marquee */
+$clientLogoFiles = glob(__DIR__ . '/assets/img/client-logos/*.{png,jpg,jpeg,webp,avif,svg}', GLOB_BRACE);
+if (!is_array($clientLogoFiles)) {
+  $clientLogoFiles = [];
+}
+natsort($clientLogoFiles);
+$clientLogoFiles = array_values($clientLogoFiles);
 ?>
 
 <!-- ══════════════════════════════════════════════════════════
@@ -61,8 +69,10 @@ if (!is_array($tours)) $tours = [];
     <div class="container hero-content">
       <div class="hero-panel fade-up">
         <p class="hero-eyebrow">360° Rundgänge für moderne Unternehmen</p>
-        <h1 id="hero-heading">MEHR SICHTBARKEIT.<br>MEHR VERTRAUEN.<br>MEHR ANFRAGEN.</h1>
-        <p class="hero-subline">Mehr Sichtbarkeit. Mehr Vertrauen. Mehr Anfragen.</p>
+        <h1 id="hero-heading" class="hero-rotating-text" aria-label="MEHR SICHTBARKEIT. MEHR VERTRAUEN. MEHR ANFRAGEN.">
+          <span class="hero-rotating-prefix">MEHR</span><br>
+          <span class="hero-rotating-word" data-hero-rotate-word>SICHTBARKEIT.</span>
+        </h1>
         <p class="hero-desc">
           Visitfy entwickelt hochwertige 360° Erlebnisse für Unternehmen jeder Branche –
           realistisch, hochwertig und sofort einsatzbereit für Website und Google&nbsp;Business.
@@ -222,24 +232,26 @@ if (!is_array($tours)) $tours = [];
     <p class="marquee-label">Vertrauen von führenden Unternehmen</p>
     <div class="marquee-track-wrap">
       <div class="marquee-track" aria-hidden="true">
-        <!-- Logos (placeholders – replace with real client logos) -->
-        <span class="marquee-logo">Flora Kaffee &amp; Eisbar</span>
-        <span class="marquee-logo">Danbo Flensburg</span>
-        <span class="marquee-logo">Buddha Lounge</span>
-        <span class="marquee-logo">Musterhotel GmbH</span>
-        <span class="marquee-logo">City Immobilien</span>
-        <span class="marquee-logo">Flensburg Fitness</span>
-        <span class="marquee-logo">Praxis Dr. Müller</span>
-        <span class="marquee-logo">Showroom Nord</span>
-        <!-- Duplicated for seamless loop – also cloned by JS -->
-        <span class="marquee-logo">Flora Kaffee &amp; Eisbar</span>
-        <span class="marquee-logo">Danbo Flensburg</span>
-        <span class="marquee-logo">Buddha Lounge</span>
-        <span class="marquee-logo">Musterhotel GmbH</span>
-        <span class="marquee-logo">City Immobilien</span>
-        <span class="marquee-logo">Flensburg Fitness</span>
-        <span class="marquee-logo">Praxis Dr. Müller</span>
-        <span class="marquee-logo">Showroom Nord</span>
+<?php if ($clientLogoFiles): ?>
+<?php foreach ($clientLogoFiles as $logoPath):
+  $fileName = basename($logoPath);
+  $baseName = pathinfo($fileName, PATHINFO_FILENAME);
+  $prettyName = preg_replace('/[-_]+/', ' ', $baseName);
+  $prettyName = preg_replace('/\s+/', ' ', (string)$prettyName);
+  $prettyName = trim((string)$prettyName);
+  $altText = $prettyName !== '' ? $prettyName : 'Kundenlogo';
+  $logoSrc = 'assets/img/client-logos/' . rawurlencode($fileName);
+?>
+        <span class="marquee-logo" title="<?= htmlspecialchars($altText, ENT_QUOTES, 'UTF-8') ?>">
+          <img src="<?= htmlspecialchars($logoSrc, ENT_QUOTES, 'UTF-8') ?>"
+               alt="<?= htmlspecialchars($altText, ENT_QUOTES, 'UTF-8') ?>"
+               loading="lazy"
+               decoding="async">
+        </span>
+<?php endforeach; ?>
+<?php else: ?>
+        <span class="marquee-logo marquee-logo--empty">Keine Kundenlogos im Ordner assets/img/client-logos</span>
+<?php endif; ?>
       </div>
     </div>
   </section>
