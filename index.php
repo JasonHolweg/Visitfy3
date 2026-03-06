@@ -24,8 +24,12 @@ if ($page !== '' && isset($allowed[$page])) {
 
 /* ── Homepage ────────────────────────────────────────────── */
 $root      = '';
-$pageTitle = 'Visitfy | 360° Rundgänge für moderne Unternehmen';
-$pageDesc  = 'Visitfy entwickelt professionelle 360° virtuelle Rundgänge für Unternehmen jeder Branche – realistisch, hochwertig und sofort einsatzbereit für Website und Google Business.';
+require __DIR__ . '/partials/cms.php';
+
+$contentConfig = visitfy_load_json(__DIR__ . '/assets/data/content.json', []);
+
+$pageTitle = (string)visitfy_get($contentConfig, 'seo.home_title', 'Visitfy | 360° Rundgänge für moderne Unternehmen');
+$pageDesc  = (string)visitfy_get($contentConfig, 'seo.home_desc', 'Visitfy entwickelt professionelle 360° virtuelle Rundgänge für Unternehmen jeder Branche – realistisch, hochwertig und sofort einsatzbereit für Website und Google Business.');
 
 require __DIR__ . '/partials/head.php';
 require __DIR__ . '/partials/header.php';
@@ -47,6 +51,47 @@ $marqueeLogoFiles = $clientLogoFiles;
 if (count($clientLogoFiles) > 0 && count($clientLogoFiles) < 10) {
   $marqueeLogoFiles = array_merge($clientLogoFiles, $clientLogoFiles);
 }
+
+$heroWords = visitfy_get($contentConfig, 'hero.rotating_words', ['SICHTBARKEIT.', 'VERTRAUEN.', 'ANFRAGEN.']);
+if (!is_array($heroWords) || !$heroWords) {
+  $heroWords = ['SICHTBARKEIT.', 'VERTRAUEN.', 'ANFRAGEN.'];
+}
+$heroWords = array_values(array_map(static fn($v) => trim((string)$v), $heroWords));
+$heroWords = array_values(array_filter($heroWords, static fn($v) => $v !== ''));
+if (!$heroWords) {
+  $heroWords = ['SICHTBARKEIT.', 'VERTRAUEN.', 'ANFRAGEN.'];
+}
+
+$kpiItems = visitfy_get($contentConfig, 'kpi.items', []);
+if (!is_array($kpiItems) || !$kpiItems) {
+  $kpiItems = [
+    ['target' => '40', 'suffix' => '%', 'label' => '+ längere Verweildauer auf Ihrer Website'],
+    ['target' => '5', 'suffix' => ' Tage', 'label' => 'Ø bis Ihr Rundgang live geht'],
+    ['target' => '420', 'suffix' => '+', 'label' => 'umgesetzte Rundgänge'],
+    ['target' => '98', 'suffix' => '%', 'label' => 'zufriedene Kunden'],
+  ];
+}
+
+$aboutFeatureItems = visitfy_get($contentConfig, 'about.features', []);
+if (!is_array($aboutFeatureItems) || !$aboutFeatureItems) {
+  $aboutFeatureItems = [
+    'Emotionale Resonanz – Rundgänge, die berühren',
+    'Visuelle Perfektion – Details, die überzeugen',
+    'Individuelle Ästhetik – Ihr Stil, nicht unser Template',
+    'Strategische Flexibilität – passt zu jeder Branche',
+    'Signifikante Reichweite – Google, Web, Social, VR',
+  ];
+}
+
+$aboutPerfectionItems = visitfy_get($contentConfig, 'about.perfection_points', []);
+if (!is_array($aboutPerfectionItems) || !$aboutPerfectionItems) {
+  $aboutPerfectionItems = [
+    'Expertise, die beeindruckt',
+    'Qualität ohne Kompromisse',
+    'Beratung auf höchstem Niveau',
+    'Schnelle Umsetzung – Ø 5 Tage bis live',
+  ];
+}
 ?>
 
 <!-- ══════════════════════════════════════════════════════════
@@ -56,10 +101,10 @@ if (count($clientLogoFiles) > 0 && count($clientLogoFiles) < 10) {
   <canvas id="intro-canvas"></canvas>
   <div id="intro-text">
     <img src="assets/img/visitfy-logo.svg" alt="Visitfy" class="intro-logo-mark">
-    <p>360° Rundgänge die begeistern</p>
-    <p class="scroll-hint">Klicken zum Fortfahren</p>
+    <p><?= htmlspecialchars((string)visitfy_get($contentConfig, 'intro.tagline', '360° Rundgänge die begeistern'), ENT_QUOTES, 'UTF-8') ?></p>
+    <p class="scroll-hint"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'intro.hint', 'Klicken zum Fortfahren'), ENT_QUOTES, 'UTF-8') ?></p>
   </div>
-  <button id="skip-btn" type="button">Überspringen ↓</button>
+  <button id="skip-btn" type="button"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'intro.skip_button', 'Überspringen ↓'), ENT_QUOTES, 'UTF-8') ?></button>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════
@@ -74,18 +119,17 @@ if (count($clientLogoFiles) > 0 && count($clientLogoFiles) < 10) {
 
     <div class="container hero-content">
       <div class="hero-panel fade-up">
-        <p class="hero-eyebrow">360° Rundgänge für moderne Unternehmen</p>
-        <h1 id="hero-heading" class="hero-rotating-text" aria-label="MEHR SICHTBARKEIT. MEHR VERTRAUEN. MEHR ANFRAGEN.">
-          <span class="hero-rotating-prefix">MEHR</span><br>
-          <span class="hero-rotating-word" data-hero-rotate-word>SICHTBARKEIT.</span>
+        <p class="hero-eyebrow"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.eyebrow', '360° Rundgänge für moderne Unternehmen'), ENT_QUOTES, 'UTF-8') ?></p>
+        <h1 id="hero-heading" class="hero-rotating-text" aria-label="<?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.prefix', 'MEHR') . ' ' . implode(' ', $heroWords), ENT_QUOTES, 'UTF-8') ?>">
+          <span class="hero-rotating-prefix"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.prefix', 'MEHR'), ENT_QUOTES, 'UTF-8') ?></span><br>
+          <span class="hero-rotating-word" data-hero-rotate-word><?= htmlspecialchars((string)($heroWords[0] ?? 'SICHTBARKEIT.'), ENT_QUOTES, 'UTF-8') ?></span>
         </h1>
         <p class="hero-desc">
-          Visitfy entwickelt hochwertige 360° Erlebnisse für Unternehmen jeder Branche –
-          realistisch, hochwertig und sofort einsatzbereit für Website und Google&nbsp;Business.
+          <?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.desc', 'Visitfy entwickelt hochwertige 360° Erlebnisse für Unternehmen jeder Branche – realistisch, hochwertig und sofort einsatzbereit für Website und Google Business.'), ENT_QUOTES, 'UTF-8') ?>
         </p>
         <div class="hero-actions">
-          <a href="pages/kontakt.php" class="btn btn-primary">Beratung anfragen</a>
-          <a href="#tours" class="btn btn-secondary">Unsere Ergebnisse</a>
+          <a href="<?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.button_primary_link', 'pages/kontakt.php'), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-primary js-btnfx-hero-primary"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.button_primary_text', 'Beratung anfragen'), ENT_QUOTES, 'UTF-8') ?></a>
+          <a href="<?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.button_secondary_link', '#tours'), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-secondary js-btnfx-hero-secondary"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.button_secondary_text', 'Unsere Ergebnisse'), ENT_QUOTES, 'UTF-8') ?></a>
         </div>
       </div>
     </div>
@@ -97,26 +141,21 @@ if (count($clientLogoFiles) > 0 && count($clientLogoFiles) < 10) {
   <!-- ══ 2) KPI / COUNT-UP ══════════════════════════════════ -->
   <section class="section kpi-section" id="kpi" aria-labelledby="kpi-heading">
     <div class="container">
-      <p class="section-eyebrow fade-up">Messbare Ergebnisse</p>
-      <h2 class="section-title fade-up delay-1" id="kpi-heading">Zahlen, die überzeugen</h2>
+      <p class="section-eyebrow fade-up"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'kpi.eyebrow', 'Messbare Ergebnisse'), ENT_QUOTES, 'UTF-8') ?></p>
+      <h2 class="section-title fade-up delay-1" id="kpi-heading"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'kpi.title', 'Zahlen, die überzeugen'), ENT_QUOTES, 'UTF-8') ?></h2>
 
       <div class="kpi-grid">
-        <div class="kpi-card glass fade-up delay-1">
-          <div class="kpi-number" data-countup data-target="40" data-suffix="%">0%</div>
-          <div class="kpi-label">+ längere Verweildauer auf Ihrer Website</div>
+<?php foreach ($kpiItems as $i => $kpi):
+  $delayClass = 'delay-' . (($i % 4) + 1);
+  $target = (string)($kpi['target'] ?? '0');
+  $suffix = (string)($kpi['suffix'] ?? '');
+  $label = (string)($kpi['label'] ?? '');
+?>
+        <div class="kpi-card glass fade-up <?= htmlspecialchars($delayClass, ENT_QUOTES, 'UTF-8') ?>">
+          <div class="kpi-number" data-countup data-target="<?= htmlspecialchars($target, ENT_QUOTES, 'UTF-8') ?>" data-suffix="<?= htmlspecialchars($suffix, ENT_QUOTES, 'UTF-8') ?>">0<?= htmlspecialchars($suffix, ENT_QUOTES, 'UTF-8') ?></div>
+          <div class="kpi-label"><?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?></div>
         </div>
-        <div class="kpi-card glass fade-up delay-2">
-          <div class="kpi-number" data-countup data-target="5" data-suffix=" Tage">0 Tage</div>
-          <div class="kpi-label">Ø bis Ihr Rundgang live geht</div>
-        </div>
-        <div class="kpi-card glass fade-up delay-3">
-          <div class="kpi-number" data-countup data-target="420" data-suffix="+">0+</div>
-          <div class="kpi-label">umgesetzte Rundgänge</div>
-        </div>
-        <div class="kpi-card glass fade-up delay-4">
-          <div class="kpi-number" data-countup data-target="98" data-suffix="%">0%</div>
-          <div class="kpi-label">zufriedene Kunden</div>
-        </div>
+<?php endforeach; ?>
       </div>
     </div>
   </section>
@@ -237,7 +276,7 @@ if (count($clientLogoFiles) > 0 && count($clientLogoFiles) < 10) {
 
   <!-- ══ 5) LOGO MARQUEE ════════════════════════════════════ -->
   <section class="marquee-section" aria-label="Unsere Kunden">
-    <p class="marquee-label">Vertrauen von führenden Unternehmen</p>
+    <p class="marquee-label"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'marquee.label', 'Vertrauen von führenden Unternehmen'), ENT_QUOTES, 'UTF-8') ?></p>
     <div class="marquee-track-wrap">
       <div class="marquee-track" aria-hidden="true">
 <?php if ($marqueeLogoFiles): ?>
@@ -364,54 +403,47 @@ if (count($clientLogoFiles) > 0 && count($clientLogoFiles) < 10) {
   <!-- ══ 8) ÜBER VISITFY + DER VISITFY-UNTERSCHIED ══════════ -->
   <section class="section" id="ueber" aria-labelledby="about-heading">
     <div class="container">
-      <p class="section-eyebrow fade-up">Über uns</p>
-      <h2 class="section-title fade-up delay-1" id="about-heading">Über Visitfy</h2>
+      <p class="section-eyebrow fade-up"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.eyebrow', 'Über uns'), ENT_QUOTES, 'UTF-8') ?></p>
+      <h2 class="section-title fade-up delay-1" id="about-heading"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.title', 'Über Visitfy'), ENT_QUOTES, 'UTF-8') ?></h2>
 
       <div class="about-grid">
         <div class="about-text fade-up delay-2">
           <p>
-            Visitfy ist ein spezialisierter Anbieter für professionelle 360° virtuelle Rundgänge.
-            Wir unterstützen Unternehmen jeder Branche dabei, ihre Location digital erlebbar zu machen –
-            von der ersten Planung bis zur nahtlosen Integration in Website und Google&nbsp;Business.
+            <?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.paragraph_1', ''), ENT_QUOTES, 'UTF-8') ?>
           </p>
           <p>
-            Unsere Rundgänge sind mehr als Panoramas: Sie sind durchdachte, emotional wirkungsvolle
-            Erlebnisse, die Vertrauen aufbauen und qualifizierte Anfragen generieren.
-            Jedes Projekt entsteht mit dem Anspruch, die einzigartige Atmosphäre Ihrer Location
-            so authentisch wie möglich einzufangen.
+            <?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.paragraph_2', ''), ENT_QUOTES, 'UTF-8') ?>
           </p>
           <p>
-            Mit über 420 abgeschlossenen Projekten und einem Team, das Gastro-, Immobilien- und
-            Tech-Know-how vereint, stehen wir für Qualität, Schnelligkeit und echten Mehrwert.
+            <?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.paragraph_3', ''), ENT_QUOTES, 'UTF-8') ?>
           </p>
         </div>
 
         <div class="fade-up delay-3">
           <div class="glass" style="padding:2rem;border-radius:var(--radius);margin-bottom:2rem">
             <h3 style="font-size:1.2rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:1.5rem;line-height:1.2">
-              Der Visitfy-Unterschied:<br>Erleben statt nur sehen.
+<?php foreach (visitfy_split_lines((string)visitfy_get($contentConfig, 'about.difference_title', 'Der Visitfy-Unterschied:\nErleben statt nur sehen.')) as $line): ?>
+              <?= htmlspecialchars($line, ENT_QUOTES, 'UTF-8') ?><br>
+<?php endforeach; ?>
             </h3>
 
             <div class="about-features">
-              <h3>Was uns auszeichnet</h3>
+              <h3><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.features_title', 'Was uns auszeichnet'), ENT_QUOTES, 'UTF-8') ?></h3>
               <ul>
-                <li>Emotionale Resonanz – Rundgänge, die berühren</li>
-                <li>Visuelle Perfektion – Details, die überzeugen</li>
-                <li>Individuelle Ästhetik – Ihr Stil, nicht unser Template</li>
-                <li>Strategische Flexibilität – passt zu jeder Branche</li>
-                <li>Signifikante Reichweite – Google, Web, Social, VR</li>
+<?php foreach ($aboutFeatureItems as $feature): ?>
+                <li><?= htmlspecialchars((string)$feature, ENT_QUOTES, 'UTF-8') ?></li>
+<?php endforeach; ?>
               </ul>
             </div>
           </div>
 
           <div class="glass" style="padding:2rem;border-radius:var(--radius)">
             <div class="about-features">
-              <h3>Perfektion in jedem Detail</h3>
+              <h3><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.perfection_title', 'Perfektion in jedem Detail'), ENT_QUOTES, 'UTF-8') ?></h3>
               <ul>
-                <li>Expertise, die beeindruckt</li>
-                <li>Qualität ohne Kompromisse</li>
-                <li>Beratung auf höchstem Niveau</li>
-                <li>Schnelle Umsetzung – Ø 5 Tage bis live</li>
+<?php foreach ($aboutPerfectionItems as $point): ?>
+                <li><?= htmlspecialchars((string)$point, ENT_QUOTES, 'UTF-8') ?></li>
+<?php endforeach; ?>
               </ul>
             </div>
           </div>
@@ -426,15 +458,16 @@ if (count($clientLogoFiles) > 0 && count($clientLogoFiles) < 10) {
     <div class="container">
       <div class="cta-inner fade-up">
         <h2 id="cta-heading">
-          Bereit, Ihre Location<br>digital erlebbar zu machen?
+<?php foreach (visitfy_split_lines((string)visitfy_get($contentConfig, 'final_cta.title', 'Bereit, Ihre Location\ndigital erlebbar zu machen?')) as $line): ?>
+          <?= htmlspecialchars($line, ENT_QUOTES, 'UTF-8') ?><br>
+<?php endforeach; ?>
         </h2>
         <p>
-          Wir erstellen Ihnen ein klares Angebot mit Zeitplan und transparenten Kosten –
-          kostenlos, unverbindlich und persönlich.
+          <?= htmlspecialchars((string)visitfy_get($contentConfig, 'final_cta.text', ''), ENT_QUOTES, 'UTF-8') ?>
         </p>
         <div class="cta-actions">
-          <a href="pages/kontakt.php" class="btn btn-primary">Angebot anfragen</a>
-          <a href="pages/faq.php" class="btn btn-secondary">Häufige Fragen</a>
+          <a href="<?= htmlspecialchars((string)visitfy_get($contentConfig, 'final_cta.button_primary_link', 'pages/kontakt.php'), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-primary js-btnfx-cta-primary"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'final_cta.button_primary_text', 'Angebot anfragen'), ENT_QUOTES, 'UTF-8') ?></a>
+          <a href="<?= htmlspecialchars((string)visitfy_get($contentConfig, 'final_cta.button_secondary_link', 'pages/faq.php'), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-secondary js-btnfx-cta-secondary"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'final_cta.button_secondary_text', 'Häufige Fragen'), ENT_QUOTES, 'UTF-8') ?></a>
         </div>
       </div>
     </div>

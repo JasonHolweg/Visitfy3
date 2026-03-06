@@ -13,6 +13,8 @@
 (function () {
   'use strict';
 
+  const scriptCfg = (window.VISITFY_SCRIPT_CONFIG && window.VISITFY_SCRIPT_CONFIG.main) || {};
+
   /* ── Reduced-motion flag ────────────────────────────────── */
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -31,12 +33,12 @@
     let W, H, dpr, particles, animFrame;
 
     /* Config */
-    const PARTICLE_COUNT    = 500;
-    const MAX_SPEED         = 0.45;
-    const MAX_LINE_DIST     = 90;
+    const PARTICLE_COUNT    = Number(scriptCfg.particle_count ?? 500);
+    const MAX_SPEED         = Number(scriptCfg.particle_max_speed ?? 0.45);
+    const MAX_LINE_DIST     = Number(scriptCfg.particle_max_line_dist ?? 90);
     const MAX_LINE_DIST_SQ  = MAX_LINE_DIST * MAX_LINE_DIST;
-    const MOUSE_RADIUS      = 120;
-    const MOUSE_FORCE       = 0.012;
+    const MOUSE_RADIUS      = Number(scriptCfg.particle_mouse_radius ?? 120);
+    const MOUSE_FORCE       = Number(scriptCfg.particle_mouse_force ?? 0.012);
 
     let mouse = { x: -9999, y: -9999 };
 
@@ -259,10 +261,11 @@
     const wordEl = document.querySelector('[data-hero-rotate-word]');
     if (!wordEl) return;
 
-    const words = ['SICHTBARKEIT.', 'VERTRAUEN.', 'ANFRAGEN.'];
+    const cfgWords = Array.isArray(scriptCfg.hero_words) ? scriptCfg.hero_words.map(v => String(v || '').trim()).filter(Boolean) : [];
+    const words = cfgWords.length ? cfgWords : ['SICHTBARKEIT.', 'VERTRAUEN.', 'ANFRAGEN.'];
     let index = 0;
-    const fadeDuration = 420;
-    const holdDuration = 1900;
+    const fadeDuration = Number(scriptCfg.hero_fade_duration ?? 420);
+    const holdDuration = Number(scriptCfg.hero_hold_duration ?? 1900);
 
     if (prefersReduced) {
       wordEl.textContent = words[0];
@@ -316,7 +319,7 @@
     const prefix = el.getAttribute('data-prefix') || '';
     /* Extract numeric part */
     const num  = parseFloat(raw.replace(/[^0-9.]/g, ''));
-    const dur  = 1800; /* ms */
+    const dur  = Number(scriptCfg.countup_duration ?? 1800); /* ms */
     const start = performance.now();
 
     function tick(now) {
@@ -355,8 +358,8 @@
     if (!items.length) return;
 
     /* Config (matching the CSS vars) */
-    const ROTATION_AMOUNT = 0.5; /* deg */
-    const ITEM_STACK_DIST = 15;  /* px, vertical offset per stacked card */
+    const ROTATION_AMOUNT = Number(scriptCfg.stack_rotation_amount ?? 0.5); /* deg */
+    const ITEM_STACK_DIST = Number(scriptCfg.stack_item_stack_dist ?? 15);  /* px, vertical offset per stacked card */
 
     if (!prefersReduced) {
       /* Apply subtle rotation + offset as cards stack */

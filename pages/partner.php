@@ -142,7 +142,7 @@ require __DIR__ . '/../partials/header.php';
               </label>
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width:100%">Partner-Anfrage absenden</button>
+            <button type="submit" class="btn btn-primary js-btnfx-partner" style="width:100%">Partner-Anfrage absenden</button>
             <div class="form-status" role="alert"></div>
           </form>
         </div>

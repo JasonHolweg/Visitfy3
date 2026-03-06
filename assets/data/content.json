@@ -1,0 +1,102 @@
+{
+  "seo": {
+    "home_title": "Visitfy | 360° Rundgänge für moderne Unternehmen",
+    "home_desc": "Visitfy entwickelt professionelle 360° virtuelle Rundgänge für Unternehmen jeder Branche – realistisch, hochwertig und sofort einsatzbereit für Website und Google Business."
+  },
+  "intro": {
+    "tagline": "360° Rundgänge die begeistern",
+    "hint": "Klicken zum Fortfahren",
+    "skip_button": "Überspringen ↓"
+  },
+  "hero": {
+    "eyebrow": "360° Rundgänge für moderne Unternehmen",
+    "prefix": "MEHR",
+    "rotating_words": [
+      "SICHTBARKEIT.",
+      "VERTRAUEN.",
+      "ANFRAGEN."
+    ],
+    "desc": "Visitfy entwickelt hochwertige 360° Erlebnisse für Unternehmen jeder Branche – realistisch, hochwertig und sofort einsatzbereit für Website und Google Business.",
+    "button_primary_text": "Beratung anfragen",
+    "button_primary_link": "pages/kontakt.php",
+    "button_secondary_text": "Unsere Ergebnisse",
+    "button_secondary_link": "#tours"
+  },
+  "kpi": {
+    "eyebrow": "Messbare Ergebnisse",
+    "title": "Zahlen, die überzeugen",
+    "items": [
+      {
+        "target": "40",
+        "suffix": "%",
+        "label": "+ längere Verweildauer auf Ihrer Website"
+      },
+      {
+        "target": "5",
+        "suffix": " Tage",
+        "label": "Ø bis Ihr Rundgang live geht"
+      },
+      {
+        "target": "420",
+        "suffix": "+",
+        "label": "umgesetzte Rundgänge"
+      },
+      {
+        "target": "98",
+        "suffix": "%",
+        "label": "zufriedene Kunden"
+      }
+    ]
+  },
+  "marquee": {
+    "label": "Vertrauen von führenden Unternehmen"
+  },
+  "about": {
+    "eyebrow": "Über uns",
+    "title": "Über Visitfy",
+    "paragraph_1": "Visitfy ist ein spezialisierter Anbieter für professionelle 360° virtuelle Rundgänge. Wir unterstützen Unternehmen jeder Branche dabei, ihre Location digital erlebbar zu machen – von der ersten Planung bis zur nahtlosen Integration in Website und Google Business.",
+    "paragraph_2": "Unsere Rundgänge sind mehr als Panoramas: Sie sind durchdachte, emotional wirkungsvolle Erlebnisse, die Vertrauen aufbauen und qualifizierte Anfragen generieren. Jedes Projekt entsteht mit dem Anspruch, die einzigartige Atmosphäre Ihrer Location so authentisch wie möglich einzufangen.",
+    "paragraph_3": "Mit über 420 abgeschlossenen Projekten und einem Team, das Gastro-, Immobilien- und Tech-Know-how vereint, stehen wir für Qualität, Schnelligkeit und echten Mehrwert.",
+    "difference_title": "Der Visitfy-Unterschied:\nErleben statt nur sehen.",
+    "features_title": "Was uns auszeichnet",
+    "features": [
+      "Emotionale Resonanz – Rundgänge, die berühren",
+      "Visuelle Perfektion – Details, die überzeugen",
+      "Individuelle Ästhetik – Ihr Stil, nicht unser Template",
+      "Strategische Flexibilität – passt zu jeder Branche",
+      "Signifikante Reichweite – Google, Web, Social, VR"
+    ],
+    "perfection_title": "Perfektion in jedem Detail",
+    "perfection_points": [
+      "Expertise, die beeindruckt",
+      "Qualität ohne Kompromisse",
+      "Beratung auf höchstem Niveau",
+      "Schnelle Umsetzung – Ø 5 Tage bis live"
+    ]
+  },
+  "team": {
+    "kristian_name": "Kristian Meister",
+    "kristian_role": "Geschäftsführer",
+    "kristian_text": "Kristian führt Visitfy mit klarem Fokus auf Qualität, Verlässlichkeit und messbare Ergebnisse. Er begleitet Projekte strategisch von der ersten Anfrage bis zur erfolgreichen Live-Schaltung.",
+    "jason_name": "Jason Holweg",
+    "jason_role": "Entwickler",
+    "jason_text": "Jason entwickelt die technischen Grundlagen und sorgt dafür, dass die digitalen Erlebnisse performant, modern und nahtlos integrierbar sind.",
+    "jason_link_text": "jasonholweg.de",
+    "jason_link_url": "https://jasonholweg.de"
+  },
+  "final_cta": {
+    "title": "Bereit, Ihre Location\ndigital erlebbar zu machen?",
+    "text": "Wir erstellen Ihnen ein klares Angebot mit Zeitplan und transparenten Kosten – kostenlos, unverbindlich und persönlich.",
+    "button_primary_text": "Angebot anfragen",
+    "button_primary_link": "pages/kontakt.php",
+    "button_secondary_text": "Häufige Fragen",
+    "button_secondary_link": "pages/faq.php"
+  },
+  "footer": {
+    "brand_text": "Ihre Location. Virtuell erlebt.\n360° Rundgänge, die Vertrauen schaffen.",
+    "contact_email": "info@visitfy.de",
+    "website_by_prefix": "Webseite von",
+    "website_by_name": "Jason Holweg",
+    "website_by_url": "https://jasonholweg.de"
+  }
+}

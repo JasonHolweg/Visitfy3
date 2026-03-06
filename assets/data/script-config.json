@@ -1,0 +1,26 @@
+{
+  "intro": {
+    "text_delay": 200,
+    "intro_hold": 1500,
+    "fade_out_duration": 1100,
+    "show_text_delay": 120,
+    "skip_click_delay": 300
+  },
+  "main": {
+    "particle_count": 500,
+    "particle_max_speed": 0.45,
+    "particle_max_line_dist": 90,
+    "particle_mouse_radius": 120,
+    "particle_mouse_force": 0.012,
+    "hero_words": [
+      "SICHTBARKEIT.",
+      "VERTRAUEN.",
+      "ANFRAGEN."
+    ],
+    "hero_fade_duration": 420,
+    "hero_hold_duration": 1900,
+    "countup_duration": 1800,
+    "stack_rotation_amount": 0.5,
+    "stack_item_stack_dist": 15
+  }
+}

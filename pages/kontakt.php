@@ -183,7 +183,7 @@ require __DIR__ . '/../partials/header.php';
               </label>
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width:100%">Anfrage absenden</button>
+            <button type="submit" class="btn btn-primary js-btnfx-kontakt" style="width:100%">Anfrage absenden</button>
           </form>
         </div>
 

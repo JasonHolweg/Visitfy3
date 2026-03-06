@@ -6,13 +6,17 @@
 (function () {
   'use strict';
 
+  const scriptCfg = (window.VISITFY_SCRIPT_CONFIG && window.VISITFY_SCRIPT_CONFIG.intro) || {};
+
   /* ── Config ─────────────────────────────────────────────── */
   const LOGO_SRC          = 'assets/img/visitfy-logo.svg';
   const ASSEMBLE_DURATION = 2200;
   const SHINE_DURATION    = 800;
-  const TEXT_DELAY        = 200;
-  const INTRO_HOLD        = 1500;
-  const FADE_OUT_DURATION = 1100;
+  const TEXT_DELAY        = Number(scriptCfg.text_delay ?? 200);
+  const INTRO_HOLD        = Number(scriptCfg.intro_hold ?? 1500);
+  const FADE_OUT_DURATION = Number(scriptCfg.fade_out_duration ?? 1100);
+  const SHOW_TEXT_DELAY   = Number(scriptCfg.show_text_delay ?? 120);
+  const SKIP_CLICK_DELAY  = Number(scriptCfg.skip_click_delay ?? 300);
 
   const FRAG_COLS = 22;
   const FRAG_ROWS = 18;
@@ -37,7 +41,7 @@
     window.addEventListener('resize', resize);
 
     // Skip long assembly animation and show the short logo/text intro only.
-    setTimeout(showText, 120);
+    setTimeout(showText, SHOW_TEXT_DELAY);
 
     // Skip button
     var skipBtn = document.getElementById('skip-btn');
@@ -50,7 +54,7 @@
       document.getElementById('intro').addEventListener('click', function (e) {
         if (e.target.id !== 'skip-btn') skip();
       }, { once: true });
-    }, 300);
+    }, SKIP_CLICK_DELAY);
   }
 
   function resize() {
