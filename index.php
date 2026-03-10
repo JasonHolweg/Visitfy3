@@ -23,8 +23,8 @@ if ($page !== '' && isset($allowed[$page])) {
 }
 
 /* ── Homepage ────────────────────────────────────────────── */
-$root      = '';
 require __DIR__ . '/partials/cms.php';
+$root      = visitfy_base_path();
 
 $contentConfig = visitfy_load_json(__DIR__ . '/assets/data/content.json', []);
 
@@ -100,7 +100,7 @@ if (!is_array($aboutPerfectionItems) || !$aboutPerfectionItems) {
 <div id="intro" role="presentation" aria-hidden="true">
   <canvas id="intro-canvas"></canvas>
   <div id="intro-text">
-    <img src="assets/img/visitfy-logo.svg" alt="Visitfy" class="intro-logo-mark">
+    <img src="<?= htmlspecialchars(visitfy_url('assets/img/visitfy-logo.svg'), ENT_QUOTES, 'UTF-8') ?>" alt="Visitfy" class="intro-logo-mark">
     <p><?= htmlspecialchars((string)visitfy_get($contentConfig, 'intro.tagline', '360° Rundgänge die begeistern'), ENT_QUOTES, 'UTF-8') ?></p>
     <p class="scroll-hint"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'intro.hint', 'Klicken zum Fortfahren'), ENT_QUOTES, 'UTF-8') ?></p>
   </div>
@@ -128,8 +128,8 @@ if (!is_array($aboutPerfectionItems) || !$aboutPerfectionItems) {
           <?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.desc', 'Visitfy entwickelt hochwertige 360° Erlebnisse für Unternehmen jeder Branche – realistisch, hochwertig und sofort einsatzbereit für Website und Google Business.'), ENT_QUOTES, 'UTF-8') ?>
         </p>
         <div class="hero-actions">
-          <a href="<?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.button_primary_link', 'pages/kontakt.php'), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-primary js-btnfx-hero-primary"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.button_primary_text', 'Beratung anfragen'), ENT_QUOTES, 'UTF-8') ?></a>
-          <a href="<?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.button_secondary_link', '#tours'), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-secondary js-btnfx-hero-secondary"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.button_secondary_text', 'Unsere Ergebnisse'), ENT_QUOTES, 'UTF-8') ?></a>
+          <a href="<?= htmlspecialchars(visitfy_url((string)visitfy_get($contentConfig, 'hero.button_primary_link', 'pages/kontakt.php')), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-primary js-btnfx-hero-primary"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.button_primary_text', 'Beratung anfragen'), ENT_QUOTES, 'UTF-8') ?></a>
+          <a href="<?= htmlspecialchars(visitfy_url((string)visitfy_get($contentConfig, 'hero.button_secondary_link', '#tours')), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-secondary js-btnfx-hero-secondary"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.button_secondary_text', 'Unsere Ergebnisse'), ENT_QUOTES, 'UTF-8') ?></a>
         </div>
       </div>
     </div>
@@ -287,7 +287,7 @@ if (!is_array($aboutPerfectionItems) || !$aboutPerfectionItems) {
   $prettyName = preg_replace('/\s+/', ' ', (string)$prettyName);
   $prettyName = trim((string)$prettyName);
   $altText = $prettyName !== '' ? $prettyName : 'Kundenlogo';
-  $logoSrc = 'assets/img/client-logos/' . rawurlencode($fileName);
+  $logoSrc = visitfy_url('assets/img/client-logos/' . rawurlencode($fileName));
 ?>
         <span class="marquee-logo" title="<?= htmlspecialchars($altText, ENT_QUOTES, 'UTF-8') ?>">
           <img src="<?= htmlspecialchars($logoSrc, ENT_QUOTES, 'UTF-8') ?>"
@@ -466,8 +466,8 @@ if (!is_array($aboutPerfectionItems) || !$aboutPerfectionItems) {
           <?= htmlspecialchars((string)visitfy_get($contentConfig, 'final_cta.text', ''), ENT_QUOTES, 'UTF-8') ?>
         </p>
         <div class="cta-actions">
-          <a href="<?= htmlspecialchars((string)visitfy_get($contentConfig, 'final_cta.button_primary_link', 'pages/kontakt.php'), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-primary js-btnfx-cta-primary"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'final_cta.button_primary_text', 'Angebot anfragen'), ENT_QUOTES, 'UTF-8') ?></a>
-          <a href="<?= htmlspecialchars((string)visitfy_get($contentConfig, 'final_cta.button_secondary_link', 'pages/faq.php'), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-secondary js-btnfx-cta-secondary"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'final_cta.button_secondary_text', 'Häufige Fragen'), ENT_QUOTES, 'UTF-8') ?></a>
+          <a href="<?= htmlspecialchars(visitfy_url((string)visitfy_get($contentConfig, 'final_cta.button_primary_link', 'pages/kontakt.php')), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-primary js-btnfx-cta-primary"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'final_cta.button_primary_text', 'Angebot anfragen'), ENT_QUOTES, 'UTF-8') ?></a>
+          <a href="<?= htmlspecialchars(visitfy_url((string)visitfy_get($contentConfig, 'final_cta.button_secondary_link', 'pages/faq.php')), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-secondary js-btnfx-cta-secondary"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'final_cta.button_secondary_text', 'Häufige Fragen'), ENT_QUOTES, 'UTF-8') ?></a>
         </div>
       </div>
     </div>

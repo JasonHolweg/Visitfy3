@@ -3,7 +3,8 @@
  * Visitfy3 – pages/faq.php
  * FAQ with Accordion (Vanilla JS)
  */
-$root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? '' : '../';
+require __DIR__ . '/../partials/cms.php';
+$root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? visitfy_base_path() : '../';
 $pageTitle = 'FAQ | Visitfy – 360° Rundgänge';
 $pageDesc  = 'Häufig gestellte Fragen zu 360° virtuellen Rundgängen von Visitfy: Was ist ein Rundgang? Welche Vorteile? Welche Branchen? Was kostet es?';
 
@@ -150,7 +151,7 @@ require __DIR__ . '/../partials/header.php';
 
       <div class="text-center" style="margin-top:4rem">
         <p style="color:var(--text-dim);margin-bottom:1.5rem">Noch Fragen? Wir helfen gerne persönlich weiter.</p>
-        <a href="kontakt.php" class="btn btn-primary">Jetzt Kontakt aufnehmen</a>
+        <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/kontakt.php" class="btn btn-primary">Jetzt Kontakt aufnehmen</a>
       </div>
     </div>
   </section>

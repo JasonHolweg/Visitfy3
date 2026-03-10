@@ -4,7 +4,8 @@
  * Rechtssicherer Impressumsaufbau (§ 5 TMG) ohne falsche Zusicherungen.
  * TODO: Reale Angaben eintragen vor Veröffentlichung.
  */
-$root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? '' : '../';
+require __DIR__ . '/../partials/cms.php';
+$root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? visitfy_base_path() : '../';
 $pageTitle = 'Impressum | Visitfy';
 $pageDesc  = 'Impressum von Visitfy – Angaben gemäß § 5 TMG.';
 

@@ -5,7 +5,8 @@
  * Tracking standardmäßig deaktiviert. Keine Google Fonts (lokal / System-Stack).
  * TODO: Alle Platzhalter vor Veröffentlichung mit realen Angaben befüllen.
  */
-$root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? '' : '../';
+require __DIR__ . '/../partials/cms.php';
+$root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? visitfy_base_path() : '../';
 $pageTitle = 'Datenschutzerklärung | Visitfy';
 $pageDesc  = 'Datenschutzerklärung von Visitfy – Informationen zur Verarbeitung personenbezogener Daten gemäß DSGVO.';
 

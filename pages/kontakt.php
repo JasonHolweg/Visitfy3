@@ -3,7 +3,8 @@
  * Visitfy3 – pages/kontakt.php
  * Contact page with form, server-side validation, honeypot, DSGVO checkbox.
  */
-$root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? '' : '../';
+require __DIR__ . '/../partials/cms.php';
+$root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? visitfy_base_path() : '../';
 $pageTitle = 'Kontakt | Visitfy – 360° Rundgänge anfragen';
 $pageDesc  = 'Kontaktieren Sie Visitfy für ein unverbindliches Angebot für Ihren 360° Rundgang. Nutzen Sie unser Kontaktformular oder schreiben Sie direkt.';
 
@@ -109,7 +110,7 @@ require __DIR__ . '/../partials/header.php';
           </div>
 <?php endif; ?>
 
-          <form method="post" action="kontakt.php" novalidate>
+          <form method="post" action="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/kontakt.php" novalidate>
             <!-- Honeypot -->
             <div class="form-honeypot" aria-hidden="true">
               <label for="hp_website">Website</label>
@@ -178,7 +179,7 @@ require __DIR__ . '/../partials/header.php';
             <div class="form-check">
               <input type="checkbox" id="k_dsgvo" name="dsgvo" required<?= !empty($_POST['dsgvo']) ? ' checked' : '' ?>>
               <label for="k_dsgvo">
-                Ich habe die <a href="datenschutz.php">Datenschutzerklärung</a> gelesen und bin mit der
+                Ich habe die <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/datenschutz.php">Datenschutzerklärung</a> gelesen und bin mit der
                 Verarbeitung meiner Daten zur Bearbeitung meiner Anfrage einverstanden. *
               </label>
             </div>

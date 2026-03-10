@@ -3,7 +3,8 @@
  * Visitfy3 – pages/partner.php
  * Partner-werden Seite
  */
-$root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? '' : '../';
+require __DIR__ . '/../partials/cms.php';
+$root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? visitfy_base_path() : '../';
 $pageTitle = 'Partner werden | Visitfy – 360° Rundgänge';
 $pageDesc  = 'Werden Sie Visitfy-Partner: Agenturen, Fotografen, Locations und Marketingprofis profitieren von unserer 360°-Expertise. Jetzt Partner-Formular ausfüllen.';
 
@@ -93,7 +94,7 @@ require __DIR__ . '/../partials/header.php';
         </p>
 
         <div class="contact-form-box fade-up delay-3">
-          <form method="post" action="partner-handler.php" data-ajax novalidate>
+          <form method="post" action="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/partner-handler.php" data-ajax novalidate>
             <!-- Honeypot -->
             <div class="form-honeypot" aria-hidden="true">
               <label for="hp_website">Website</label>
@@ -137,7 +138,7 @@ require __DIR__ . '/../partials/header.php';
             <div class="form-check">
               <input type="checkbox" id="p_dsgvo" name="dsgvo" required>
               <label for="p_dsgvo">
-                Ich habe die <a href="datenschutz.php">Datenschutzerklärung</a> gelesen und bin mit der
+                Ich habe die <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/datenschutz.php">Datenschutzerklärung</a> gelesen und bin mit der
                 Verarbeitung meiner Daten zur Bearbeitung meiner Anfrage einverstanden. *
               </label>
             </div>

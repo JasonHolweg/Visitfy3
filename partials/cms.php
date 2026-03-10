@@ -41,3 +41,41 @@ if (!function_exists('visitfy_split_lines')) {
         return array_values(array_filter($parts, static fn($v) => $v !== ''));
     }
 }
+
+if (!function_exists('visitfy_base_path')) {
+    function visitfy_base_path(): string
+    {
+        $scriptName = (string)($_SERVER['SCRIPT_NAME'] ?? '');
+        if ($scriptName === '') {
+            return '/';
+        }
+
+        if (substr($scriptName, -9) === '/index.php') {
+            $base = substr($scriptName, 0, -9);
+        } else {
+            $base = rtrim(dirname($scriptName), '/\\');
+        }
+
+        $base = trim((string)$base, '/\\');
+        return $base === '' ? '/' : '/' . $base . '/';
+    }
+}
+
+if (!function_exists('visitfy_url')) {
+    function visitfy_url(string $path = ''): string
+    {
+        if ($path === '') {
+            return visitfy_base_path();
+        }
+
+        if (preg_match('#^(?:https?:)?//#i', $path) || strpos($path, 'mailto:') === 0 || strpos($path, 'tel:') === 0) {
+            return $path;
+        }
+
+        if (strpos($path, '#') === 0) {
+            return $path;
+        }
+
+        return visitfy_base_path() . ltrim($path, '/');
+    }
+}

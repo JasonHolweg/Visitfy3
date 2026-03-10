@@ -3,8 +3,8 @@
  * Visitfy3 – pages/about.php
  * About Us page with JSON-driven content.
  */
-$root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? '' : '../';
 require __DIR__ . '/../partials/cms.php';
+$root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? visitfy_base_path() : '../';
 
 $contentConfig = visitfy_load_json(__DIR__ . '/../assets/data/content.json', []);
 
