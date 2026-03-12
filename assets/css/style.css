@@ -1099,6 +1099,16 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   position: relative;
 }
 
+/* Extends the container's content box so the last sticky card
+   has enough scroll room to fully reach top: 15vh.
+   A pseudo-element avoids margin-collapse issues that occur
+   when using margin-bottom on the last child. */
+.stack-container::after {
+  content: '';
+  display: block;
+  height: 50vh;
+}
+
 .stack-item {
   position: sticky;
   top: 15vh; /* stackPosition = 15% */
@@ -1218,6 +1228,169 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 }
 
 /* ============================================================
+   CARD-SWAP (Alternative Tours Display)
+   Cards stacked on top of each other; top card swaps away on scroll
+   ============================================================ */
+
+/* When cardswap mode is active, hide the stack layout rules */
+.scroll-stack-section[data-tour-mode="cardswap"] .stack-container {
+  display: none;
+}
+
+.cardswap-wrapper {
+  display: none;
+}
+
+.scroll-stack-section[data-tour-mode="cardswap"] .cardswap-wrapper {
+  display: block;
+}
+
+.cardswap-anchor {
+  position: relative;
+  /* Height set by JS: (cardCount - 1) * scrollPerCard + viewport height */
+}
+
+.cardswap-viewport {
+  position: sticky;
+  top: 10vh;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  height: auto;
+  perspective: 1200px;
+}
+
+.cardswap-deck {
+  position: relative;
+  width: 100%;
+}
+
+.cardswap-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  overflow: hidden;
+  transition: transform 0.05s linear, opacity 0.05s linear;
+  will-change: transform, opacity;
+  transform-origin: center top;
+}
+
+/* The first card (static/bottom) sits in flow for height */
+.cardswap-card:first-child {
+  position: relative;
+}
+
+/* Stacked cards get a subtle offset/scale for depth illusion */
+.cardswap-card[data-swap-index="1"] { z-index: 4; }
+.cardswap-card[data-swap-index="2"] { z-index: 3; }
+.cardswap-card[data-swap-index="3"] { z-index: 2; }
+.cardswap-card[data-swap-index="4"] { z-index: 1; }
+
+/* Card inner parts reuse stack-card styles */
+.cardswap-card .stack-card-header,
+.cardswap-card .stack-card-title,
+.cardswap-card .stack-card-tag,
+.cardswap-card .stack-card-desc,
+.cardswap-card .iframe-wrap,
+.cardswap-card .iframe-placeholder,
+.cardswap-card iframe {
+  /* Inherit from existing stack-card rules */
+}
+
+.cardswap-card .stack-card-header {
+  padding: 1.75rem 2rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.cardswap-card .stack-card-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.cardswap-card .stack-card-tag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0.35em 0.9em;
+  border: 1px solid var(--line);
+  border-radius: 50px;
+}
+
+.cardswap-card .stack-card-desc {
+  padding: 0 2rem 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  line-height: 1.65;
+}
+
+.cardswap-card .iframe-wrap {
+  position: relative;
+  padding-top: 56.25%;
+  background: var(--surface-3);
+  border-top: 1px solid var(--line);
+}
+
+.cardswap-card iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Progress dots for cardswap */
+.cardswap-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.cardswap-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line);
+  transition: background 0.3s, transform 0.3s;
+}
+
+.cardswap-dot.active {
+  background: var(--accent, #fff);
+  transform: scale(1.3);
+}
+
+/* Reduced motion for cardswap */
+@media (prefers-reduced-motion: reduce) {
+  .cardswap-card {
+    position: relative !important;
+    transform: none !important;
+    opacity: 1 !important;
+    margin-bottom: var(--gap);
+  }
+  .cardswap-anchor {
+    height: auto !important;
+  }
+  .cardswap-viewport {
+    position: relative;
+    top: auto;
+  }
+}
+
+/* ============================================================
    LOGO MARQUEE
    ============================================================ */
 .marquee-section {
@@ -1251,11 +1424,9 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   animation: marquee-scroll 30s linear infinite;
 }
 
-.marquee-track:hover { animation-play-state: paused; }
-
 @keyframes marquee-scroll {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 .marquee-logo {

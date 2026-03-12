@@ -48,8 +48,189 @@
       }
     ]
   },
+  "mockup": {
+    "desktop_img": "",
+    "tablet_img": "",
+    "phone_img": ""
+  },
+  "mockup_text": {
+    "eyebrow": "So sieht es aus",
+    "title": "Ihr Rundgang – auf jedem Gerät",
+    "sub": "Ob Desktop, Tablet oder Smartphone – Ihr 360° Rundgang sieht überall perfekt aus."
+  },
+  "vergleich": {
+    "eyebrow": "Der Unterschied",
+    "title": "Nur Fotos vs. 360° Rundgang",
+    "sub": "Sehen Sie selbst, wie ein 360° Rundgang Ihre Präsenz verändert.",
+    "badge_negative": "Nur Fotos",
+    "badge_positive": "360° Rundgang",
+    "negative_items": [
+      "Nur begrenzte Perspektive",
+      "Kein Erkundungserlebnis",
+      "Weniger vertrauenswürdig",
+      "Nicht interaktiv"
+    ],
+    "positive_items": [
+      "Freie Rundumsicht",
+      "Interaktives Erleben",
+      "Stärkt Vertrauen",
+      "Mehr Anfragen"
+    ]
+  },
+  "warum360": {
+    "eyebrow": "Warum 360°?",
+    "title": "360° Rundgänge für jede Branche –\nund jede Location",
+    "sub": "Ein virtueller Rundgang schafft unmittelbar Nähe – noch bevor der erste echte Kontakt stattfindet.",
+    "cards": [
+      {
+        "emoji": "🏛️",
+        "title": "Räume verkaufen",
+        "text": "Virtuelle Rundgänge lassen Kunden Ihre Räume erleben, bevor sie die Tür öffnen. Das senkt die Hemmschwelle und steigert die Konversionsrate von Interessenten zu echten Besuchern."
+      },
+      {
+        "emoji": "🤝",
+        "title": "Vertrauen aufbauen",
+        "text": "Transparenz erzeugt Vertrauen. Wer Ihre Location bereits virtuell besucht hat, kommt mit einem positiven Vorurteil und deutlich höherer Kaufbereitschaft."
+      },
+      {
+        "emoji": "✨",
+        "title": "Atmosphäre erlebbar machen",
+        "text": "Ein Foto zeigt einen Raum. Ein 360° Rundgang lässt Ihre Gäste Ihre Atmosphäre, Ihr Licht, Ihr Raumgefühl wirklich spüren – rund um die Uhr, von überall."
+      },
+      {
+        "emoji": "🔍",
+        "title": "Transparenz schaffen",
+        "text": "Hochwertige 360° Präsenz auf Google Business stärkt Ihre Auffindbarkeit und zeigt potenziellen Kunden genau, was sie erwartet – ehrlich, realistisch, professionell."
+      }
+    ]
+  },
+  "tours_text": {
+    "eyebrow": "Live-Demos",
+    "title": "Beispiel-Rundgänge",
+    "sub": "Erlebe unsere Arbeit direkt – immersiv, interaktiv und hochauflösend. Scrolle durch die Rundgänge."
+  },
+  "cases": {
+    "eyebrow": "Erfolgsgeschichten",
+    "title": "Mini Case Studies",
+    "sub": "Echte Ergebnisse unserer Kunden – in Zahlen und Fakten.",
+    "items": [
+      {
+        "tag": "Gastronomie",
+        "title": "Flora Kaffee & Eisbar",
+        "desc": "Zwei Standorte, zwei Rundgänge – und eine messbar gesunkene Hemmschwelle für neue Gäste.",
+        "stat1_value": "+35%",
+        "stat1_label": "Neue Google-Aufrufe",
+        "stat2_value": "2×",
+        "stat2_label": "Standorte digitalisiert"
+      },
+      {
+        "tag": "Möbelhaus",
+        "title": "Danbo Flensburg",
+        "desc": "Kunden erleben das gesamte Sortiment virtuell – und kommen gezielter in den Showroom.",
+        "stat1_value": "+50%",
+        "stat1_label": "Längere Verweildauer",
+        "stat2_value": "↑",
+        "stat2_label": "Qualifizierte Anfragen"
+      },
+      {
+        "tag": "Hotel & Lounge",
+        "title": "Buddha Lounge",
+        "desc": "Ein 360° Rundgang im Sterne-Hotel: Gäste reservieren gezielter, weil sie die Atmosphäre bereits kennen.",
+        "stat1_value": "+28%",
+        "stat1_label": "Mehr Online-Reservierungen",
+        "stat2_value": "24/7",
+        "stat2_label": "Virtuell erlebbar"
+      }
+    ]
+  },
+  "testimonials": {
+    "eyebrow": "Kundenstimmen",
+    "title": "Das sagen unsere Kunden",
+    "items": [
+      {
+        "text": "Die Rundgänge haben unsere Hemmschwelle komplett gesenkt. Viele Gäste trauen sich jetzt erst rein, weil sie den Ort vorher online schon besucht haben.",
+        "author": "Flora Kaffee & Eisbar",
+        "company": "2 Rundgänge – 2 Standorte"
+      },
+      {
+        "text": "Der Rundgang überzeugt neue Kunden schnell von unserem Inventar. Das hat unseren Online-Vertrieb spürbar unterstützt.",
+        "author": "Danbo Flensburg",
+        "company": "Digitale Möbelpräsentation"
+      },
+      {
+        "text": "Der perfekte erste Eindruck für unseren Gastbereich! Gäste reservieren jetzt gezielter, weil sie unsere Atmosphäre bereits kennen.",
+        "author": "Buddha Lounge",
+        "company": "360° Präsentation im Sterne-Hotel"
+      }
+    ]
+  },
   "marquee": {
     "label": "Vertrauen von führenden Unternehmen"
+  },
+  "ablauf": {
+    "eyebrow": "Ablauf",
+    "title": "So entsteht Ihr professioneller\n360° Rundgang",
+    "items": [
+      {
+        "emoji": "🎯",
+        "title": "Strategisches Briefing & Planung",
+        "text": "In einem persönlichen Gespräch definieren wir gemeinsam Ihre Ziele, den gewünschten Stil und den optimalen Aufnahmetag. Wir beraten Sie, welche Bereiche Ihrer Location besonders wirkungsvoll in Szene gesetzt werden. Kostenlos und unverbindlich."
+      },
+      {
+        "emoji": "📸",
+        "title": "Professionelle 360° Aufnahme vor Ort",
+        "text": "Unser Team kommt zu Ihnen und digitalisiert Ihre Location mit modernster Scan-Technologie. Sorgfältige Nachbearbeitung garantiert gestochen scharfe, stimmungsvolle Bilder, die Ihre Räume in bestem Licht zeigen."
+      },
+      {
+        "emoji": "🚀",
+        "title": "Integration & Live-Schaltung",
+        "text": "Sie erhalten Ihren fertigen iFrame-Code zur Einbindung auf Ihrer Website und in Google Business. Wir begleiten Sie beim Launch und stehen für Fragen bereit – bis Ihr Rundgang reibungslos live ist."
+      }
+    ]
+  },
+  "kontakt_text": {
+    "eyebrow": "Kontakt",
+    "title": "Jetzt unverbindlich anfragen",
+    "sub": "Wir erstellen Ihnen ein klares Angebot mit Zeitplan und transparenten Kosten – kostenlos und persönlich.",
+    "sidebar_heading": "So erreichen Sie uns",
+    "sidebar_text": "Nutzen Sie das Formular für eine schnelle Anfrage – oder schreiben Sie uns direkt per E-Mail.",
+    "email": "info@visitfy.de",
+    "response_label": "Antwortzeit",
+    "response_text": "In der Regel innerhalb von 24 Stunden an Werktagen.",
+    "location_label": "Standort",
+    "location_text": "Flensburg, Deutschland"
+  },
+  "faq": {
+    "eyebrow": "Antworten",
+    "title": "Häufige Fragen",
+    "sub": "Alles Wichtige zu 360° Rundgängen, Ablauf, Kosten und Branchen auf einen Blick.",
+    "button_text": "Alle Fragen ansehen",
+    "items": [
+      {
+        "question": "Was ist ein 360° Rundgang?",
+        "answer": "<p>Ein 360° Rundgang ist eine interaktive, virtuelle Begehung Ihrer Räume. Mit modernster Kameratechnik werden alle Bereiche Ihrer Location fotorealistisch erfasst und zu einem nahtlosen, immersiven Erlebnis zusammengesetzt.</p>"
+      },
+      {
+        "question": "Welche Vorteile bietet ein 360° Rundgang?",
+        "answer": "<p>Ein 360° Rundgang bietet Ihrem Unternehmen messbare Mehrwerte:</p><ul><li>Stärkeres Vertrauen bei potenziellen Kunden noch vor dem ersten Besuch</li><li>Höhere Sichtbarkeit auf Google Maps und in der organischen Suche</li><li>Mehr qualifizierte Anfragen durch Interessenten, die bereits überzeugt sind</li><li>24/7 verfügbares, interaktives Schaufenster für Ihre Location</li></ul>"
+      },
+      {
+        "question": "Für welche Branchen eignet sich ein 360° Rundgang?",
+        "answer": "<p>Grundsätzlich für jede Location, die Kunden physisch besuchen oder vorab erleben sollen: Gastronomie, Hotels, Immobilien, Einzelhandel, Praxen, Fitnessstudios und mehr.</p>"
+      },
+      {
+        "question": "Was kostet ein 360° Rundgang?",
+        "answer": "<p>Die Kosten richten sich nach Größe und Raumanzahl Ihrer Location. Für ein transparentes, individuelles Angebot beraten wir Sie gerne persönlich und unverbindlich.</p>"
+      },
+      {
+        "question": "Wie lange dauert die Erstellung?",
+        "answer": "<p>Nach Briefing und Aufnahme vor Ort ist Ihr Rundgang im Durchschnitt innerhalb von 5 Werktagen live. Für größere Locations kalkulieren wir gemeinsam den Zeitplan.</p>"
+      },
+      {
+        "question": "Wo kann ich den Rundgang einbinden?",
+        "answer": "<p>Überall dort, wo Ihre Kunden sind:</p><ul><li>Auf Ihrer eigenen Website (per iFrame, ein Klick)</li><li>Direkt in Ihrem Google Business Profil</li><li>In Buchungsportalen und auf Social Media</li></ul>"
+      }
+    ]
   },
   "about": {
     "eyebrow": "Über uns",
@@ -98,5 +279,11 @@
     "website_by_prefix": "Webseite von",
     "website_by_name": "Jason Holweg",
     "website_by_url": "https://jasonholweg.de"
+  },
+  "button_fx": {
+    "enabled": false,
+    "color": "#8ec9ff",
+    "shimmer": true,
+    "targets": []
   }
 }
