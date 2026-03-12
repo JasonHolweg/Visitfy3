@@ -763,9 +763,14 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 .compare-card--with {
   border-color: rgba(80, 255, 120, 0.18);
 }
-
+.compare-card--without {
+  border-color: rgba(255, 80, 80, 0.18);
+}
 .compare-card--with:hover {
   border-color: rgba(80, 255, 120, 0.35);
+}
+.compare-card--without:hover {
+  border-color: rgba(255, 80, 80, 0.35);
 }
 
 .compare-card-header {

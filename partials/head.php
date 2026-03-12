@@ -42,5 +42,5 @@ $canonicalUrl = 'https://visitfy.de/'; // TODO: set dynamically per deployment
   <link rel="icon" href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>assets/img/logo.svg" type="image/svg+xml">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>assets/css/style.css">
+  <link rel="stylesheet" href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>assets/css/style.css?v=<?= filemtime(dirname(__DIR__) . '/assets/css/style.css') ?>">
 </head>
