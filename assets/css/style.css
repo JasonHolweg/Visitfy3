@@ -601,6 +601,350 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 }
 
 /* ============================================================
+   DEVICE MOCKUP SECTION
+   ============================================================ */
+.mockup-section {
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.mockup-devices {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  margin-top: 3rem;
+  position: relative;
+}
+
+/* Laptop */
+.mockup-laptop {
+  flex-shrink: 0;
+  width: clamp(320px, 52vw, 640px);
+}
+
+.mockup-laptop-screen {
+  position: relative;
+  border-radius: 12px 12px 0 0;
+  border: 2px solid var(--line-strong);
+  border-bottom: none;
+  background: var(--surface-2);
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+
+.mockup-laptop-screen::after {
+  content: '';
+  display: block;
+  height: 14px;
+  border-radius: 0 0 8px 8px;
+  border: 2px solid var(--line-strong);
+  border-top: none;
+  background: var(--surface-3);
+  position: relative;
+  width: 110%;
+  left: -5%;
+}
+
+.mockup-laptop-screen img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Tablet */
+.mockup-tablet {
+  flex-shrink: 0;
+  width: clamp(120px, 18vw, 200px);
+}
+
+.mockup-tablet-screen {
+  position: relative;
+  border-radius: 14px;
+  border: 2px solid var(--line-strong);
+  background: var(--surface-2);
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+}
+
+.mockup-tablet-screen img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Phone */
+.mockup-phone {
+  flex-shrink: 0;
+  width: clamp(70px, 10vw, 120px);
+}
+
+.mockup-phone-screen {
+  position: relative;
+  border-radius: 16px;
+  border: 2px solid var(--line-strong);
+  background: var(--surface-2);
+  aspect-ratio: 9 / 19;
+  overflow: hidden;
+}
+
+.mockup-phone-screen img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Placeholder (until real images are added) */
+.mockup-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.mockup-placeholder svg {
+  opacity: 0.35;
+}
+
+@media (max-width: 600px) {
+  .mockup-devices {
+    gap: 0.75rem;
+  }
+  .mockup-laptop { width: 60vw; }
+  .mockup-tablet { width: 22vw; }
+  .mockup-phone  { width: 14vw; }
+  .mockup-placeholder span { display: none; }
+}
+
+/* ============================================================
+   COMPARE / VORTEILE SECTION
+   ============================================================ */
+.compare-section {
+  background: var(--surface);
+}
+
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap);
+  margin-top: 3rem;
+  max-width: 820px;
+  margin-inline: auto;
+}
+
+.compare-card {
+  padding: 2rem;
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  transition: transform 0.35s var(--ease-out), border-color 0.25s, box-shadow 0.35s;
+}
+
+.compare-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--line-strong);
+  box-shadow: 0 12px 36px rgba(0,0,0,0.4);
+}
+
+.compare-card--with {
+  border-color: rgba(80, 255, 120, 0.18);
+}
+
+.compare-card--with:hover {
+  border-color: rgba(80, 255, 120, 0.35);
+}
+
+.compare-card-header {
+  margin-bottom: 1.75rem;
+}
+
+/* Badge / Pill */
+.compare-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4em 1em;
+  border-radius: 50px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.compare-badge--negative {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--line);
+  color: var(--text-dim);
+}
+
+.compare-badge--negative svg {
+  color: rgba(255, 100, 100, 0.8);
+}
+
+.compare-badge--positive {
+  background: rgba(80, 255, 120, 0.08);
+  border: 1px solid rgba(80, 255, 120, 0.25);
+  color: rgba(140, 255, 170, 0.95);
+}
+
+.compare-badge--positive svg {
+  color: rgba(80, 255, 120, 0.9);
+}
+
+/* List */
+.compare-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.compare-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 0.92rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.compare-list li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.compare-list li:first-child {
+  padding-top: 0;
+}
+
+/* Check icons */
+.compare-check {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+
+.compare-check--muted {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+}
+
+.compare-check--muted svg {
+  opacity: 0.4;
+}
+
+.compare-check--green {
+  background: rgba(80, 255, 120, 0.12);
+  color: rgba(80, 255, 120, 0.9);
+}
+
+/* Positive card items slightly brighter */
+.compare-list--positive li {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+@media (max-width: 768px) {
+  .compare-grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   MINI CASE STUDIES
+   ============================================================ */
+.cases-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--gap);
+  margin-top: 3rem;
+}
+
+.case-card {
+  padding: 2rem;
+  border-radius: var(--radius);
+  transition: transform 0.35s var(--ease-out), border-color 0.25s;
+  display: flex;
+  flex-direction: column;
+}
+
+.case-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--glass-border-h);
+  box-shadow: var(--glass-shadow-h);
+}
+
+.case-card-tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0.3em 0.8em;
+  border: 1px solid var(--line);
+  border-radius: 50px;
+  margin-bottom: 1rem;
+  align-self: flex-start;
+}
+
+.case-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.6rem;
+}
+
+.case-card-desc {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  line-height: 1.65;
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
+
+.case-card-results {
+  display: flex;
+  gap: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.case-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.case-stat-value {
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.case-stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+/* ============================================================
    KPI / STATS SECTION
    ============================================================ */
 .kpi-section { background: var(--surface); }
