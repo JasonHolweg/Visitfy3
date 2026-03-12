@@ -7,8 +7,7 @@ Options -Indexes
 
 # ── Deny direct access to sensitive files ────────────────────
 <FilesMatch "(\.env|\.git|\.gitignore|deploy\.env|bootstrap\.php)$">
-  Order allow,deny
-  Deny from all
+  Require all denied
 </FilesMatch>
 
 # ── Security headers ─────────────────────────────────────────
@@ -23,7 +22,7 @@ Options -Indexes
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
 
   # Restrict browser feature access
-  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), encrypted-media=()"
 
   # Remove PHP version disclosure
   Header unset X-Powered-By

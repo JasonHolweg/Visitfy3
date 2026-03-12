@@ -7,6 +7,11 @@ require __DIR__ . '/../partials/cms.php';
 
 /* ── Session for CSRF token ────────────────────────────── */
 if (session_status() === PHP_SESSION_NONE) {
+    session_set_cookie_params([
+        'httponly' => true,
+        'samesite' => 'Lax',
+        'secure'   => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+    ]);
     session_start();
 }
 if (empty($_SESSION['csrf_token'])) {
@@ -57,10 +62,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             /* TODO: replace with SMTP mailer (e.g. PHPMailer + config) */
             $to = 'info@visitfy.de'; /* TODO: verify recipient */
-            /* Strip CRLF from subject fields to prevent email header injection */
+            /* Strip CRLF from all user fields to prevent email header/body injection */
             $safeSubjectName = str_replace(["\r", "\n"], '', $name);
+            $safeName        = str_replace(["\r", "\n"], '', $name);
+            $safeFirma       = str_replace(["\r", "\n"], '', $firma);
+            $safeEmail       = str_replace(["\r", "\n"], '', $email);
+            $safeTelefon     = str_replace(["\r", "\n"], '', $telefon);
+            $safeBranche     = str_replace(["\r", "\n"], '', $branche);
             $subject = 'Neue Anfrage von ' . $safeSubjectName;
-            $body    = "Name: $name\nFirma: $firma\nE-Mail: $email\nTelefon: $telefon\nBranche: $branche\n\nNachricht:\n$nachricht";
+            $body    = "Name: $safeName\nFirma: $safeFirma\nE-Mail: $safeEmail\nTelefon: $safeTelefon\nBranche: $safeBranche\n\nNachricht:\n$nachricht";
             /* Sanitize email to prevent header injection: reject newlines */
             if (preg_match('/[\r\n]/', $email)) {
                 $formError = 'Ungültige E-Mail-Adresse.';
