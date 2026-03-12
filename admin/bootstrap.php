@@ -135,6 +135,7 @@ function admin_upload_folders(): array
 {
     return [
         'Allgemeine Bilder (assets/img)' => 'assets/img',
+        'Mockup Bilder (assets/img/mockups)' => 'assets/img/mockups',
         'Client Logos (assets/img/client-logos)' => 'assets/img/client-logos',
     ];
 }

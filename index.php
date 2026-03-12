@@ -39,6 +39,10 @@ $toursJson = file_get_contents(__DIR__ . '/assets/data/tours.json');
 $tours     = $toursJson ? json_decode($toursJson, true) : [];
 if (!is_array($tours)) $tours = [];
 
+/* Load script config for tour display mode */
+$scriptCfg       = visitfy_load_json(__DIR__ . '/assets/data/script-config.json', []);
+$tourDisplayMode = (string)visitfy_get($scriptCfg, 'main.tour_display_style', 'stack');
+
 /* Load client logos for marquee */
 $clientLogoFiles = glob(__DIR__ . '/assets/img/client-logos/*.{png,jpg,jpeg,webp,avif,svg}', GLOB_BRACE);
 if (!is_array($clientLogoFiles)) {
@@ -48,8 +52,14 @@ natsort($clientLogoFiles);
 $clientLogoFiles = array_values($clientLogoFiles);
 
 $marqueeLogoFiles = $clientLogoFiles;
-if (count($clientLogoFiles) > 0 && count($clientLogoFiles) < 10) {
-  $marqueeLogoFiles = array_merge($clientLogoFiles, $clientLogoFiles);
+if (count($clientLogoFiles) > 0) {
+  /* Ensure enough logos for seamless marquee: duplicate set 5x, then double for CSS loop */
+  $repeatedLogos = $clientLogoFiles;
+  while (count($repeatedLogos) < count($clientLogoFiles) * 5) {
+    $repeatedLogos = array_merge($repeatedLogos, $clientLogoFiles);
+  }
+  /* Double the full set so CSS translateX(-50%) creates seamless loop */
+  $marqueeLogoFiles = array_merge($repeatedLogos, $repeatedLogos);
 }
 
 $heroWords = visitfy_get($contentConfig, 'hero.rotating_words', ['SICHTBARKEIT.', 'VERTRAUEN.', 'ANFRAGEN.']);
@@ -119,43 +129,57 @@ if (!is_array($kpiItems) || !$kpiItems) {
 
 
   <!-- ══ 2) GERÄTE MOCKUP ═════════════════════════════════ -->
+<?php
+  $mockupDesktop = trim((string)visitfy_get($contentConfig, 'mockup.desktop_img', ''));
+  $mockupTablet  = trim((string)visitfy_get($contentConfig, 'mockup.tablet_img', ''));
+  $mockupPhone   = trim((string)visitfy_get($contentConfig, 'mockup.phone_img', ''));
+?>
   <section class="section mockup-section" id="mockup" aria-labelledby="mockup-heading">
     <div class="container">
-      <p class="section-eyebrow fade-up text-center">So sieht es aus</p>
-      <h2 class="section-title fade-up delay-1 text-center" id="mockup-heading">Ihr Rundgang – auf jedem Gerät</h2>
+      <p class="section-eyebrow fade-up text-center"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'mockup_text.eyebrow', 'So sieht es aus'), ENT_QUOTES, 'UTF-8') ?></p>
+      <h2 class="section-title fade-up delay-1 text-center" id="mockup-heading"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'mockup_text.title', 'Ihr Rundgang – auf jedem Gerät'), ENT_QUOTES, 'UTF-8') ?></h2>
       <p class="section-sub fade-up delay-2 text-center" style="margin-inline:auto">
-        Ob Desktop, Tablet oder Smartphone – Ihr 360° Rundgang sieht überall perfekt aus.
+        <?= htmlspecialchars((string)visitfy_get($contentConfig, 'mockup_text.sub', 'Ob Desktop, Tablet oder Smartphone – Ihr 360° Rundgang sieht überall perfekt aus.'), ENT_QUOTES, 'UTF-8') ?>
       </p>
 
       <div class="mockup-devices fade-up delay-3">
         <!-- Laptop Mockup -->
         <div class="mockup-laptop">
           <div class="mockup-laptop-screen">
-            <!-- Bild hier einfügen: z.B. <img src="assets/img/mockup-laptop.png" alt="Rundgang auf Laptop"> -->
+<?php if ($mockupDesktop !== '' && is_file(__DIR__ . '/' . $mockupDesktop)): ?>
+            <img src="<?= htmlspecialchars(visitfy_url($mockupDesktop), ENT_QUOTES, 'UTF-8') ?>" alt="Rundgang auf Laptop" loading="lazy" decoding="async">
+<?php else: ?>
             <div class="mockup-placeholder" aria-label="Laptop-Vorschau">
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 17h20"/><path d="M6 21h12"/></svg>
               <span>Laptop-Bild einfügen</span>
             </div>
+<?php endif; ?>
           </div>
         </div>
         <!-- Tablet Mockup -->
         <div class="mockup-tablet">
           <div class="mockup-tablet-screen">
-            <!-- Bild hier einfügen: z.B. <img src="assets/img/mockup-tablet.png" alt="Rundgang auf Tablet"> -->
+<?php if ($mockupTablet !== '' && is_file(__DIR__ . '/' . $mockupTablet)): ?>
+            <img src="<?= htmlspecialchars(visitfy_url($mockupTablet), ENT_QUOTES, 'UTF-8') ?>" alt="Rundgang auf Tablet" loading="lazy" decoding="async">
+<?php else: ?>
             <div class="mockup-placeholder" aria-label="Tablet-Vorschau">
               <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="2" width="16" height="20" rx="2"/><circle cx="12" cy="19" r="1"/></svg>
               <span>Tablet</span>
             </div>
+<?php endif; ?>
           </div>
         </div>
         <!-- Phone Mockup -->
         <div class="mockup-phone">
           <div class="mockup-phone-screen">
-            <!-- Bild hier einfügen: z.B. <img src="assets/img/mockup-phone.png" alt="Rundgang auf Smartphone"> -->
+<?php if ($mockupPhone !== '' && is_file(__DIR__ . '/' . $mockupPhone)): ?>
+            <img src="<?= htmlspecialchars(visitfy_url($mockupPhone), ENT_QUOTES, 'UTF-8') ?>" alt="Rundgang auf Smartphone" loading="lazy" decoding="async">
+<?php else: ?>
             <div class="mockup-placeholder" aria-label="Smartphone-Vorschau">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M12 18h.01"/></svg>
               <span>Phone</span>
             </div>
+<?php endif; ?>
           </div>
         </div>
       </div>
@@ -164,12 +188,18 @@ if (!is_array($kpiItems) || !$kpiItems) {
 
 
   <!-- ══ 3) VORTEILE VERGLEICH ══════════════════════════════ -->
+<?php
+  $vergleichNegItems = visitfy_get($contentConfig, 'vergleich.negative_items', ['Nur begrenzte Perspektive', 'Kein Erkundungserlebnis', 'Weniger vertrauenswürdig', 'Nicht interaktiv']);
+  if (!is_array($vergleichNegItems) || !$vergleichNegItems) $vergleichNegItems = ['Nur begrenzte Perspektive', 'Kein Erkundungserlebnis', 'Weniger vertrauenswürdig', 'Nicht interaktiv'];
+  $vergleichPosItems = visitfy_get($contentConfig, 'vergleich.positive_items', ['Freie Rundumsicht', 'Interaktives Erleben', 'Stärkt Vertrauen', 'Mehr Anfragen']);
+  if (!is_array($vergleichPosItems) || !$vergleichPosItems) $vergleichPosItems = ['Freie Rundumsicht', 'Interaktives Erleben', 'Stärkt Vertrauen', 'Mehr Anfragen'];
+?>
   <section class="section compare-section" id="vergleich" aria-labelledby="compare-heading">
     <div class="container">
-      <p class="section-eyebrow fade-up text-center">Der Unterschied</p>
-      <h2 class="section-title fade-up delay-1 text-center" id="compare-heading">Nur Fotos vs. 360° Rundgang</h2>
+      <p class="section-eyebrow fade-up text-center"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'vergleich.eyebrow', 'Der Unterschied'), ENT_QUOTES, 'UTF-8') ?></p>
+      <h2 class="section-title fade-up delay-1 text-center" id="compare-heading"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'vergleich.title', 'Nur Fotos vs. 360° Rundgang'), ENT_QUOTES, 'UTF-8') ?></h2>
       <p class="section-sub fade-up delay-2 text-center" style="margin-inline:auto">
-        Sehen Sie selbst, wie ein 360° Rundgang Ihre Präsenz verändert.
+        <?= htmlspecialchars((string)visitfy_get($contentConfig, 'vergleich.sub', 'Sehen Sie selbst, wie ein 360° Rundgang Ihre Präsenz verändert.'), ENT_QUOTES, 'UTF-8') ?>
       </p>
 
       <div class="compare-grid fade-up delay-3">
@@ -178,34 +208,18 @@ if (!is_array($kpiItems) || !$kpiItems) {
           <div class="compare-card-header">
             <span class="compare-badge compare-badge--negative" aria-hidden="true">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-              Nur Fotos
+              <?= htmlspecialchars((string)visitfy_get($contentConfig, 'vergleich.badge_negative', 'Nur Fotos'), ENT_QUOTES, 'UTF-8') ?>
             </span>
           </div>
           <ul class="compare-list compare-list--negative">
+<?php foreach ($vergleichNegItems as $negItem): ?>
             <li>
               <span class="compare-check compare-check--muted" aria-hidden="true">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
               </span>
-              Nur begrenzte Perspektive
+              <?= htmlspecialchars(trim((string)$negItem), ENT_QUOTES, 'UTF-8') ?>
             </li>
-            <li>
-              <span class="compare-check compare-check--muted" aria-hidden="true">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-              </span>
-              Kein Erkundungserlebnis
-            </li>
-            <li>
-              <span class="compare-check compare-check--muted" aria-hidden="true">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-              </span>
-              Weniger vertrauenswürdig
-            </li>
-            <li>
-              <span class="compare-check compare-check--muted" aria-hidden="true">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-              </span>
-              Nicht interaktiv
-            </li>
+<?php endforeach; ?>
           </ul>
         </div>
         <!-- 360° Rundgang -->
@@ -213,34 +227,18 @@ if (!is_array($kpiItems) || !$kpiItems) {
           <div class="compare-card-header">
             <span class="compare-badge compare-badge--positive" aria-hidden="true">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-              360° Rundgang
+              <?= htmlspecialchars((string)visitfy_get($contentConfig, 'vergleich.badge_positive', '360° Rundgang'), ENT_QUOTES, 'UTF-8') ?>
             </span>
           </div>
           <ul class="compare-list compare-list--positive">
+<?php foreach ($vergleichPosItems as $posItem): ?>
             <li>
               <span class="compare-check compare-check--green" aria-hidden="true">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
               </span>
-              Freie Rundumsicht
+              <?= htmlspecialchars(trim((string)$posItem), ENT_QUOTES, 'UTF-8') ?>
             </li>
-            <li>
-              <span class="compare-check compare-check--green" aria-hidden="true">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-              </span>
-              Interaktives Erleben
-            </li>
-            <li>
-              <span class="compare-check compare-check--green" aria-hidden="true">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-              </span>
-              Stärkt Vertrauen
-            </li>
-            <li>
-              <span class="compare-check compare-check--green" aria-hidden="true">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-              </span>
-              Mehr Anfragen
-            </li>
+<?php endforeach; ?>
           </ul>
         </div>
       </div>
@@ -249,63 +247,53 @@ if (!is_array($kpiItems) || !$kpiItems) {
 
 
   <!-- ══ 4) WARUM 360° ══════════════════════════════════════ -->
+<?php
+  $w360Cards = visitfy_get($contentConfig, 'warum360.cards', []);
+  if (!is_array($w360Cards) || !$w360Cards) {
+    $w360Cards = [
+      ['emoji' => '🏛️', 'title' => 'Räume verkaufen', 'text' => 'Virtuelle Rundgänge lassen Kunden Ihre Räume erleben, bevor sie die Tür öffnen. Das senkt die Hemmschwelle und steigert die Konversionsrate von Interessenten zu echten Besuchern.'],
+      ['emoji' => '🤝', 'title' => 'Vertrauen aufbauen', 'text' => 'Transparenz erzeugt Vertrauen. Wer Ihre Location bereits virtuell besucht hat, kommt mit einem positiven Vorurteil und deutlich höherer Kaufbereitschaft.'],
+      ['emoji' => '✨', 'title' => 'Atmosphäre erlebbar machen', 'text' => 'Ein Foto zeigt einen Raum. Ein 360° Rundgang lässt Ihre Gäste Ihre Atmosphäre, Ihr Licht, Ihr Raumgefühl wirklich spüren – rund um die Uhr, von überall.'],
+      ['emoji' => '🔍', 'title' => 'Transparenz schaffen', 'text' => 'Hochwertige 360° Präsenz auf Google Business stärkt Ihre Auffindbarkeit und zeigt potenziellen Kunden genau, was sie erwartet – ehrlich, realistisch, professionell.'],
+    ];
+  }
+  $bentoClasses = ['bento-wide slide-left', 'bento-square slide-right', 'bento-square slide-left', 'bento-wide slide-right'];
+  $bentoDelays  = ['0s', '0.15s', '0.3s', '0.45s'];
+?>
   <section class="section" aria-labelledby="value-heading">
     <div class="container">
-      <p class="section-eyebrow fade-up">Warum 360°?</p>
+      <p class="section-eyebrow fade-up"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'warum360.eyebrow', 'Warum 360°?'), ENT_QUOTES, 'UTF-8') ?></p>
       <h2 class="section-title fade-up delay-1" id="value-heading">
-        360° Rundgänge für jede Branche –<br>und jede Location
+        <?= nl2br(htmlspecialchars((string)visitfy_get($contentConfig, 'warum360.title', "360° Rundgänge für jede Branche –\nund jede Location"), ENT_QUOTES, 'UTF-8')) ?>
       </h2>
       <p class="section-sub fade-up delay-2">
-        Ein virtueller Rundgang schafft unmittelbar Nähe – noch bevor der erste echte Kontakt stattfindet.
+        <?= htmlspecialchars((string)visitfy_get($contentConfig, 'warum360.sub', 'Ein virtueller Rundgang schafft unmittelbar Nähe – noch bevor der erste echte Kontakt stattfindet.'), ENT_QUOTES, 'UTF-8') ?>
       </p>
 
       <div class="bento-grid">
-        <article class="feature-card glass bento-wide slide-left" style="--slide-delay: 0s">
-          <div class="feature-icon" aria-hidden="true">🏛️</div>
-          <h3>Räume verkaufen</h3>
-          <p>
-            Virtuelle Rundgänge lassen Kunden Ihre Räume erleben, bevor sie die Tür öffnen.
-            Das senkt die Hemmschwelle und steigert die Konversionsrate von Interessenten zu echten Besuchern.
-          </p>
+<?php foreach ($w360Cards as $wi => $wCard):
+  $bentoClass = $bentoClasses[$wi % 4] ?? 'bento-wide slide-left';
+  $bentoDelay = $bentoDelays[$wi % 4] ?? '0s';
+?>
+        <article class="feature-card glass <?= $bentoClass ?>" style="--slide-delay: <?= $bentoDelay ?>">
+          <div class="feature-icon" aria-hidden="true"><?= htmlspecialchars((string)($wCard['emoji'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
+          <h3><?= htmlspecialchars((string)($wCard['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
+          <p><?= htmlspecialchars((string)($wCard['text'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>
         </article>
-        <article class="feature-card glass bento-square slide-right" style="--slide-delay: 0.15s">
-          <div class="feature-icon" aria-hidden="true">🤝</div>
-          <h3>Vertrauen aufbauen</h3>
-          <p>
-            Transparenz erzeugt Vertrauen. Wer Ihre Location bereits virtuell besucht hat, kommt mit einem
-            positiven Vorurteil und deutlich höherer Kaufbereitschaft.
-          </p>
-        </article>
-        <article class="feature-card glass bento-square slide-left" style="--slide-delay: 0.3s">
-          <div class="feature-icon" aria-hidden="true">✨</div>
-          <h3>Atmosphäre erlebbar machen</h3>
-          <p>
-            Ein Foto zeigt einen Raum. Ein 360° Rundgang lässt Ihre Gäste Ihre Atmosphäre, Ihr Licht,
-            Ihr Raumgefühl wirklich spüren – rund um die Uhr, von überall.
-          </p>
-        </article>
-        <article class="feature-card glass bento-wide slide-right" style="--slide-delay: 0.45s">
-          <div class="feature-icon" aria-hidden="true">🔍</div>
-          <h3>Transparenz schaffen</h3>
-          <p>
-            Hochwertige 360° Präsenz auf Google Business stärkt Ihre Auffindbarkeit und zeigt potenziellen
-            Kunden genau, was sie erwartet – ehrlich, realistisch, professionell.
-          </p>
-        </article>
+<?php endforeach; ?>
       </div>
     </div>
   </section>
 
 
   <!-- ══ 5) LIVE DEMOS ══════════════════════════════════════ -->
-  <section class="section scroll-stack-section" id="tours" aria-labelledby="tours-heading">
+  <section class="section scroll-stack-section" id="tours" aria-labelledby="tours-heading" data-tour-mode="<?= htmlspecialchars($tourDisplayMode, ENT_QUOTES, 'UTF-8') ?>">
     <div class="container">
       <div class="scroll-stack-intro">
-        <p class="section-eyebrow fade-up">Live-Demos</p>
-        <h2 class="section-title fade-up delay-1" id="tours-heading">Beispiel-Rundgänge</h2>
+        <p class="section-eyebrow fade-up"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'tours_text.eyebrow', 'Live-Demos'), ENT_QUOTES, 'UTF-8') ?></p>
+        <h2 class="section-title fade-up delay-1" id="tours-heading"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'tours_text.title', 'Beispiel-Rundgänge'), ENT_QUOTES, 'UTF-8') ?></h2>
         <p class="section-sub fade-up delay-2" style="margin:0 auto">
-          Erlebe unsere Arbeit direkt – immersiv, interaktiv und hochauflösend.
-          Scrolle durch die Rundgänge.
+          <?= htmlspecialchars((string)visitfy_get($contentConfig, 'tours_text.sub', 'Erlebe unsere Arbeit direkt – immersiv, interaktiv und hochauflösend. Scrolle durch die Rundgänge.'), ENT_QUOTES, 'UTF-8') ?>
         </p>
       </div>
 
@@ -354,6 +342,63 @@ if (!is_array($kpiItems) || !$kpiItems) {
         </article>
 <?php endforeach; ?>
       </div>
+
+      <!-- Card-Swap alternative layout -->
+      <div class="cardswap-wrapper" aria-label="Rundgang-Beispiele (Card Swap)">
+        <div class="cardswap-anchor">
+          <div class="cardswap-viewport">
+            <div class="cardswap-deck">
+<?php foreach ($tours as $i => $tour):
+  $title  = htmlspecialchars($tour['title']       ?? 'Rundgang', ENT_QUOTES, 'UTF-8');
+  $tag    = htmlspecialchars($tour['tag']         ?? '',         ENT_QUOTES, 'UTF-8');
+  $desc   = htmlspecialchars($tour['description'] ?? '',         ENT_QUOTES, 'UTF-8');
+  $url    = $tour['matterportUrl'] ?? '';
+  $safeUrl = '';
+  if (preg_match('#^https://my\.matterport\.com/show/\?m=[a-zA-Z0-9]+$#', $url)) {
+      $safeUrl = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+  }
+  $num = $i + 1;
+?>
+              <div class="cardswap-card" data-swap-index="<?= $i + 1 ?>">
+                <div class="stack-card-header">
+                  <div>
+                    <p style="font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.3rem">Rundgang <?= sprintf('%02d', $num) ?></p>
+                    <h3 class="stack-card-title"><?= $title ?></h3>
+                  </div>
+<?php if ($tag): ?>
+                  <span class="stack-card-tag"><?= $tag ?></span>
+<?php endif; ?>
+                </div>
+<?php if ($desc): ?>
+                <p class="stack-card-desc"><?= $desc ?></p>
+<?php endif; ?>
+                <div class="iframe-wrap">
+<?php if ($safeUrl): ?>
+                  <iframe
+                    src="<?= $safeUrl ?>"
+                    title="360° Rundgang – <?= $title ?>"
+                    allow="fullscreen; xr-spatial-tracking;"
+                    allowfullscreen
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation"
+                    loading="eager"
+                  ></iframe>
+<?php else: ?>
+                  <div class="iframe-placeholder" aria-label="Kein Rundgang verfügbar"></div>
+<?php endif; ?>
+                </div>
+              </div>
+<?php endforeach; ?>
+            </div>
+            <div class="cardswap-dots">
+<?php foreach ($tours as $i => $tour): ?>
+              <span class="cardswap-dot<?= $i === 0 ? ' active' : '' ?>"></span>
+<?php endforeach; ?>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -382,121 +427,80 @@ if (!is_array($kpiItems) || !$kpiItems) {
 
 
   <!-- ══ 7) MINI CASE STUDIES ═══════════════════════════════ -->
+<?php
+  $caseStudyItems = visitfy_get($contentConfig, 'cases.items', []);
+  if (!is_array($caseStudyItems) || !$caseStudyItems) {
+    $caseStudyItems = [
+      ['tag' => 'Gastronomie', 'title' => 'Flora Kaffee &amp; Eisbar', 'desc' => 'Zwei Standorte, zwei Rundgänge – und eine messbar gesunkene Hemmschwelle für neue Gäste.', 'stat1_value' => '+35%', 'stat1_label' => 'Neue Google-Aufrufe', 'stat2_value' => '2×', 'stat2_label' => 'Standorte digitalisiert'],
+      ['tag' => 'Möbelhaus', 'title' => 'Danbo Flensburg', 'desc' => 'Kunden erleben das gesamte Sortiment virtuell – und kommen gezielter in den Showroom.', 'stat1_value' => '+50%', 'stat1_label' => 'Längere Verweildauer', 'stat2_value' => '↑', 'stat2_label' => 'Qualifizierte Anfragen'],
+      ['tag' => 'Hotel &amp; Lounge', 'title' => 'Buddha Lounge', 'desc' => 'Ein 360° Rundgang im Sterne-Hotel: Gäste reservieren gezielter, weil sie die Atmosphäre bereits kennen.', 'stat1_value' => '+28%', 'stat1_label' => 'Mehr Online-Reservierungen', 'stat2_value' => '24/7', 'stat2_label' => 'Virtuell erlebbar'],
+    ];
+  }
+?>
   <section class="section" id="case-studies" aria-labelledby="cases-heading">
     <div class="container">
-      <p class="section-eyebrow fade-up text-center">Erfolgsgeschichten</p>
-      <h2 class="section-title fade-up delay-1 text-center" id="cases-heading">Mini Case Studies</h2>
+      <p class="section-eyebrow fade-up text-center"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'cases.eyebrow', 'Erfolgsgeschichten'), ENT_QUOTES, 'UTF-8') ?></p>
+      <h2 class="section-title fade-up delay-1 text-center" id="cases-heading"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'cases.title', 'Mini Case Studies'), ENT_QUOTES, 'UTF-8') ?></h2>
       <p class="section-sub fade-up delay-2 text-center" style="margin-inline:auto">
-        Echte Ergebnisse unserer Kunden – in Zahlen und Fakten.
+        <?= htmlspecialchars((string)visitfy_get($contentConfig, 'cases.sub', 'Echte Ergebnisse unserer Kunden – in Zahlen und Fakten.'), ENT_QUOTES, 'UTF-8') ?>
       </p>
 
       <div class="cases-grid">
-        <article class="case-card glass fade-up delay-1">
-          <div class="case-card-tag">Gastronomie</div>
-          <h3 class="case-card-title">Flora Kaffee &amp; Eisbar</h3>
-          <p class="case-card-desc">
-            Zwei Standorte, zwei Rundgänge – und eine messbar gesunkene Hemmschwelle für neue Gäste.
-          </p>
+<?php foreach ($caseStudyItems as $ci => $cItem):
+  $delayC = 'delay-' . (($ci % 3) + 1);
+?>
+        <article class="case-card glass fade-up <?= $delayC ?>">
+          <div class="case-card-tag"><?= htmlspecialchars((string)($cItem['tag'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
+          <h3 class="case-card-title"><?= htmlspecialchars((string)($cItem['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
+          <p class="case-card-desc"><?= htmlspecialchars((string)($cItem['desc'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>
           <div class="case-card-results">
             <div class="case-stat">
-              <span class="case-stat-value">+35%</span>
-              <span class="case-stat-label">Neue Google-Aufrufe</span>
+              <span class="case-stat-value"><?= htmlspecialchars((string)($cItem['stat1_value'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
+              <span class="case-stat-label"><?= htmlspecialchars((string)($cItem['stat1_label'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
             </div>
             <div class="case-stat">
-              <span class="case-stat-value">2×</span>
-              <span class="case-stat-label">Standorte digitalisiert</span>
+              <span class="case-stat-value"><?= htmlspecialchars((string)($cItem['stat2_value'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
+              <span class="case-stat-label"><?= htmlspecialchars((string)($cItem['stat2_label'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
             </div>
           </div>
         </article>
-
-        <article class="case-card glass fade-up delay-2">
-          <div class="case-card-tag">Möbelhaus</div>
-          <h3 class="case-card-title">Danbo Flensburg</h3>
-          <p class="case-card-desc">
-            Kunden erleben das gesamte Sortiment virtuell – und kommen gezielter in den Showroom.
-          </p>
-          <div class="case-card-results">
-            <div class="case-stat">
-              <span class="case-stat-value">+50%</span>
-              <span class="case-stat-label">Längere Verweildauer</span>
-            </div>
-            <div class="case-stat">
-              <span class="case-stat-value">↑</span>
-              <span class="case-stat-label">Qualifizierte Anfragen</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="case-card glass fade-up delay-3">
-          <div class="case-card-tag">Hotel &amp; Lounge</div>
-          <h3 class="case-card-title">Buddha Lounge</h3>
-          <p class="case-card-desc">
-            Ein 360° Rundgang im Sterne-Hotel: Gäste reservieren gezielter, weil sie die Atmosphäre bereits kennen.
-          </p>
-          <div class="case-card-results">
-            <div class="case-stat">
-              <span class="case-stat-value">+28%</span>
-              <span class="case-stat-label">Mehr Online-Reservierungen</span>
-            </div>
-            <div class="case-stat">
-              <span class="case-stat-value">24/7</span>
-              <span class="case-stat-label">Virtuell erlebbar</span>
-            </div>
-          </div>
-        </article>
+<?php endforeach; ?>
       </div>
     </div>
   </section>
 
 
   <!-- ══ 8) KUNDENSTIMMEN ═══════════════════════════════════ -->
+<?php
+  $testimonialItems = visitfy_get($contentConfig, 'testimonials.items', []);
+  if (!is_array($testimonialItems) || !$testimonialItems) {
+    $testimonialItems = [
+      ['text' => 'Die Rundgänge haben unsere Hemmschwelle komplett gesenkt. Viele Gäste trauen sich jetzt erst rein, weil sie den Ort vorher online schon besucht haben.', 'author' => 'Flora Kaffee & Eisbar', 'company' => '2 Rundgänge – 2 Standorte'],
+      ['text' => 'Der Rundgang überzeugt neue Kunden schnell von unserem Inventar. Das hat unseren Online-Vertrieb spürbar unterstützt.', 'author' => 'Danbo Flensburg', 'company' => 'Digitale Möbelpräsentation'],
+      ['text' => 'Der perfekte erste Eindruck für unseren Gastbereich! Gäste reservieren jetzt gezielter, weil sie unsere Atmosphäre bereits kennen.', 'author' => 'Buddha Lounge', 'company' => '360° Präsentation im Sterne-Hotel'],
+    ];
+  }
+?>
   <section class="section" aria-labelledby="testimonials-heading" style="background:var(--surface)">
     <div class="container">
-      <p class="section-eyebrow fade-up">Kundenstimmen</p>
-      <h2 class="section-title fade-up delay-1" id="testimonials-heading">Das sagen unsere Kunden</h2>
+      <p class="section-eyebrow fade-up"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'testimonials.eyebrow', 'Kundenstimmen'), ENT_QUOTES, 'UTF-8') ?></p>
+      <h2 class="section-title fade-up delay-1" id="testimonials-heading"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'testimonials.title', 'Das sagen unsere Kunden'), ENT_QUOTES, 'UTF-8') ?></h2>
 
       <div class="testimonials-grid">
-        <article class="testimonial-card glass fade-up delay-1">
+<?php foreach ($testimonialItems as $ti => $tItem):
+  $delayT = 'delay-' . (($ti % 3) + 1);
+?>
+        <article class="testimonial-card glass fade-up <?= $delayT ?>">
           <div class="stars" aria-label="5 von 5 Sternen">
             <?php for ($s = 0; $s < 5; $s++): ?>
             <svg class="star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
             <?php endfor; ?>
           </div>
-          <p class="testimonial-text">
-            Die Rundgänge haben unsere Hemmschwelle komplett gesenkt. Viele Gäste trauen sich
-            jetzt erst rein, weil sie den Ort vorher online schon besucht haben.
-          </p>
-          <p class="testimonial-author">Flora Kaffee &amp; Eisbar</p>
-          <p class="testimonial-company">2 Rundgänge – 2 Standorte</p>
+          <p class="testimonial-text"><?= htmlspecialchars((string)($tItem['text'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>
+          <p class="testimonial-author"><?= htmlspecialchars((string)($tItem['author'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>
+          <p class="testimonial-company"><?= htmlspecialchars((string)($tItem['company'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>
         </article>
-
-        <article class="testimonial-card glass fade-up delay-2">
-          <div class="stars" aria-label="5 von 5 Sternen">
-            <?php for ($s = 0; $s < 5; $s++): ?>
-            <svg class="star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
-            <?php endfor; ?>
-          </div>
-          <p class="testimonial-text">
-            Der Rundgang überzeugt neue Kunden schnell von unserem Inventar.
-            Das hat unseren Online-Vertrieb spürbar unterstützt.
-          </p>
-          <p class="testimonial-author">Danbo Flensburg</p>
-          <p class="testimonial-company">Digitale Möbelpräsentation</p>
-        </article>
-
-        <article class="testimonial-card glass fade-up delay-3">
-          <div class="stars" aria-label="5 von 5 Sternen">
-            <?php for ($s = 0; $s < 5; $s++): ?>
-            <svg class="star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
-            <?php endfor; ?>
-          </div>
-          <p class="testimonial-text">
-            Der perfekte erste Eindruck für unseren Gastbereich! Gäste reservieren jetzt
-            gezielter, weil sie unsere Atmosphäre bereits kennen.
-          </p>
-          <p class="testimonial-author">Buddha Lounge</p>
-          <p class="testimonial-company">360° Präsentation im Sterne-Hotel</p>
-        </article>
+<?php endforeach; ?>
       </div>
     </div>
   </section>
@@ -533,43 +537,35 @@ if (!is_array($kpiItems) || !$kpiItems) {
 
 
   <!-- ══ 9) ABLAUF ══════════════════════════════════════════ -->
+<?php
+  $ablaufSteps = visitfy_get($contentConfig, 'ablauf.items', []);
+  if (!is_array($ablaufSteps) || !$ablaufSteps) {
+    $ablaufSteps = [
+      ['emoji' => '🎯', 'title' => 'Strategisches Briefing & Planung', 'text' => 'In einem persönlichen Gespräch definieren wir gemeinsam Ihre Ziele, den gewünschten Stil und den optimalen Aufnahmetag. Wir beraten Sie, welche Bereiche Ihrer Location besonders wirkungsvoll in Szene gesetzt werden. Kostenlos und unverbindlich.'],
+      ['emoji' => '📸', 'title' => 'Professionelle 360° Aufnahme vor Ort', 'text' => 'Unser Team kommt zu Ihnen und digitalisiert Ihre Location mit modernster Scan-Technologie. Sorgfältige Nachbearbeitung garantiert gestochen scharfe, stimmungsvolle Bilder, die Ihre Räume in bestem Licht zeigen.'],
+      ['emoji' => '🚀', 'title' => 'Integration & Live-Schaltung', 'text' => 'Sie erhalten Ihren fertigen iFrame-Code zur Einbindung auf Ihrer Website und in Google Business. Wir begleiten Sie beim Launch und stehen für Fragen bereit – bis Ihr Rundgang reibungslos live ist.'],
+    ];
+  }
+?>
   <section class="section" id="prozess" aria-labelledby="process-heading">
     <div class="container">
-      <p class="section-eyebrow fade-up">Ablauf</p>
+      <p class="section-eyebrow fade-up"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'ablauf.eyebrow', 'Ablauf'), ENT_QUOTES, 'UTF-8') ?></p>
       <h2 class="section-title fade-up delay-1" id="process-heading">
-        So entsteht Ihr professioneller<br>360° Rundgang
+        <?= nl2br(htmlspecialchars((string)visitfy_get($contentConfig, 'ablauf.title', "So entsteht Ihr professioneller\n360° Rundgang"), ENT_QUOTES, 'UTF-8')) ?>
       </h2>
 
       <div class="process-steps">
-        <div class="process-card glass fade-up delay-1">
-          <p class="process-num">SCHRITT 01</p>
-          <div class="process-icon" aria-hidden="true">🎯</div>
-          <h3>Strategisches Briefing &amp; Planung</h3>
-          <p>
-            In einem persönlichen Gespräch definieren wir gemeinsam Ihre Ziele, den gewünschten Stil
-            und den optimalen Aufnahmetag. Wir beraten Sie, welche Bereiche Ihrer Location besonders
-            wirkungsvoll in Szene gesetzt werden. Kostenlos und unverbindlich.
-          </p>
+<?php foreach ($ablaufSteps as $ai => $aStep):
+  $delayA = 'delay-' . (($ai % 3) + 1);
+  $stepNum = sprintf('%02d', $ai + 1);
+?>
+        <div class="process-card glass fade-up <?= $delayA ?>">
+          <p class="process-num">SCHRITT <?= $stepNum ?></p>
+          <div class="process-icon" aria-hidden="true"><?= htmlspecialchars((string)($aStep['emoji'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
+          <h3><?= htmlspecialchars((string)($aStep['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
+          <p><?= htmlspecialchars((string)($aStep['text'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>
         </div>
-        <div class="process-card glass fade-up delay-2">
-          <p class="process-num">SCHRITT 02</p>
-          <div class="process-icon" aria-hidden="true">📸</div>
-          <h3>Professionelle 360° Aufnahme vor Ort</h3>
-          <p>
-            Unser Team kommt zu Ihnen und digitalisiert Ihre Location mit modernster Scan-Technologie.
-            Sorgfältige Nachbearbeitung garantiert gestochen scharfe, stimmungsvolle Bilder, die Ihre
-            Räume in bestem Licht zeigen.
-          </p>
-        </div>
-        <div class="process-card glass fade-up delay-3">
-          <p class="process-num">SCHRITT 03</p>
-          <div class="process-icon" aria-hidden="true">🚀</div>
-          <h3>Integration &amp; Live-Schaltung</h3>
-          <p>
-            Sie erhalten Ihren fertigen iFrame-Code zur Einbindung auf Ihrer Website und in Google Business.
-            Wir begleiten Sie beim Launch und stehen für Fragen bereit – bis Ihr Rundgang reibungslos live ist.
-          </p>
-        </div>
+<?php endforeach; ?>
       </div>
     </div>
   </section>
@@ -578,30 +574,27 @@ if (!is_array($kpiItems) || !$kpiItems) {
   <!-- ══ 10) KONTAKTFORMULAR ════════════════════════════════ -->
   <section class="section" id="kontakt" aria-labelledby="kontakt-heading" style="background:var(--surface)">
     <div class="container">
-      <p class="section-eyebrow fade-up text-center">Kontakt</p>
-      <h2 class="section-title fade-up delay-1 text-center" id="kontakt-heading">Jetzt unverbindlich anfragen</h2>
+      <p class="section-eyebrow fade-up text-center"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'kontakt_text.eyebrow', 'Kontakt'), ENT_QUOTES, 'UTF-8') ?></p>
+      <h2 class="section-title fade-up delay-1 text-center" id="kontakt-heading"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'kontakt_text.title', 'Jetzt unverbindlich anfragen'), ENT_QUOTES, 'UTF-8') ?></h2>
       <p class="section-sub fade-up delay-2 text-center" style="margin-inline:auto">
-        Wir erstellen Ihnen ein klares Angebot mit Zeitplan und transparenten Kosten – kostenlos und persönlich.
+        <?= htmlspecialchars((string)visitfy_get($contentConfig, 'kontakt_text.sub', 'Wir erstellen Ihnen ein klares Angebot mit Zeitplan und transparenten Kosten – kostenlos und persönlich.'), ENT_QUOTES, 'UTF-8') ?>
       </p>
 
       <div class="contact-grid fade-up delay-3">
         <!-- Contact info -->
         <div class="contact-info">
-          <h3>So erreichen Sie uns</h3>
-          <p>
-            Nutzen Sie das Formular für eine schnelle Anfrage – oder schreiben Sie uns
-            direkt per E-Mail.
-          </p>
+          <h3><?= htmlspecialchars((string)visitfy_get($contentConfig, 'kontakt_text.sidebar_heading', 'So erreichen Sie uns'), ENT_QUOTES, 'UTF-8') ?></h3>
+          <p><?= htmlspecialchars((string)visitfy_get($contentConfig, 'kontakt_text.sidebar_text', 'Nutzen Sie das Formular für eine schnelle Anfrage – oder schreiben Sie uns direkt per E-Mail.'), ENT_QUOTES, 'UTF-8') ?></p>
           <p style="margin-top:1.5rem">
-            <a href="mailto:info@visitfy.de">info@visitfy.de</a>
+            <a href="mailto:<?= htmlspecialchars((string)visitfy_get($contentConfig, 'kontakt_text.email', 'info@visitfy.de'), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'kontakt_text.email', 'info@visitfy.de'), ENT_QUOTES, 'UTF-8') ?></a>
           </p>
           <div style="margin-top:2.5rem">
-            <p style="font-size:0.78rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.75rem">Antwortzeit</p>
-            <p>In der Regel innerhalb von 24 Stunden an Werktagen.</p>
+            <p style="font-size:0.78rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.75rem"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'kontakt_text.response_label', 'Antwortzeit'), ENT_QUOTES, 'UTF-8') ?></p>
+            <p><?= htmlspecialchars((string)visitfy_get($contentConfig, 'kontakt_text.response_text', 'In der Regel innerhalb von 24 Stunden an Werktagen.'), ENT_QUOTES, 'UTF-8') ?></p>
           </div>
           <div style="margin-top:2rem">
-            <p style="font-size:0.78rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.75rem">Standort</p>
-            <p>Flensburg, Deutschland</p>
+            <p style="font-size:0.78rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.75rem"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'kontakt_text.location_label', 'Standort'), ENT_QUOTES, 'UTF-8') ?></p>
+            <p><?= htmlspecialchars((string)visitfy_get($contentConfig, 'kontakt_text.location_text', 'Flensburg, Deutschland'), ENT_QUOTES, 'UTF-8') ?></p>
           </div>
         </div>
 
@@ -673,116 +666,45 @@ if (!is_array($kpiItems) || !$kpiItems) {
 
 
   <!-- ══ 11) FAQ ════════════════════════════════════════════ -->
+<?php
+  $faqItems = visitfy_get($contentConfig, 'faq.items', []);
+  if (!is_array($faqItems) || !$faqItems) {
+    $faqItems = [
+      ['question' => 'Was ist ein 360° Rundgang?', 'answer' => '<p>Ein 360° Rundgang ist eine interaktive, virtuelle Begehung Ihrer Räume. Mit modernster Kameratechnik werden alle Bereiche Ihrer Location fotorealistisch erfasst und zu einem nahtlosen, immersiven Erlebnis zusammengesetzt.</p>'],
+      ['question' => 'Welche Vorteile bietet ein 360° Rundgang?', 'answer' => '<p>Ein 360° Rundgang bietet Ihrem Unternehmen messbare Mehrwerte:</p><ul><li>Stärkeres Vertrauen bei potenziellen Kunden noch vor dem ersten Besuch</li><li>Höhere Sichtbarkeit auf Google Maps und in der organischen Suche</li><li>Mehr qualifizierte Anfragen durch Interessenten, die bereits überzeugt sind</li><li>24/7 verfügbares, interaktives Schaufenster für Ihre Location</li></ul>'],
+      ['question' => 'Für welche Branchen eignet sich ein 360° Rundgang?', 'answer' => '<p>Grundsätzlich für jede Location, die Kunden physisch besuchen oder vorab erleben sollen: Gastronomie, Hotels, Immobilien, Einzelhandel, Praxen, Fitnessstudios und mehr.</p>'],
+      ['question' => 'Was kostet ein 360° Rundgang?', 'answer' => '<p>Die Kosten richten sich nach Größe und Raumanzahl Ihrer Location. Für ein transparentes, individuelles Angebot beraten wir Sie gerne persönlich und unverbindlich.</p>'],
+      ['question' => 'Wie lange dauert die Erstellung?', 'answer' => '<p>Nach Briefing und Aufnahme vor Ort ist Ihr Rundgang im Durchschnitt innerhalb von 5 Werktagen live. Für größere Locations kalkulieren wir gemeinsam den Zeitplan.</p>'],
+      ['question' => 'Wo kann ich den Rundgang einbinden?', 'answer' => '<p>Überall dort, wo Ihre Kunden sind:</p><ul><li>Auf Ihrer eigenen Website (per iFrame, ein Klick)</li><li>Direkt in Ihrem Google Business Profil</li><li>In Buchungsportalen und auf Social Media</li></ul>'],
+    ];
+  }
+?>
   <section class="section" id="faq" aria-labelledby="faq-heading">
     <div class="container">
-      <p class="section-eyebrow fade-up text-center">Antworten</p>
-      <h2 class="section-title fade-up delay-1 text-center" id="faq-heading">Häufige Fragen</h2>
+      <p class="section-eyebrow fade-up text-center"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'faq.eyebrow', 'Antworten'), ENT_QUOTES, 'UTF-8') ?></p>
+      <h2 class="section-title fade-up delay-1 text-center" id="faq-heading"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'faq.title', 'Häufige Fragen'), ENT_QUOTES, 'UTF-8') ?></h2>
       <p class="section-sub fade-up delay-2 text-center" style="margin-inline:auto">
-        Alles Wichtige zu 360° Rundgängen, Ablauf, Kosten und Branchen auf einen Blick.
+        <?= htmlspecialchars((string)visitfy_get($contentConfig, 'faq.sub', 'Alles Wichtige zu 360° Rundgängen, Ablauf, Kosten und Branchen auf einen Blick.'), ENT_QUOTES, 'UTF-8') ?>
       </p>
 
       <div class="faq-list fade-up delay-3" style="margin-inline:auto">
-
+<?php foreach ($faqItems as $fItem): ?>
         <div class="faq-item">
           <button class="faq-question" aria-expanded="false">
-            Was ist ein 360° Rundgang?
+            <?= htmlspecialchars((string)($fItem['question'] ?? ''), ENT_QUOTES, 'UTF-8') ?>
             <span class="faq-arrow" aria-hidden="true">▼</span>
           </button>
           <div class="faq-answer" role="region">
             <div class="faq-answer-inner">
-              <p>
-                Ein 360° Rundgang ist eine interaktive, virtuelle Begehung Ihrer Räume. Mit modernster
-                Kameratechnik werden alle Bereiche Ihrer Location fotorealistisch erfasst und zu einem
-                nahtlosen, immersiven Erlebnis zusammengesetzt.
-              </p>
+              <?= (string)($fItem['answer'] ?? '') ?>
             </div>
           </div>
         </div>
-
-        <div class="faq-item">
-          <button class="faq-question" aria-expanded="false">
-            Welche Vorteile bietet ein 360° Rundgang?
-            <span class="faq-arrow" aria-hidden="true">▼</span>
-          </button>
-          <div class="faq-answer" role="region">
-            <div class="faq-answer-inner">
-              <p>Ein 360° Rundgang bietet Ihrem Unternehmen messbare Mehrwerte:</p>
-              <ul>
-                <li>Stärkeres Vertrauen bei potenziellen Kunden noch vor dem ersten Besuch</li>
-                <li>Höhere Sichtbarkeit auf Google Maps und in der organischen Suche</li>
-                <li>Mehr qualifizierte Anfragen durch Interessenten, die bereits überzeugt sind</li>
-                <li>24/7 verfügbares, interaktives Schaufenster für Ihre Location</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question" aria-expanded="false">
-            Für welche Branchen eignet sich ein 360° Rundgang?
-            <span class="faq-arrow" aria-hidden="true">▼</span>
-          </button>
-          <div class="faq-answer" role="region">
-            <div class="faq-answer-inner">
-              <p>
-                Grundsätzlich für jede Location, die Kunden physisch besuchen oder vorab erleben sollen:
-                Gastronomie, Hotels, Immobilien, Einzelhandel, Praxen, Fitnessstudios und mehr.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question" aria-expanded="false">
-            Was kostet ein 360° Rundgang?
-            <span class="faq-arrow" aria-hidden="true">▼</span>
-          </button>
-          <div class="faq-answer" role="region">
-            <div class="faq-answer-inner">
-              <p>
-                Die Kosten richten sich nach Größe und Raumanzahl Ihrer Location. Für ein transparentes,
-                individuelles Angebot beraten wir Sie gerne persönlich und unverbindlich.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question" aria-expanded="false">
-            Wie lange dauert die Erstellung?
-            <span class="faq-arrow" aria-hidden="true">▼</span>
-          </button>
-          <div class="faq-answer" role="region">
-            <div class="faq-answer-inner">
-              <p>
-                Nach Briefing und Aufnahme vor Ort ist Ihr Rundgang im Durchschnitt innerhalb von
-                5 Werktagen live. Für größere Locations kalkulieren wir gemeinsam den Zeitplan.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question" aria-expanded="false">
-            Wo kann ich den Rundgang einbinden?
-            <span class="faq-arrow" aria-hidden="true">▼</span>
-          </button>
-          <div class="faq-answer" role="region">
-            <div class="faq-answer-inner">
-              <p>Überall dort, wo Ihre Kunden sind:</p>
-              <ul>
-                <li>Auf Ihrer eigenen Website (per iFrame, ein Klick)</li>
-                <li>Direkt in Ihrem Google Business Profil</li>
-                <li>In Buchungsportalen und auf Social Media</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
+<?php endforeach; ?>
       </div>
 
       <div class="text-center" style="margin-top:3rem">
-        <a href="<?= htmlspecialchars(visitfy_url('pages/faq.php'), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-secondary">Alle Fragen ansehen</a>
+        <a href="<?= htmlspecialchars(visitfy_url('pages/faq.php'), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-secondary"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'faq.button_text', 'Alle Fragen ansehen'), ENT_QUOTES, 'UTF-8') ?></a>
       </div>
     </div>
   </section>

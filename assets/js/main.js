@@ -206,8 +206,13 @@
     /* ── Logo Marquee ──────────────────────────────────────── */
     initMarquee();
 
-    /* ── Scroll-Stack ─────────────────────────────────────── */
-    initScrollStack();
+    /* ── Scroll-Stack or Card-Swap ────────────────────────── */
+    const tourMode = scriptCfg.tour_display_style || 'stack';
+    if (tourMode === 'cardswap') {
+      initCardSwap();
+    } else {
+      initScrollStack();
+    }
 
     /* ── FAQ Accordion ─────────────────────────────────────── */
     initAccordion();
@@ -352,10 +357,13 @@
       SCROLL-STACK
      Each .stack-item is CSS sticky; JS adds subtle rotation
      transform as items accumulate at top.
+     When the section ends, all cards are "frozen" into absolute
+     positioning so they scroll away together (no stagger).
   ═══════════════════════════════════════════════════════════ */
   function initScrollStack() {
+    const container = document.querySelector('.stack-container');
     const items = document.querySelectorAll('.stack-item');
-    if (!items.length) return;
+    if (!items.length || !container) return;
 
     /* Config (matching the CSS vars) */
     const ROTATION_AMOUNT = Number(scriptCfg.stack_rotation_amount ?? 0.5); /* deg */
@@ -392,6 +400,71 @@
       }, { passive: true });
     }
 
+    updateDots(0);
+
+    window.addEventListener('scroll', () => {
+      const anchorRect = anchor.getBoundingClientRect();
+      /* How far we've scrolled into the anchor */
+      const scrolled = -anchorRect.top;
+
+      if (scrolled < 0 || scrolled > totalScroll) {
+        /* Reset: show all cards normally when outside range */
+        cards.forEach((card, i) => {
+          card.style.transform = i === 0 ? '' : `translateY(${i * 6}px) scale(${1 - i * 0.02})`;
+          card.style.opacity   = i === 0 ? '1' : `${1 - i * 0.08}`;
+        });
+        updateDots(scrolled <= 0 ? 0 : cardCount - 1);
+        return;
+      }
+
+      /* Which card index is transitioning? */
+      const rawIndex = scrolled / SCROLL_PER;
+      const currentIdx = Math.min(Math.floor(rawIndex), cardCount - 2);
+      const progress   = rawIndex - currentIdx; /* 0..1 within current transition */
+
+      const newActive = Math.min(Math.round(rawIndex), cardCount - 1);
+      if (newActive !== activeIndex) {
+        activeIndex = newActive;
+        updateDots(activeIndex);
+      }
+
+      cards.forEach((card, i) => {
+        if (i < currentIdx) {
+          /* Already swiped away */
+          card.style.transform = 'translateY(-40px) scale(0.92)';
+          card.style.opacity   = '0';
+          card.style.pointerEvents = 'none';
+        } else if (i === currentIdx) {
+          /* Currently swiping away */
+          const scale   = 1 - progress * 0.08;
+          const moveY   = -progress * 40;
+          const opacity = 1 - progress;
+          card.style.transform = `translateY(${moveY}px) scale(${scale})`;
+          card.style.opacity   = `${Math.max(opacity, 0)}`;
+          card.style.pointerEvents = progress > 0.5 ? 'none' : '';
+        } else if (i === currentIdx + 1) {
+          /* Next card rising into view */
+          const behind  = (i - currentIdx - 1);
+          const yStart  = 6;
+          const scStart = 0.98;
+          const moveY   = yStart * (1 - progress);
+          const scale   = scStart + progress * (1 - scStart);
+          const opacity = 0.92 + progress * 0.08;
+          card.style.transform = `translateY(${moveY}px) scale(${scale})`;
+          card.style.opacity   = `${opacity}`;
+          card.style.pointerEvents = progress > 0.5 ? '' : 'none';
+        } else {
+          /* Further behind cards */
+          const behind = i - currentIdx - 1;
+          const moveY  = behind * 6;
+          const scale  = 1 - behind * 0.02;
+          const opacity = 1 - behind * 0.08;
+          card.style.transform = `translateY(${moveY}px) scale(${scale})`;
+          card.style.opacity   = `${Math.max(opacity, 0.5)}`;
+          card.style.pointerEvents = 'none';
+        }
+      });
+    }, { passive: true });
   }
 
 

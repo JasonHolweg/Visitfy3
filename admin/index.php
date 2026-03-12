@@ -62,6 +62,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && admin_is_logged_in()) {
         $action = (string)($_POST['action'] ?? '');
 
         if ($action === 'save_content') {
+            /* ── Handle mockup file uploads ───────────────────── */
+            $mockupDir = admin_absolute_path('assets/img/mockups');
+            if (!is_dir($mockupDir)) {
+                @mkdir($mockupDir, 0775, true);
+            }
+            $mockupAllowedExt = ['png', 'jpg', 'jpeg', 'webp', 'avif'];
+            $mockupKeys = ['desktop', 'tablet', 'phone'];
+            foreach ($mockupKeys as $mk) {
+                $fileKey = 'mockup_' . $mk . '_file';
+                if (
+                    isset($_FILES[$fileKey]) &&
+                    is_array($_FILES[$fileKey]) &&
+                    ($_FILES[$fileKey]['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK &&
+                    ($_FILES[$fileKey]['tmp_name'] ?? '') !== ''
+                ) {
+                    $origName = basename((string)($_FILES[$fileKey]['name'] ?? ''));
+                    $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
+                    if (in_array($ext, $mockupAllowedExt, true)) {
+                        $destName = 'mockup-' . $mk . '.' . $ext;
+                        $destAbs  = $mockupDir . '/' . $destName;
+                        if (move_uploaded_file($_FILES[$fileKey]['tmp_name'], $destAbs)) {
+                            $_POST['mockup_' . $mk . '_img'] = 'assets/img/mockups/' . $destName;
+                        }
+                    }
+                }
+            }
+
             $features = preg_split('/\r\n|\r|\n/', (string)($_POST['about_features'] ?? '')) ?: [];
             $features = array_values(array_filter(array_map(static fn($v) => trim((string)$v), $features), static fn($v) => $v !== ''));
 
@@ -129,6 +156,108 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && admin_is_logged_in()) {
               ];
             }
 
+            /* ── Process Vergleich items ──────────────────────── */
+            $vergleichNeg = $_POST['vergleich_neg_item'] ?? [];
+            if (!is_array($vergleichNeg)) $vergleichNeg = [];
+            $vergleichNeg = array_values(array_filter(array_map(static fn($v) => trim((string)$v), $vergleichNeg), static fn($v) => $v !== ''));
+            $vergleichPos = $_POST['vergleich_pos_item'] ?? [];
+            if (!is_array($vergleichPos)) $vergleichPos = [];
+            $vergleichPos = array_values(array_filter(array_map(static fn($v) => trim((string)$v), $vergleichPos), static fn($v) => $v !== ''));
+
+            /* ── Process Warum 360° cards ─────────────────────── */
+            $w360Emojis = $_POST['warum360_emoji'] ?? [];
+            $w360Titles = $_POST['warum360_card_title'] ?? [];
+            $w360Texts  = $_POST['warum360_card_text'] ?? [];
+            if (!is_array($w360Emojis)) $w360Emojis = [];
+            if (!is_array($w360Titles)) $w360Titles = [];
+            if (!is_array($w360Texts))  $w360Texts = [];
+            $w360Cards = [];
+            $w360Count = max(count($w360Emojis), count($w360Titles), count($w360Texts));
+            for ($i = 0; $i < $w360Count; $i++) {
+              $emoji = trim((string)($w360Emojis[$i] ?? ''));
+              $title = trim((string)($w360Titles[$i] ?? ''));
+              $text  = trim((string)($w360Texts[$i] ?? ''));
+              if ($emoji === '' && $title === '' && $text === '') continue;
+              $w360Cards[] = ['emoji' => $emoji, 'title' => $title, 'text' => $text];
+            }
+
+            /* ── Process Case Studies ─────────────────────────── */
+            $caseTags   = $_POST['case_tag'] ?? [];
+            $caseTitles = $_POST['case_title'] ?? [];
+            $caseDescs  = $_POST['case_desc'] ?? [];
+            $caseStat1V = $_POST['case_stat1_value'] ?? [];
+            $caseStat1L = $_POST['case_stat1_label'] ?? [];
+            $caseStat2V = $_POST['case_stat2_value'] ?? [];
+            $caseStat2L = $_POST['case_stat2_label'] ?? [];
+            foreach (['caseTags','caseTitles','caseDescs','caseStat1V','caseStat1L','caseStat2V','caseStat2L'] as $_v) {
+              if (!is_array($$_v)) $$_v = [];
+            }
+            $caseItems = [];
+            $caseCount = max(count($caseTags), count($caseTitles), count($caseDescs));
+            for ($i = 0; $i < $caseCount; $i++) {
+              $tag   = trim((string)($caseTags[$i] ?? ''));
+              $title = trim((string)($caseTitles[$i] ?? ''));
+              $desc  = trim((string)($caseDescs[$i] ?? ''));
+              $s1v   = trim((string)($caseStat1V[$i] ?? ''));
+              $s1l   = trim((string)($caseStat1L[$i] ?? ''));
+              $s2v   = trim((string)($caseStat2V[$i] ?? ''));
+              $s2l   = trim((string)($caseStat2L[$i] ?? ''));
+              if ($tag === '' && $title === '' && $desc === '') continue;
+              $caseItems[] = [
+                'tag' => $tag, 'title' => $title, 'desc' => $desc,
+                'stat1_value' => $s1v, 'stat1_label' => $s1l,
+                'stat2_value' => $s2v, 'stat2_label' => $s2l,
+              ];
+            }
+
+            /* ── Process Testimonials ─────────────────────────── */
+            $testiTexts     = $_POST['testi_text'] ?? [];
+            $testiAuthors   = $_POST['testi_author'] ?? [];
+            $testiCompanies = $_POST['testi_company'] ?? [];
+            if (!is_array($testiTexts))     $testiTexts = [];
+            if (!is_array($testiAuthors))   $testiAuthors = [];
+            if (!is_array($testiCompanies)) $testiCompanies = [];
+            $testiItems = [];
+            $testiCount = max(count($testiTexts), count($testiAuthors), count($testiCompanies));
+            for ($i = 0; $i < $testiCount; $i++) {
+              $text    = trim((string)($testiTexts[$i] ?? ''));
+              $author  = trim((string)($testiAuthors[$i] ?? ''));
+              $company = trim((string)($testiCompanies[$i] ?? ''));
+              if ($text === '' && $author === '' && $company === '') continue;
+              $testiItems[] = ['text' => $text, 'author' => $author, 'company' => $company];
+            }
+
+            /* ── Process Ablauf steps ─────────────────────────── */
+            $ablaufEmojis = $_POST['ablauf_emoji'] ?? [];
+            $ablaufTitles = $_POST['ablauf_step_title'] ?? [];
+            $ablaufTexts  = $_POST['ablauf_step_text'] ?? [];
+            if (!is_array($ablaufEmojis)) $ablaufEmojis = [];
+            if (!is_array($ablaufTitles)) $ablaufTitles = [];
+            if (!is_array($ablaufTexts))  $ablaufTexts = [];
+            $ablaufSteps = [];
+            $ablaufCount = max(count($ablaufEmojis), count($ablaufTitles), count($ablaufTexts));
+            for ($i = 0; $i < $ablaufCount; $i++) {
+              $emoji = trim((string)($ablaufEmojis[$i] ?? ''));
+              $title = trim((string)($ablaufTitles[$i] ?? ''));
+              $text  = trim((string)($ablaufTexts[$i] ?? ''));
+              if ($emoji === '' && $title === '' && $text === '') continue;
+              $ablaufSteps[] = ['emoji' => $emoji, 'title' => $title, 'text' => $text];
+            }
+
+            /* ── Process FAQ items ────────────────────────────── */
+            $faqQuestions = $_POST['faq_question'] ?? [];
+            $faqAnswers   = $_POST['faq_answer'] ?? [];
+            if (!is_array($faqQuestions)) $faqQuestions = [];
+            if (!is_array($faqAnswers))   $faqAnswers = [];
+            $faqItems = [];
+            $faqCount = max(count($faqQuestions), count($faqAnswers));
+            for ($i = 0; $i < $faqCount; $i++) {
+              $question = trim((string)($faqQuestions[$i] ?? ''));
+              $answer   = trim((string)($faqAnswers[$i] ?? ''));
+              if ($question === '' && $answer === '') continue;
+              $faqItems[] = ['question' => $question, 'answer' => $answer];
+            }
+
             $content = [
                 'seo' => [
                     'home_title' => (string)($_POST['seo_home_title'] ?? ''),
@@ -153,6 +282,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && admin_is_logged_in()) {
                     'eyebrow' => (string)($_POST['kpi_eyebrow'] ?? ''),
                     'title' => (string)($_POST['kpi_title'] ?? ''),
                   'items' => $kpiItems,
+                ],
+                'mockup' => [
+                    'desktop_img' => (string)($_POST['mockup_desktop_img'] ?? ''),
+                    'tablet_img' => (string)($_POST['mockup_tablet_img'] ?? ''),
+                    'phone_img' => (string)($_POST['mockup_phone_img'] ?? ''),
                 ],
                 'marquee' => [
                     'label' => (string)($_POST['marquee_label'] ?? ''),
@@ -200,6 +334,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && admin_is_logged_in()) {
                   'shimmer' => !empty($_POST['button_fx_shimmer']),
                   'targets' => $buttonFxTargets,
                 ],
+                'mockup_text' => [
+                    'eyebrow' => (string)($_POST['mockup_text_eyebrow'] ?? ''),
+                    'title' => (string)($_POST['mockup_text_title'] ?? ''),
+                    'sub' => (string)($_POST['mockup_text_sub'] ?? ''),
+                ],
+                'vergleich' => [
+                    'eyebrow' => (string)($_POST['vergleich_eyebrow'] ?? ''),
+                    'title' => (string)($_POST['vergleich_title'] ?? ''),
+                    'sub' => (string)($_POST['vergleich_sub'] ?? ''),
+                    'badge_negative' => (string)($_POST['vergleich_badge_negative'] ?? ''),
+                    'badge_positive' => (string)($_POST['vergleich_badge_positive'] ?? ''),
+                    'negative_items' => $vergleichNeg,
+                    'positive_items' => $vergleichPos,
+                ],
+                'warum360' => [
+                    'eyebrow' => (string)($_POST['warum360_eyebrow'] ?? ''),
+                    'title' => (string)($_POST['warum360_title_text'] ?? ''),
+                    'sub' => (string)($_POST['warum360_sub'] ?? ''),
+                    'cards' => $w360Cards,
+                ],
+                'tours_text' => [
+                    'eyebrow' => (string)($_POST['tours_text_eyebrow'] ?? ''),
+                    'title' => (string)($_POST['tours_text_title'] ?? ''),
+                    'sub' => (string)($_POST['tours_text_sub'] ?? ''),
+                ],
+                'cases' => [
+                    'eyebrow' => (string)($_POST['cases_eyebrow'] ?? ''),
+                    'title' => (string)($_POST['cases_title_text'] ?? ''),
+                    'sub' => (string)($_POST['cases_sub'] ?? ''),
+                    'items' => $caseItems,
+                ],
+                'testimonials' => [
+                    'eyebrow' => (string)($_POST['testimonials_eyebrow'] ?? ''),
+                    'title' => (string)($_POST['testimonials_title'] ?? ''),
+                    'items' => $testiItems,
+                ],
+                'ablauf' => [
+                    'eyebrow' => (string)($_POST['ablauf_eyebrow'] ?? ''),
+                    'title' => (string)($_POST['ablauf_title_text'] ?? ''),
+                    'items' => $ablaufSteps,
+                ],
+                'kontakt_text' => [
+                    'eyebrow' => (string)($_POST['kontakt_eyebrow'] ?? ''),
+                    'title' => (string)($_POST['kontakt_title'] ?? ''),
+                    'sub' => (string)($_POST['kontakt_sub'] ?? ''),
+                    'sidebar_heading' => (string)($_POST['kontakt_sidebar_heading'] ?? ''),
+                    'sidebar_text' => (string)($_POST['kontakt_sidebar_text'] ?? ''),
+                    'email' => (string)($_POST['kontakt_email'] ?? ''),
+                    'response_label' => (string)($_POST['kontakt_response_label'] ?? ''),
+                    'response_text' => (string)($_POST['kontakt_response_text'] ?? ''),
+                    'location_label' => (string)($_POST['kontakt_location_label'] ?? ''),
+                    'location_text' => (string)($_POST['kontakt_location_text'] ?? ''),
+                ],
+                'faq' => [
+                    'eyebrow' => (string)($_POST['faq_eyebrow'] ?? ''),
+                    'title' => (string)($_POST['faq_title'] ?? ''),
+                    'sub' => (string)($_POST['faq_sub'] ?? ''),
+                    'items' => $faqItems,
+                    'button_text' => (string)($_POST['faq_button_text'] ?? ''),
+                ],
             ];
 
             if (!admin_write_json($contentPath, $content)) {
@@ -233,6 +427,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && admin_is_logged_in()) {
                     'countup_duration' => (int)($_POST['main_countup_duration'] ?? 1800),
                     'stack_rotation_amount' => (float)($_POST['main_stack_rotation_amount'] ?? 0.5),
                     'stack_item_stack_dist' => (int)($_POST['main_stack_item_stack_dist'] ?? 15),
+                    'tour_display_style' => in_array(($_POST['main_tour_display_style'] ?? 'stack'), ['stack', 'cardswap'], true) ? $_POST['main_tour_display_style'] : 'stack',
                 ],
             ];
 
@@ -448,6 +643,51 @@ function admin_lines(array $src, string $path): string
   if (!preg_match('/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/', $buttonFxColor)) {
     $buttonFxColor = '#8ec9ff';
   }
+
+  /* ── Prepare repeater arrays for admin forms ──────────── */
+  $w360FormCards = $content['warum360']['cards'] ?? [];
+  if (!is_array($w360FormCards) || !$w360FormCards) {
+    $w360FormCards = [
+      ['emoji' => '🏛️', 'title' => 'Räume verkaufen', 'text' => ''],
+      ['emoji' => '🤝', 'title' => 'Vertrauen aufbauen', 'text' => ''],
+      ['emoji' => '✨', 'title' => 'Atmosphäre erlebbar machen', 'text' => ''],
+      ['emoji' => '🔍', 'title' => 'Transparenz schaffen', 'text' => ''],
+    ];
+  }
+
+  $caseFormItems = $content['cases']['items'] ?? [];
+  if (!is_array($caseFormItems) || !$caseFormItems) {
+    $caseFormItems = [
+      ['tag' => '', 'title' => '', 'desc' => '', 'stat1_value' => '', 'stat1_label' => '', 'stat2_value' => '', 'stat2_label' => ''],
+      ['tag' => '', 'title' => '', 'desc' => '', 'stat1_value' => '', 'stat1_label' => '', 'stat2_value' => '', 'stat2_label' => ''],
+      ['tag' => '', 'title' => '', 'desc' => '', 'stat1_value' => '', 'stat1_label' => '', 'stat2_value' => '', 'stat2_label' => ''],
+    ];
+  }
+
+  $testiFormItems = $content['testimonials']['items'] ?? [];
+  if (!is_array($testiFormItems) || !$testiFormItems) {
+    $testiFormItems = [
+      ['text' => '', 'author' => '', 'company' => ''],
+      ['text' => '', 'author' => '', 'company' => ''],
+      ['text' => '', 'author' => '', 'company' => ''],
+    ];
+  }
+
+  $ablaufFormSteps = $content['ablauf']['items'] ?? [];
+  if (!is_array($ablaufFormSteps) || !$ablaufFormSteps) {
+    $ablaufFormSteps = [
+      ['emoji' => '🎯', 'title' => '', 'text' => ''],
+      ['emoji' => '📸', 'title' => '', 'text' => ''],
+      ['emoji' => '🚀', 'title' => '', 'text' => ''],
+    ];
+  }
+
+  $faqFormItems = $content['faq']['items'] ?? [];
+  if (!is_array($faqFormItems) || !$faqFormItems) {
+    $faqFormItems = [
+      ['question' => '', 'answer' => ''],
+    ];
+  }
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -463,7 +703,7 @@ function admin_lines(array $src, string $path): string
     .top{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:16px}
     .top h1{font-size:1.2rem;margin:0}
     .top a{color:#fff;text-decoration:none;border:1px solid #3a3a3a;border-radius:8px;padding:8px 12px}
-    .grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+    .grid{display:grid;grid-template-columns:1fr;gap:16px}
     .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
     .panel h2{font-size:1rem;margin:0 0 10px}
     .msg{padding:10px 12px;border-radius:10px;margin-bottom:10px;font-size:.92rem}
@@ -503,7 +743,7 @@ function admin_lines(array $src, string $path): string
     .kpi-remove{background:#1b1b1b;color:#fff;border:1px solid #3b3b3b;padding:6px 10px;border-radius:8px;font-size:.8rem}
     .kpi-add{background:#1b1b1b;color:#fff;border:1px solid #3b3b3b}
     hr{border:none;border-top:1px solid #242424;margin:14px 0}
-    @media (max-width: 1020px){.grid{grid-template-columns:1fr}.field-grid,.field-grid-3{grid-template-columns:1fr}}
+    @media (max-width: 1020px){.field-grid,.field-grid-3{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -524,7 +764,7 @@ function admin_lines(array $src, string $path): string
       </div>
 
       <div class="tab active" id="tab-content">
-        <form method="post" action="">
+        <form method="post" action="" enctype="multipart/form-data">
           <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
           <input type="hidden" name="action" value="save_content">
 
@@ -532,13 +772,23 @@ function admin_lines(array $src, string $path): string
             <button type="button" class="content-btn active" data-content-target="seo">SEO</button>
             <button type="button" class="content-btn" data-content-target="intro">Intro</button>
             <button type="button" class="content-btn" data-content-target="hero">Hero</button>
+            <button type="button" class="content-btn" data-content-target="mockup">Mockup</button>
+            <button type="button" class="content-btn" data-content-target="vergleich">Vergleich</button>
+            <button type="button" class="content-btn" data-content-target="warum360">Warum 360°</button>
+            <button type="button" class="content-btn" data-content-target="tours_text">Live-Demos</button>
             <button type="button" class="content-btn" data-content-target="kpi">KPI</button>
+            <button type="button" class="content-btn" data-content-target="cases">Case Studies</button>
+            <button type="button" class="content-btn" data-content-target="testimonials">Kundenstimmen</button>
             <button type="button" class="content-btn" data-content-target="marquee">Marquee</button>
+            <button type="button" class="content-btn" data-content-target="ablauf">Ablauf</button>
+            <button type="button" class="content-btn" data-content-target="kontakt_text">Kontakt</button>
+            <button type="button" class="content-btn" data-content-target="faq">FAQ</button>
             <button type="button" class="content-btn" data-content-target="about">About</button>
             <button type="button" class="content-btn" data-content-target="team">Team</button>
             <button type="button" class="content-btn" data-content-target="cta">Final CTA</button>
             <button type="button" class="content-btn" data-content-target="footer">Footer</button>
             <button type="button" class="content-btn" data-content-target="buttonfx">Button Stil</button>
+            <button type="button" class="content-btn" data-content-target="bilder">Bilder</button>
           </div>
 
           <section class="content-section active" data-content-section="seo">
@@ -633,10 +883,330 @@ function admin_lines(array $src, string $path): string
             </div>
           </section>
 
+          <section class="content-section" data-content-section="mockup">
+            <h2>Mockup Sektion</h2>
+            <div class="field-grid">
+              <div>
+                <label>Eyebrow</label>
+                <input type="text" name="mockup_text_eyebrow" value="<?= htmlspecialchars(admin_field($content, 'mockup_text.eyebrow', 'So sieht es aus'), ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+              <div>
+                <label>Titel</label>
+                <input type="text" name="mockup_text_title" value="<?= htmlspecialchars(admin_field($content, 'mockup_text.title', 'Ihr Rundgang – auf jedem Gerät'), ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+            </div>
+            <label>Untertitel</label>
+            <textarea name="mockup_text_sub"><?= htmlspecialchars(admin_field($content, 'mockup_text.sub', 'Ob Desktop, Tablet oder Smartphone – Ihr 360° Rundgang sieht überall perfekt aus.'), ENT_QUOTES, 'UTF-8') ?></textarea>
+            <hr>
+            <h2>Mockup Bilder</h2>
+            <p class="small" style="margin-bottom:12px">Lade hier die Screenshot-Bilder für die 3 Geräte hoch. Erlaubte Formate: PNG, JPG, WebP, AVIF.</p>
+<?php
+  $mockupFields = [
+    ['key' => 'desktop', 'label' => 'Desktop (Laptop)', 'field' => 'mockup.desktop_img'],
+    ['key' => 'tablet',  'label' => 'Tablet',            'field' => 'mockup.tablet_img'],
+    ['key' => 'phone',   'label' => 'Smartphone (iPhone)','field' => 'mockup.phone_img'],
+  ];
+?>
+            <div class="field-grid">
+<?php foreach ($mockupFields as $mf):
+  $currentPath = admin_field($content, $mf['field']);
+  $fileExists  = $currentPath !== '' && is_file(admin_absolute_path($currentPath));
+?>
+              <div>
+                <label><?= $mf['label'] ?></label>
+<?php if ($fileExists): ?>
+                <div style="margin-bottom:8px;padding:8px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;text-align:center;background:rgba(0,0,0,0.3)">
+                  <img src="../<?= htmlspecialchars($currentPath, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($mf['label'], ENT_QUOTES, 'UTF-8') ?>" style="max-height:120px;max-width:100%;border-radius:4px">
+                  <p class="small" style="margin-top:4px;color:var(--text-muted)">Aktuell: <?= htmlspecialchars(basename($currentPath), ENT_QUOTES, 'UTF-8') ?></p>
+                </div>
+<?php endif; ?>
+                <input type="file" name="mockup_<?= $mf['key'] ?>_file" accept=".png,.jpg,.jpeg,.webp,.avif">
+                <input type="hidden" name="mockup_<?= $mf['key'] ?>_img" value="<?= htmlspecialchars($currentPath, ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+<?php endforeach; ?>
+            </div>
+          </section>
+
           <section class="content-section" data-content-section="marquee">
             <h2>Marquee</h2>
             <label>Marquee Label</label>
             <input type="text" name="marquee_label" value="<?= htmlspecialchars(admin_field($content, 'marquee.label'), ENT_QUOTES, 'UTF-8') ?>">
+          </section>
+
+          <!-- ── Vergleich ──────────────────────────────── -->
+          <section class="content-section" data-content-section="vergleich">
+            <h2>Vergleich (Nur Fotos vs. 360°)</h2>
+            <div class="field-grid">
+              <div>
+                <label>Eyebrow</label>
+                <input type="text" name="vergleich_eyebrow" value="<?= htmlspecialchars(admin_field($content, 'vergleich.eyebrow', 'Der Unterschied'), ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+              <div>
+                <label>Titel</label>
+                <input type="text" name="vergleich_title" value="<?= htmlspecialchars(admin_field($content, 'vergleich.title', 'Nur Fotos vs. 360° Rundgang'), ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+            </div>
+            <label>Untertitel</label>
+            <textarea name="vergleich_sub"><?= htmlspecialchars(admin_field($content, 'vergleich.sub', 'Sehen Sie selbst, wie ein 360° Rundgang Ihre Präsenz verändert.'), ENT_QUOTES, 'UTF-8') ?></textarea>
+            <div class="field-grid">
+              <div>
+                <label>Badge links (negativ)</label>
+                <input type="text" name="vergleich_badge_negative" value="<?= htmlspecialchars(admin_field($content, 'vergleich.badge_negative', 'Nur Fotos'), ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+              <div>
+                <label>Badge rechts (positiv)</label>
+                <input type="text" name="vergleich_badge_positive" value="<?= htmlspecialchars(admin_field($content, 'vergleich.badge_positive', '360° Rundgang'), ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+            </div>
+            <hr>
+            <div class="field-grid">
+              <div>
+                <p class="small" style="margin-bottom:4px"><strong>Negative Punkte</strong></p>
+                <div id="vergleich-neg-rows">
+<?php
+  $negItems = $content['vergleich']['negative_items'] ?? [];
+  if (!is_array($negItems) || !$negItems) $negItems = [''];
+  foreach ($negItems as $ni => $nVal):
+?>
+                  <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px" data-vneg-row>
+                    <input type="text" name="vergleich_neg_item[]" value="<?= htmlspecialchars(trim((string)$nVal), ENT_QUOTES, 'UTF-8') ?>" style="flex:1">
+                    <button type="button" class="kpi-remove" data-vneg-remove style="flex-shrink:0">×</button>
+                  </div>
+<?php endforeach; ?>
+                </div>
+                <button class="kpi-add" id="vneg-add" type="button" style="margin-top:4px">+ Punkt</button>
+              </div>
+              <div>
+                <p class="small" style="margin-bottom:4px"><strong>Positive Punkte</strong></p>
+                <div id="vergleich-pos-rows">
+<?php
+  $posItems = $content['vergleich']['positive_items'] ?? [];
+  if (!is_array($posItems) || !$posItems) $posItems = [''];
+  foreach ($posItems as $pi => $pVal):
+?>
+                  <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px" data-vpos-row>
+                    <input type="text" name="vergleich_pos_item[]" value="<?= htmlspecialchars(trim((string)$pVal), ENT_QUOTES, 'UTF-8') ?>" style="flex:1">
+                    <button type="button" class="kpi-remove" data-vpos-remove style="flex-shrink:0">×</button>
+                  </div>
+<?php endforeach; ?>
+                </div>
+                <button class="kpi-add" id="vpos-add" type="button" style="margin-top:4px">+ Punkt</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- ── Warum 360° ─────────────────────────────── -->
+          <section class="content-section" data-content-section="warum360">
+            <h2>Warum 360°</h2>
+            <div class="field-grid">
+              <div>
+                <label>Eyebrow</label>
+                <input type="text" name="warum360_eyebrow" value="<?= htmlspecialchars(admin_field($content, 'warum360.eyebrow', 'Warum 360°?'), ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+              <div>
+                <label>Titel</label>
+                <input type="text" name="warum360_title_text" value="<?= htmlspecialchars(admin_field($content, 'warum360.title', '360° Rundgänge für jede Branche – und jede Location'), ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+            </div>
+            <label>Untertitel</label>
+            <textarea name="warum360_sub"><?= htmlspecialchars(admin_field($content, 'warum360.sub', 'Ein virtueller Rundgang schafft unmittelbar Nähe – noch bevor der erste echte Kontakt stattfindet.'), ENT_QUOTES, 'UTF-8') ?></textarea>
+            <hr>
+            <p class="small">Feature-Karten (Bento Grid)</p>
+<?php foreach ($w360FormCards as $wi => $wCard): ?>
+            <div style="border:1px solid #272727;border-radius:10px;padding:10px;margin-bottom:8px">
+              <strong style="font-size:.82rem">Karte <?= $wi + 1 ?></strong>
+              <div class="field-grid-3">
+                <div>
+                  <label>Emoji</label>
+                  <input type="text" name="warum360_emoji[]" value="<?= htmlspecialchars((string)($wCard['emoji'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                </div>
+                <div>
+                  <label>Titel</label>
+                  <input type="text" name="warum360_card_title[]" value="<?= htmlspecialchars((string)($wCard['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                </div>
+                <div></div>
+              </div>
+              <label>Text</label>
+              <textarea name="warum360_card_text[]"><?= htmlspecialchars((string)($wCard['text'] ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
+            </div>
+<?php endforeach; ?>
+          </section>
+
+          <!-- ── Live-Demos Text ────────────────────────── -->
+          <section class="content-section" data-content-section="tours_text">
+            <h2>Live-Demos (Texte)</h2>
+            <p class="small">Rundgänge selbst werden über <strong>tours.json</strong> verwaltet.</p>
+            <div class="field-grid">
+              <div>
+                <label>Eyebrow</label>
+                <input type="text" name="tours_text_eyebrow" value="<?= htmlspecialchars(admin_field($content, 'tours_text.eyebrow', 'Live-Demos'), ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+              <div>
+                <label>Titel</label>
+                <input type="text" name="tours_text_title" value="<?= htmlspecialchars(admin_field($content, 'tours_text.title', 'Beispiel-Rundgänge'), ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+            </div>
+            <label>Untertitel</label>
+            <textarea name="tours_text_sub"><?= htmlspecialchars(admin_field($content, 'tours_text.sub', 'Erlebe unsere Arbeit direkt – immersiv, interaktiv und hochauflösend. Scrolle durch die Rundgänge.'), ENT_QUOTES, 'UTF-8') ?></textarea>
+          </section>
+
+          <!-- ── Case Studies ───────────────────────────── -->
+          <section class="content-section" data-content-section="cases">
+            <h2>Mini Case Studies</h2>
+            <div class="field-grid">
+              <div>
+                <label>Eyebrow</label>
+                <input type="text" name="cases_eyebrow" value="<?= htmlspecialchars(admin_field($content, 'cases.eyebrow', 'Erfolgsgeschichten'), ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+              <div>
+                <label>Titel</label>
+                <input type="text" name="cases_title_text" value="<?= htmlspecialchars(admin_field($content, 'cases.title', 'Mini Case Studies'), ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+            </div>
+            <label>Untertitel</label>
+            <textarea name="cases_sub"><?= htmlspecialchars(admin_field($content, 'cases.sub', 'Echte Ergebnisse unserer Kunden – in Zahlen und Fakten.'), ENT_QUOTES, 'UTF-8') ?></textarea>
+            <hr>
+<?php foreach ($caseFormItems as $ci => $cItem): ?>
+            <div style="border:1px solid #272727;border-radius:10px;padding:10px;margin-bottom:8px">
+              <strong style="font-size:.82rem">Case <?= $ci + 1 ?></strong>
+              <div class="field-grid-3">
+                <div><label>Branche/Tag</label><input type="text" name="case_tag[]" value="<?= htmlspecialchars((string)($cItem['tag'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"></div>
+                <div><label>Firmenname</label><input type="text" name="case_title[]" value="<?= htmlspecialchars((string)($cItem['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"></div>
+                <div></div>
+              </div>
+              <label>Beschreibung</label>
+              <textarea name="case_desc[]"><?= htmlspecialchars((string)($cItem['desc'] ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
+              <div class="field-grid">
+                <div><label>Stat 1 Wert</label><input type="text" name="case_stat1_value[]" value="<?= htmlspecialchars((string)($cItem['stat1_value'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"></div>
+                <div><label>Stat 1 Label</label><input type="text" name="case_stat1_label[]" value="<?= htmlspecialchars((string)($cItem['stat1_label'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"></div>
+                <div><label>Stat 2 Wert</label><input type="text" name="case_stat2_value[]" value="<?= htmlspecialchars((string)($cItem['stat2_value'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"></div>
+                <div><label>Stat 2 Label</label><input type="text" name="case_stat2_label[]" value="<?= htmlspecialchars((string)($cItem['stat2_label'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"></div>
+              </div>
+            </div>
+<?php endforeach; ?>
+          </section>
+
+          <!-- ── Kundenstimmen ──────────────────────────── -->
+          <section class="content-section" data-content-section="testimonials">
+            <h2>Kundenstimmen</h2>
+            <div class="field-grid">
+              <div>
+                <label>Eyebrow</label>
+                <input type="text" name="testimonials_eyebrow" value="<?= htmlspecialchars(admin_field($content, 'testimonials.eyebrow', 'Kundenstimmen'), ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+              <div>
+                <label>Titel</label>
+                <input type="text" name="testimonials_title" value="<?= htmlspecialchars(admin_field($content, 'testimonials.title', 'Das sagen unsere Kunden'), ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+            </div>
+            <hr>
+<?php foreach ($testiFormItems as $ti => $tItem): ?>
+            <div style="border:1px solid #272727;border-radius:10px;padding:10px;margin-bottom:8px">
+              <strong style="font-size:.82rem">Stimme <?= $ti + 1 ?></strong>
+              <label>Zitat</label>
+              <textarea name="testi_text[]"><?= htmlspecialchars((string)($tItem['text'] ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
+              <div class="field-grid">
+                <div><label>Autor / Firma</label><input type="text" name="testi_author[]" value="<?= htmlspecialchars((string)($tItem['author'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"></div>
+                <div><label>Untertitel</label><input type="text" name="testi_company[]" value="<?= htmlspecialchars((string)($tItem['company'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"></div>
+              </div>
+            </div>
+<?php endforeach; ?>
+          </section>
+
+          <!-- ── Ablauf ─────────────────────────────────── -->
+          <section class="content-section" data-content-section="ablauf">
+            <h2>Ablauf</h2>
+            <div class="field-grid">
+              <div>
+                <label>Eyebrow</label>
+                <input type="text" name="ablauf_eyebrow" value="<?= htmlspecialchars(admin_field($content, 'ablauf.eyebrow', 'Ablauf'), ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+              <div>
+                <label>Titel</label>
+                <input type="text" name="ablauf_title_text" value="<?= htmlspecialchars(admin_field($content, 'ablauf.title', 'So entsteht Ihr professioneller 360° Rundgang'), ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+            </div>
+            <hr>
+<?php foreach ($ablaufFormSteps as $ai => $aStep): ?>
+            <div style="border:1px solid #272727;border-radius:10px;padding:10px;margin-bottom:8px">
+              <strong style="font-size:.82rem">Schritt <?= $ai + 1 ?></strong>
+              <div class="field-grid-3">
+                <div><label>Emoji</label><input type="text" name="ablauf_emoji[]" value="<?= htmlspecialchars((string)($aStep['emoji'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"></div>
+                <div><label>Titel</label><input type="text" name="ablauf_step_title[]" value="<?= htmlspecialchars((string)($aStep['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"></div>
+                <div></div>
+              </div>
+              <label>Text</label>
+              <textarea name="ablauf_step_text[]"><?= htmlspecialchars((string)($aStep['text'] ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
+            </div>
+<?php endforeach; ?>
+          </section>
+
+          <!-- ── Kontakt ────────────────────────────────── -->
+          <section class="content-section" data-content-section="kontakt_text">
+            <h2>Kontakt Sektion</h2>
+            <div class="field-grid">
+              <div>
+                <label>Eyebrow</label>
+                <input type="text" name="kontakt_eyebrow" value="<?= htmlspecialchars(admin_field($content, 'kontakt_text.eyebrow', 'Kontakt'), ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+              <div>
+                <label>Titel</label>
+                <input type="text" name="kontakt_title" value="<?= htmlspecialchars(admin_field($content, 'kontakt_text.title', 'Jetzt unverbindlich anfragen'), ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+            </div>
+            <label>Untertitel</label>
+            <textarea name="kontakt_sub"><?= htmlspecialchars(admin_field($content, 'kontakt_text.sub', 'Wir erstellen Ihnen ein klares Angebot mit Zeitplan und transparenten Kosten – kostenlos und persönlich.'), ENT_QUOTES, 'UTF-8') ?></textarea>
+            <hr>
+            <p class="small">Sidebar (Info-Bereich neben dem Formular)</p>
+            <label>Überschrift</label>
+            <input type="text" name="kontakt_sidebar_heading" value="<?= htmlspecialchars(admin_field($content, 'kontakt_text.sidebar_heading', 'So erreichen Sie uns'), ENT_QUOTES, 'UTF-8') ?>">
+            <label>Text</label>
+            <textarea name="kontakt_sidebar_text"><?= htmlspecialchars(admin_field($content, 'kontakt_text.sidebar_text', 'Nutzen Sie das Formular für eine schnelle Anfrage – oder schreiben Sie uns direkt per E-Mail.'), ENT_QUOTES, 'UTF-8') ?></textarea>
+            <label>E-Mail</label>
+            <input type="text" name="kontakt_email" value="<?= htmlspecialchars(admin_field($content, 'kontakt_text.email', 'info@visitfy.de'), ENT_QUOTES, 'UTF-8') ?>">
+            <div class="field-grid">
+              <div><label>Response Label</label><input type="text" name="kontakt_response_label" value="<?= htmlspecialchars(admin_field($content, 'kontakt_text.response_label', 'Antwortzeit'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>Response Text</label><input type="text" name="kontakt_response_text" value="<?= htmlspecialchars(admin_field($content, 'kontakt_text.response_text', 'In der Regel innerhalb von 24 Stunden an Werktagen.'), ENT_QUOTES, 'UTF-8') ?>"></div>
+            </div>
+            <div class="field-grid">
+              <div><label>Standort Label</label><input type="text" name="kontakt_location_label" value="<?= htmlspecialchars(admin_field($content, 'kontakt_text.location_label', 'Standort'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>Standort Text</label><input type="text" name="kontakt_location_text" value="<?= htmlspecialchars(admin_field($content, 'kontakt_text.location_text', 'Flensburg, Deutschland'), ENT_QUOTES, 'UTF-8') ?>"></div>
+            </div>
+          </section>
+
+          <!-- ── FAQ ────────────────────────────────────── -->
+          <section class="content-section" data-content-section="faq">
+            <h2>FAQ</h2>
+            <div class="field-grid">
+              <div>
+                <label>Eyebrow</label>
+                <input type="text" name="faq_eyebrow" value="<?= htmlspecialchars(admin_field($content, 'faq.eyebrow', 'Antworten'), ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+              <div>
+                <label>Titel</label>
+                <input type="text" name="faq_title" value="<?= htmlspecialchars(admin_field($content, 'faq.title', 'Häufige Fragen'), ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+            </div>
+            <label>Untertitel</label>
+            <textarea name="faq_sub"><?= htmlspecialchars(admin_field($content, 'faq.sub', 'Alles Wichtige zu 360° Rundgängen, Ablauf, Kosten und Branchen auf einen Blick.'), ENT_QUOTES, 'UTF-8') ?></textarea>
+            <label>Button Text</label>
+            <input type="text" name="faq_button_text" value="<?= htmlspecialchars(admin_field($content, 'faq.button_text', 'Alle Fragen ansehen'), ENT_QUOTES, 'UTF-8') ?>">
+            <hr>
+            <div id="faq-rows">
+<?php foreach ($faqFormItems as $fi => $fItem): ?>
+              <div style="border:1px solid #272727;border-radius:10px;padding:10px;margin-bottom:8px" data-faq-row>
+                <div class="kpi-row-top">
+                  <strong style="font-size:.82rem">Frage <?= $fi + 1 ?></strong>
+                  <button class="kpi-remove" type="button" data-faq-remove>Entfernen</button>
+                </div>
+                <label>Frage</label>
+                <input type="text" name="faq_question[]" value="<?= htmlspecialchars((string)($fItem['question'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                <label>Antwort (HTML erlaubt)</label>
+                <textarea name="faq_answer[]"><?= htmlspecialchars((string)($fItem['answer'] ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
+              </div>
+<?php endforeach; ?>
+            </div>
+            <div class="actions"><button class="kpi-add" id="faq-add" type="button">+ Frage hinzufügen</button></div>
           </section>
 
           <section class="content-section" data-content-section="about">
@@ -737,6 +1307,74 @@ function admin_lines(array $src, string $path): string
 
           <div class="actions"><button type="submit">Inhalte speichern</button></div>
         </form>
+
+        <!-- ── Bilder (inside content tab, outside content form) ── -->
+        <section class="content-section" data-content-section="bilder">
+          <h2>Bilder hochladen</h2>
+          <form method="post" action="" enctype="multipart/form-data">
+            <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
+            <input type="hidden" name="action" value="upload_image">
+            <label for="target_folder">Zielordner</label>
+            <select id="target_folder" name="target_folder">
+              <?php foreach (admin_upload_folders() as $label => $path): ?>
+                <option value="<?= htmlspecialchars($path, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?></option>
+              <?php endforeach; ?>
+            </select>
+
+            <label for="image_file">Datei</label>
+            <input id="image_file" type="file" name="image_file" accept=".png,.jpg,.jpeg,.webp,.avif,.svg" required>
+
+            <div class="actions"><button type="submit">Upload</button></div>
+          </form>
+
+          <p class="small" style="margin-top:12px">Logos für Marquee bitte in <strong>assets/img/client-logos</strong> hochladen.</p>
+
+          <hr>
+          <h2>Vorschau</h2>
+          <div class="img-grid">
+            <?php
+            foreach (admin_upload_folders() as $folderLabel => $folderPath) {
+                $absFolder = admin_absolute_path($folderPath);
+                if (!is_dir($absFolder)) {
+                    continue;
+                }
+                $items = glob($absFolder . '/*.{png,jpg,jpeg,webp,avif,svg}', GLOB_BRACE);
+                if (!is_array($items)) {
+                    continue;
+                }
+                $items = array_slice($items, 0, 30);
+                foreach ($items as $imgPath) {
+                    $name = basename($imgPath);
+                    $src = '../' . trim($folderPath, '/') . '/' . rawurlencode($name);
+                    ?>
+                    <div class="thumb">
+                      <img src="<?= htmlspecialchars($src, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($name, ENT_QUOTES, 'UTF-8') ?>">
+                      <span><?= htmlspecialchars($name, ENT_QUOTES, 'UTF-8') ?></span>
+                      <small><?= htmlspecialchars($folderLabel, ENT_QUOTES, 'UTF-8') ?></small>
+                      <div class="thumb-actions">
+                        <form method="post" action="">
+                          <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
+                          <input type="hidden" name="action" value="rename_image">
+                          <input type="hidden" name="target_folder" value="<?= htmlspecialchars($folderPath, ENT_QUOTES, 'UTF-8') ?>">
+                          <input type="hidden" name="old_name" value="<?= htmlspecialchars($name, ENT_QUOTES, 'UTF-8') ?>">
+                          <input type="text" name="new_name" value="<?= htmlspecialchars($name, ENT_QUOTES, 'UTF-8') ?>" aria-label="Neuer Dateiname">
+                          <button type="submit">Umbenennen</button>
+                        </form>
+                        <form method="post" action="" onsubmit="return confirm('Bild wirklich löschen?');">
+                          <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
+                          <input type="hidden" name="action" value="delete_image">
+                          <input type="hidden" name="target_folder" value="<?= htmlspecialchars($folderPath, ENT_QUOTES, 'UTF-8') ?>">
+                          <input type="hidden" name="image_name" value="<?= htmlspecialchars($name, ENT_QUOTES, 'UTF-8') ?>">
+                          <button class="thumb-delete" type="submit">Löschen</button>
+                        </form>
+                      </div>
+                    </div>
+                    <?php
+                }
+            }
+            ?>
+          </div>
+        </section>
       </div>
 
       <div class="tab" id="tab-scripts">
@@ -765,79 +1403,19 @@ function admin_lines(array $src, string $path): string
             <div><label>CountUp Duration (ms)</label><input type="number" name="main_countup_duration" value="<?= htmlspecialchars(admin_field($script, 'main.countup_duration', '1800'), ENT_QUOTES, 'UTF-8') ?>"></div>
             <div><label>Stack Rotation Amount</label><input type="text" name="main_stack_rotation_amount" value="<?= htmlspecialchars(admin_field($script, 'main.stack_rotation_amount', '0.5'), ENT_QUOTES, 'UTF-8') ?>"></div>
             <div><label>Stack Item Dist (px)</label><input type="number" name="main_stack_item_stack_dist" value="<?= htmlspecialchars(admin_field($script, 'main.stack_item_stack_dist', '15'), ENT_QUOTES, 'UTF-8') ?>"></div>
+            <div>
+              <label>Tour Animation Stil</label>
+              <select name="main_tour_display_style">
+                <option value="stack"<?= admin_field($script, 'main.tour_display_style', 'stack') === 'stack' ? ' selected' : '' ?>>Stack (Standard)</option>
+                <option value="cardswap"<?= admin_field($script, 'main.tour_display_style', 'stack') === 'cardswap' ? ' selected' : '' ?>>Card Swap</option>
+              </select>
+            </div>
           </div>
           <label>Hero Wörter (1 Zeile = 1 Wort)</label>
           <textarea name="script_hero_words"><?= htmlspecialchars(admin_lines($script, 'main.hero_words'), ENT_QUOTES, 'UTF-8') ?></textarea>
 
           <div class="actions"><button type="submit">Script-Variablen speichern</button></div>
         </form>
-      </div>
-    </div>
-
-    <div class="panel">
-      <h2>Bilder hochladen</h2>
-      <form method="post" action="" enctype="multipart/form-data">
-        <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
-        <input type="hidden" name="action" value="upload_image">
-        <label for="target_folder">Zielordner</label>
-        <select id="target_folder" name="target_folder">
-          <?php foreach (admin_upload_folders() as $label => $path): ?>
-            <option value="<?= htmlspecialchars($path, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?></option>
-          <?php endforeach; ?>
-        </select>
-
-        <label for="image_file">Datei</label>
-        <input id="image_file" type="file" name="image_file" accept=".png,.jpg,.jpeg,.webp,.avif,.svg" required>
-
-        <div class="actions"><button type="submit">Upload</button></div>
-      </form>
-
-      <p class="small" style="margin-top:12px">Logos für Marquee bitte in <strong>assets/img/client-logos</strong> hochladen.</p>
-
-      <hr>
-      <h2>Vorschau</h2>
-      <div class="img-grid">
-        <?php
-        foreach (admin_upload_folders() as $folderLabel => $folderPath) {
-            $absFolder = admin_absolute_path($folderPath);
-            if (!is_dir($absFolder)) {
-                continue;
-            }
-            $items = glob($absFolder . '/*.{png,jpg,jpeg,webp,avif,svg}', GLOB_BRACE);
-            if (!is_array($items)) {
-                continue;
-            }
-            $items = array_slice($items, 0, 30);
-            foreach ($items as $imgPath) {
-                $name = basename($imgPath);
-                $src = '../' . trim($folderPath, '/') . '/' . rawurlencode($name);
-                ?>
-                <div class="thumb">
-                  <img src="<?= htmlspecialchars($src, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($name, ENT_QUOTES, 'UTF-8') ?>">
-                  <span><?= htmlspecialchars($name, ENT_QUOTES, 'UTF-8') ?></span>
-                  <small><?= htmlspecialchars($folderLabel, ENT_QUOTES, 'UTF-8') ?></small>
-                  <div class="thumb-actions">
-                    <form method="post" action="">
-                      <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
-                      <input type="hidden" name="action" value="rename_image">
-                      <input type="hidden" name="target_folder" value="<?= htmlspecialchars($folderPath, ENT_QUOTES, 'UTF-8') ?>">
-                      <input type="hidden" name="old_name" value="<?= htmlspecialchars($name, ENT_QUOTES, 'UTF-8') ?>">
-                      <input type="text" name="new_name" value="<?= htmlspecialchars($name, ENT_QUOTES, 'UTF-8') ?>" aria-label="Neuer Dateiname">
-                      <button type="submit">Umbenennen</button>
-                    </form>
-                    <form method="post" action="" onsubmit="return confirm('Bild wirklich löschen?');">
-                      <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
-                      <input type="hidden" name="action" value="delete_image">
-                      <input type="hidden" name="target_folder" value="<?= htmlspecialchars($folderPath, ENT_QUOTES, 'UTF-8') ?>">
-                      <input type="hidden" name="image_name" value="<?= htmlspecialchars($name, ENT_QUOTES, 'UTF-8') ?>">
-                      <button class="thumb-delete" type="submit">Löschen</button>
-                    </form>
-                  </div>
-                </div>
-                <?php
-            }
-        }
-        ?>
       </div>
     </div>
   </div>
@@ -959,6 +1537,142 @@ function admin_lines(array $src, string $path): string
       }
     });
   }
+
+  /* ── FAQ Add/Remove ────────────────────────────────── */
+  const faqRows = document.getElementById('faq-rows');
+  const faqAdd = document.getElementById('faq-add');
+
+  function createFaqRow() {
+    const row = document.createElement('div');
+    row.style.cssText = 'border:1px solid #272727;border-radius:10px;padding:10px;margin-bottom:8px';
+    row.setAttribute('data-faq-row', '');
+    row.innerHTML = `
+      <div class="kpi-row-top">
+        <strong style="font-size:.82rem"></strong>
+        <button class="kpi-remove" type="button" data-faq-remove>Entfernen</button>
+      </div>
+      <label>Frage</label>
+      <input type="text" name="faq_question[]" value="">
+      <label>Antwort (HTML erlaubt)</label>
+      <textarea name="faq_answer[]"></textarea>
+    `;
+    return row;
+  }
+
+  function syncFaqLabels() {
+    if (!faqRows) return;
+    const rows = faqRows.querySelectorAll('[data-faq-row]');
+    rows.forEach((row, i) => {
+      const t = row.querySelector('.kpi-row-top strong');
+      if (t) t.textContent = `Frage ${i + 1}`;
+    });
+    const removeBtns = faqRows.querySelectorAll('[data-faq-remove]');
+    removeBtns.forEach(btn => {
+      btn.disabled = rows.length <= 1;
+      btn.style.opacity = rows.length <= 1 ? '0.45' : '1';
+      btn.style.cursor = rows.length <= 1 ? 'not-allowed' : 'pointer';
+    });
+  }
+
+  faqAdd?.addEventListener('click', () => {
+    faqRows.appendChild(createFaqRow());
+    syncFaqLabels();
+  });
+
+  faqRows?.addEventListener('click', event => {
+    const btn = event.target.closest('[data-faq-remove]');
+    if (!btn) return;
+    const row = btn.closest('[data-faq-row]');
+    if (!row) return;
+    if (faqRows.querySelectorAll('[data-faq-row]').length <= 1) return;
+    row.remove();
+    syncFaqLabels();
+  });
+  if (faqRows) syncFaqLabels();
+
+  /* ── Vergleich Negative Add/Remove ─────────────────── */
+  const vnegRows = document.getElementById('vergleich-neg-rows');
+  const vnegAdd = document.getElementById('vneg-add');
+
+  function createVnegRow() {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:6px;align-items:center;margin-bottom:6px';
+    row.setAttribute('data-vneg-row', '');
+    row.innerHTML = `
+      <input type="text" name="vergleich_neg_item[]" value="" style="flex:1">
+      <button type="button" class="kpi-remove" data-vneg-remove style="flex-shrink:0">×</button>
+    `;
+    return row;
+  }
+
+  function syncVnegBtns() {
+    if (!vnegRows) return;
+    const rows = vnegRows.querySelectorAll('[data-vneg-row]');
+    const removeBtns = vnegRows.querySelectorAll('[data-vneg-remove]');
+    removeBtns.forEach(btn => {
+      btn.disabled = rows.length <= 1;
+      btn.style.opacity = rows.length <= 1 ? '0.45' : '1';
+      btn.style.cursor = rows.length <= 1 ? 'not-allowed' : 'pointer';
+    });
+  }
+
+  vnegAdd?.addEventListener('click', () => {
+    vnegRows.appendChild(createVnegRow());
+    syncVnegBtns();
+  });
+
+  vnegRows?.addEventListener('click', event => {
+    const btn = event.target.closest('[data-vneg-remove]');
+    if (!btn) return;
+    const row = btn.closest('[data-vneg-row]');
+    if (!row) return;
+    if (vnegRows.querySelectorAll('[data-vneg-row]').length <= 1) return;
+    row.remove();
+    syncVnegBtns();
+  });
+  if (vnegRows) syncVnegBtns();
+
+  /* ── Vergleich Positive Add/Remove ─────────────────── */
+  const vposRows = document.getElementById('vergleich-pos-rows');
+  const vposAdd = document.getElementById('vpos-add');
+
+  function createVposRow() {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:6px;align-items:center;margin-bottom:6px';
+    row.setAttribute('data-vpos-row', '');
+    row.innerHTML = `
+      <input type="text" name="vergleich_pos_item[]" value="" style="flex:1">
+      <button type="button" class="kpi-remove" data-vpos-remove style="flex-shrink:0">×</button>
+    `;
+    return row;
+  }
+
+  function syncVposBtns() {
+    if (!vposRows) return;
+    const rows = vposRows.querySelectorAll('[data-vpos-row]');
+    const removeBtns = vposRows.querySelectorAll('[data-vpos-remove]');
+    removeBtns.forEach(btn => {
+      btn.disabled = rows.length <= 1;
+      btn.style.opacity = rows.length <= 1 ? '0.45' : '1';
+      btn.style.cursor = rows.length <= 1 ? 'not-allowed' : 'pointer';
+    });
+  }
+
+  vposAdd?.addEventListener('click', () => {
+    vposRows.appendChild(createVposRow());
+    syncVposBtns();
+  });
+
+  vposRows?.addEventListener('click', event => {
+    const btn = event.target.closest('[data-vpos-remove]');
+    if (!btn) return;
+    const row = btn.closest('[data-vpos-row]');
+    if (!row) return;
+    if (vposRows.querySelectorAll('[data-vpos-row]').length <= 1) return;
+    row.remove();
+    syncVposBtns();
+  });
+  if (vposRows) syncVposBtns();
 </script>
 </body>
 </html>

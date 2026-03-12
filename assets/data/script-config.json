@@ -21,6 +21,7 @@
     "hero_hold_duration": 1900,
     "countup_duration": 1800,
     "stack_rotation_amount": 0.5,
-    "stack_item_stack_dist": 15
+    "stack_item_stack_dist": 15,
+    "tour_display_style": "stack"
   }
 }
