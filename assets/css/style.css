@@ -1712,6 +1712,89 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   opacity: 0.9;
 }
 
+/* ── About page enhancements ─────────────────────────────── */
+
+/* Panel badge (small label with icon before difference title) */
+.about-panel-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0.3em 0.85em;
+  border: 1px solid var(--line);
+  border-radius: 50px;
+  margin-bottom: 1rem;
+}
+
+/* Icon circle inside feature list items */
+.about-item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid var(--glass-border);
+  color: var(--text);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+/* Hide the CSS dot for icon-enhanced items */
+.about-features li.about-icon-item::before {
+  display: none;
+}
+
+/* Subtle hover highlight on icon */
+.about-features li:hover .about-item-icon {
+  background: rgba(255,255,255,0.12);
+  border-color: var(--line-strong);
+}
+
+/* Stagger fade-in for list items when parent panel is revealed */
+@keyframes about-item-reveal {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.fade-up.visible .about-features li {
+  animation: about-item-reveal 0.4s var(--ease-out) both;
+}
+.fade-up.visible .about-features li:nth-child(1) { animation-delay: 0.06s; }
+.fade-up.visible .about-features li:nth-child(2) { animation-delay: 0.13s; }
+.fade-up.visible .about-features li:nth-child(3) { animation-delay: 0.20s; }
+.fade-up.visible .about-features li:nth-child(4) { animation-delay: 0.27s; }
+.fade-up.visible .about-features li:nth-child(5) { animation-delay: 0.34s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-up.visible .about-features li { animation: none; }
+}
+
+/* Team avatar circle */
+.about-team-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  color: var(--text-muted);
+  transition: background 0.25s, border-color 0.25s;
+}
+
+.about-team-card:hover .about-team-avatar {
+  background: rgba(255,255,255,0.10);
+  border-color: var(--line-strong);
+}
+
 @media (max-width: 768px) {
   .about-grid { grid-template-columns: 1fr; gap: 2rem; }
 }

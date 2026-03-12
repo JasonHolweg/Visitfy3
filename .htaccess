@@ -1,0 +1,38 @@
+# ══════════════════════════════════════════════════════════════
+#  Visitfy3 – Apache configuration & security hardening
+# ══════════════════════════════════════════════════════════════
+
+# ── Prevent directory listing ────────────────────────────────
+Options -Indexes
+
+# ── Deny direct access to sensitive files ────────────────────
+<FilesMatch "(\.env|\.git|\.gitignore|deploy\.env|bootstrap\.php)$">
+  Require all denied
+</FilesMatch>
+
+# ── Security headers ─────────────────────────────────────────
+<IfModule mod_headers.c>
+  # Prevent clickjacking
+  Header always set X-Frame-Options "SAMEORIGIN"
+
+  # Prevent MIME-type sniffing
+  Header always set X-Content-Type-Options "nosniff"
+
+  # Control referrer information
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Restrict browser feature access
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), encrypted-media=()"
+
+  # Remove PHP version disclosure
+  Header unset X-Powered-By
+  Header always unset X-Powered-By
+</IfModule>
+
+# ── Character encoding ───────────────────────────────────────
+AddDefaultCharset UTF-8
+
+# ── PHP hardening (where PHP is run via mod_php/CGI) ─────────
+<IfModule mod_php.c>
+  php_flag expose_php Off
+</IfModule>

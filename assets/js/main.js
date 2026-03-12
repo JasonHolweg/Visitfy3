@@ -369,124 +369,35 @@
     const ROTATION_AMOUNT = Number(scriptCfg.stack_rotation_amount ?? 0.5); /* deg */
     const ITEM_STACK_DIST = Number(scriptCfg.stack_item_stack_dist ?? 15);  /* px, vertical offset per stacked card */
 
-    if (prefersReduced) return;
-
-    let frozen = false;
-
-    window.addEventListener('scroll', () => {
-      const containerRect = container.getBoundingClientRect();
-      const stickyTopPx   = window.innerHeight * 0.15; /* 15vh */
-
-      /* --- Freeze / Unfreeze logic ---------------------------------- */
-      const lastItem = items[items.length - 1];
-      const cardH    = (lastItem.querySelector('.stack-card') || lastItem).offsetHeight;
-
-      if (!frozen) {
-        /* Check: are ALL cards stuck at the sticky position? */
-        const allStuck = containerRect.top < stickyTopPx &&
-          Array.from(items).every(it => it.getBoundingClientRect().top <= stickyTopPx + 8);
-        /* Is the container bottom approaching the card zone? */
-        const nearEnd  = containerRect.bottom < stickyTopPx + cardH;
-
-        if (allStuck && nearEnd) {
-          frozen = true;
-          /* Lock container height so absolute children don't collapse it */
-          container.style.minHeight = container.offsetHeight + 'px';
-          /* Place ALL items at the same absolute position within the container */
-          const absTop = stickyTopPx - containerRect.top;
-          items.forEach(item => {
-            item.style.position     = 'absolute';
-            item.style.top          = absTop + 'px';
-            item.style.left         = '0';
-            item.style.right        = '0';
-            item.style.marginBottom = '0';
-          });
-          return; /* nothing else to compute this frame */
-        }
-      } else {
-        /* Unfreeze when user scrolls back up past the exit zone (hysteresis) */
-        const safe = containerRect.bottom > stickyTopPx + cardH + 200;
-        if (safe) {
-          frozen = false;
-          container.style.minHeight = '';
-          items.forEach(item => {
-            item.style.position     = '';
-            item.style.top          = '';
-            item.style.left         = '';
-            item.style.right        = '';
-            item.style.marginBottom = '';
-          });
-        } else {
-          return; /* still frozen */
-        }
-      }
-
-      /* --- Normal rotation + offset as cards stack ------------------- */
-      items.forEach((item, idx) => {
-        const rect = item.getBoundingClientRect();
-        const card = item.querySelector('.stack-card');
-        if (!card) return;
-        const stickyTop = parseFloat(getComputedStyle(item).top) || 0;
-        const isStuck   = rect.top <= stickyTop + 2;
-        if (isStuck) {
-          let stackCount = 0;
-          items.forEach((other, j) => {
-            if (j >= idx) return;
-            const otherRect = other.getBoundingClientRect();
-            const otherTop  = parseFloat(getComputedStyle(other).top) || 0;
-            if (otherRect.top <= otherTop + 2) stackCount++;
-          });
-          const rot    = (idx % 2 === 0 ? 1 : -1) * ROTATION_AMOUNT * Math.min(stackCount, 3) * 0.5;
-          const offset = stackCount * ITEM_STACK_DIST;
-          card.style.transform = `translateY(${offset}px) rotate(${rot}deg)`;
-        } else {
-          card.style.transform = '';
-        }
-      });
-    }, { passive: true });
-  }
-
-
-  /* ═══════════════════════════════════════════════════════════
-     CARD-SWAP
-     Cards stacked on top of each other in a fixed viewport.
-     Scroll progress swaps the top card away (scale down + fade
-     out upwards) to reveal the next card beneath.
-  ═══════════════════════════════════════════════════════════ */
-  function initCardSwap() {
-    const section = document.querySelector('.scroll-stack-section');
-    if (!section) return;
-
-    const wrapper = section.querySelector('.cardswap-wrapper');
-    if (!wrapper) return;
-
-    const anchor   = wrapper.querySelector('.cardswap-anchor');
-    const viewport = wrapper.querySelector('.cardswap-viewport');
-    const cards    = wrapper.querySelectorAll('.cardswap-card');
-    const dots     = wrapper.querySelectorAll('.cardswap-dot');
-    if (!cards.length) return;
-
-    const cardCount     = cards.length;
-    const SCROLL_PER    = 600; /* px of scroll per card transition */
-    const totalScroll   = (cardCount - 1) * SCROLL_PER;
-
-    /* Set anchor height so there's enough scroll distance */
-    anchor.style.height = (totalScroll + window.innerHeight * 0.8) + 'px';
-
-    /* z-index: last card on bottom, first on top */
-    cards.forEach((card, i) => {
-      card.style.zIndex = cardCount - i;
-      card.style.position = i === 0 ? 'relative' : 'absolute';
-    });
-
-    if (prefersReduced) return;
-
-    let activeIndex = 0;
-
-    function updateDots(idx) {
-      dots.forEach((dot, i) => {
-        dot.classList.toggle('active', i === idx);
-      });
+    if (!prefersReduced) {
+      /* Apply subtle rotation + offset as cards stack */
+      window.addEventListener('scroll', () => {
+        items.forEach((item, idx) => {
+          const rect = item.getBoundingClientRect();
+          const card = item.querySelector('.stack-card');
+          if (!card) return;
+          /* Is this card currently stuck at its sticky position? */
+          const stickyTop = parseFloat(getComputedStyle(item).top) || 0;
+          const isStuck   = rect.top <= stickyTop + 2;
+          if (isStuck) {
+            /* Count cards stacked ON TOP of this one (higher z-index, later in DOM).
+               The topmost card (last in DOM) gets stackCount=0 and no offset;
+               background cards get progressively larger offset so they peek from below. */
+            let stackCount = 0;
+            items.forEach((other, j) => {
+              if (j <= idx) return;
+              const otherRect = other.getBoundingClientRect();
+              const otherTop  = parseFloat(getComputedStyle(other).top) || 0;
+              if (otherRect.top <= otherTop + 2) stackCount++;
+            });
+            const rot    = (idx % 2 === 0 ? 1 : -1) * ROTATION_AMOUNT * Math.min(stackCount, 3) * 0.5;
+            const offset = stackCount * ITEM_STACK_DIST;
+            card.style.transform = `translateY(${offset}px) rotate(${rot}deg)`;
+          } else {
+            card.style.transform = '';
+          }
+        });
+      }, { passive: true });
     }
 
     updateDots(0);
