@@ -237,10 +237,10 @@
   ═══════════════════════════════════════════════════════════ */
   function initFadeUps() {
     if (prefersReduced) {
-      document.querySelectorAll('.fade-up').forEach(el => el.classList.add('visible'));
+      document.querySelectorAll('.fade-up, .slide-left, .slide-right').forEach(el => el.classList.add('visible'));
       return;
     }
-    const items = document.querySelectorAll('.fade-up:not(.visible)');
+    const items = document.querySelectorAll('.fade-up:not(.visible), .slide-left:not(.visible), .slide-right:not(.visible)');
     if (!items.length) return;
     const io = new IntersectionObserver(entries => {
       entries.forEach(entry => {

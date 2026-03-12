@@ -990,13 +990,51 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 }
 
 /* ============================================================
-   FEATURE CARDS (Value Proposition)
+   FEATURE CARDS – BENTO GRID (Value Proposition)
    ============================================================ */
-.features-grid {
+.bento-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: 1.45fr 1fr;
+  grid-template-rows: auto auto;
   gap: var(--gap);
   margin-top: 3rem;
+  overflow: hidden;
+}
+
+/* Row 2 flips: square left, wide right */
+.bento-grid .bento-square:nth-of-type(2) { order: 2; }
+.bento-grid .bento-wide:nth-of-type(2)   { order: 2; }
+
+/* Second row: square first, wide second */
+.bento-grid > :nth-child(3) { grid-column: 1; }
+.bento-grid > :nth-child(4) { grid-column: 2; }
+
+/* Row 2: swap proportions */
+.bento-grid > :nth-child(3) { /* square */ }
+.bento-grid > :nth-child(4) { /* wide   */ }
+
+/* Actual 2-column bento: wide=~60%, square=~40%, then swap */
+@media (min-width: 769px) {
+  .bento-grid {
+    grid-template-columns: 1.45fr 1fr;
+    grid-template-rows: auto auto;
+  }
+  /* Row 1: wide left, square right */
+  .bento-grid > :nth-child(1) { grid-column: 1; grid-row: 1; }
+  .bento-grid > :nth-child(2) { grid-column: 2; grid-row: 1; }
+  /* Row 2: square left, wide right */
+  .bento-grid > :nth-child(3) { grid-column: 1; grid-row: 2; }
+  .bento-grid > :nth-child(4) { grid-column: 2; grid-row: 2; }
+
+  /* Reverse proportions for row 2 */
+  .bento-grid {
+    grid-template-columns: 1.45fr 1fr;
+  }
+}
+
+/* Override grid for row 2 proportions */
+@supports (grid-template-rows: subgrid) {
+  .bento-grid { /* progressive enhancement placeholder */ }
 }
 
 .feature-card {
@@ -1028,6 +1066,19 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   font-size: 0.9rem;
   color: var(--text-dim);
   line-height: 1.65;
+}
+
+@media (max-width: 768px) {
+  .bento-grid {
+    grid-template-columns: 1fr;
+  }
+  .bento-grid > :nth-child(1),
+  .bento-grid > :nth-child(2),
+  .bento-grid > :nth-child(3),
+  .bento-grid > :nth-child(4) {
+    grid-column: 1;
+    grid-row: auto;
+  }
 }
 
 /* ============================================================
@@ -1999,8 +2050,34 @@ textarea { resize: vertical; min-height: 130px; }
 .delay-3 { transition-delay: 0.3s; }
 .delay-4 { transition-delay: 0.4s; }
 
+/* Slide-in from left */
+.slide-left {
+  opacity: 0;
+  transform: translateX(-80px);
+  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+  transition-delay: var(--slide-delay, 0s);
+}
+
+.slide-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Slide-in from right */
+.slide-right {
+  opacity: 0;
+  transform: translateX(80px);
+  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+  transition-delay: var(--slide-delay, 0s);
+}
+
+.slide-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .fade-up { opacity: 1; transform: none; transition: none; }
+  .fade-up, .slide-left, .slide-right { opacity: 1; transform: none; transition: none; }
 }
 
 /* ============================================================

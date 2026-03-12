@@ -259,8 +259,8 @@ if (!is_array($kpiItems) || !$kpiItems) {
         Ein virtueller Rundgang schafft unmittelbar Nähe – noch bevor der erste echte Kontakt stattfindet.
       </p>
 
-      <div class="features-grid">
-        <article class="feature-card glass fade-up delay-1">
+      <div class="bento-grid">
+        <article class="feature-card glass bento-wide slide-left" style="--slide-delay: 0s">
           <div class="feature-icon" aria-hidden="true">🏛️</div>
           <h3>Räume verkaufen</h3>
           <p>
@@ -268,7 +268,7 @@ if (!is_array($kpiItems) || !$kpiItems) {
             Das senkt die Hemmschwelle und steigert die Konversionsrate von Interessenten zu echten Besuchern.
           </p>
         </article>
-        <article class="feature-card glass fade-up delay-2">
+        <article class="feature-card glass bento-square slide-right" style="--slide-delay: 0.15s">
           <div class="feature-icon" aria-hidden="true">🤝</div>
           <h3>Vertrauen aufbauen</h3>
           <p>
@@ -276,7 +276,7 @@ if (!is_array($kpiItems) || !$kpiItems) {
             positiven Vorurteil und deutlich höherer Kaufbereitschaft.
           </p>
         </article>
-        <article class="feature-card glass fade-up delay-3">
+        <article class="feature-card glass bento-square slide-left" style="--slide-delay: 0.3s">
           <div class="feature-icon" aria-hidden="true">✨</div>
           <h3>Atmosphäre erlebbar machen</h3>
           <p>
@@ -284,7 +284,7 @@ if (!is_array($kpiItems) || !$kpiItems) {
             Ihr Raumgefühl wirklich spüren – rund um die Uhr, von überall.
           </p>
         </article>
-        <article class="feature-card glass fade-up delay-4">
+        <article class="feature-card glass bento-wide slide-right" style="--slide-delay: 0.45s">
           <div class="feature-icon" aria-hidden="true">🔍</div>
           <h3>Transparenz schaffen</h3>
           <p>
