@@ -368,14 +368,16 @@
           const rect = item.getBoundingClientRect();
           const card = item.querySelector('.stack-card');
           if (!card) return;
-          /* How many cards are above this one and stuck? */
+          /* Is this card currently stuck at its sticky position? */
           const stickyTop = parseFloat(getComputedStyle(item).top) || 0;
           const isStuck   = rect.top <= stickyTop + 2;
           if (isStuck) {
-            /* Count how many items are currently stuck above */
+            /* Count cards stacked ON TOP of this one (higher z-index, later in DOM).
+               The topmost card (last in DOM) gets stackCount=0 and no offset;
+               background cards get progressively larger offset so they peek from below. */
             let stackCount = 0;
             items.forEach((other, j) => {
-              if (j >= idx) return;
+              if (j <= idx) return;
               const otherRect = other.getBoundingClientRect();
               const otherTop  = parseFloat(getComputedStyle(other).top) || 0;
               if (otherRect.top <= otherTop + 2) stackCount++;

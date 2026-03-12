@@ -1,9 +1,18 @@
 <?php
 /**
  * Visitfy3 – pages/kontakt.php
- * Contact page with form, server-side validation, honeypot, DSGVO checkbox.
+ * Contact page with form, server-side validation, honeypot, CSRF, DSGVO checkbox.
  */
 require __DIR__ . '/../partials/cms.php';
+
+/* ── Session for CSRF token ────────────────────────────── */
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(24));
+}
+
 $root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? visitfy_base_path() : '../';
 $pageTitle = 'Kontakt | Visitfy – 360° Rundgänge anfragen';
 $pageDesc  = 'Kontaktieren Sie Visitfy für ein unverbindliches Angebot für Ihren 360° Rundgang. Nutzen Sie unser Kontaktformular oder schreiben Sie direkt.';
@@ -13,8 +22,12 @@ $formSent  = false;
 $formError = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    /* CSRF check */
+    $csrfToken = (string)($_POST['csrf_token'] ?? '');
+    if (!hash_equals((string)($_SESSION['csrf_token'] ?? ''), $csrfToken)) {
+        $formError = 'Ungültige Anfrage. Bitte laden Sie die Seite neu.';
     /* Honeypot check */
-    if (!empty($_POST['hp_website'])) {
+    } elseif (!empty($_POST['hp_website'])) {
         /* Silent reject */
         $formSent = true;
     } else {
@@ -33,6 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $formError = 'Bitte geben Sie einen gültigen Namen an.';
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 200) {
             $formError = 'Bitte geben Sie eine gültige E-Mail-Adresse an.';
+        } elseif (strlen($telefon) > 40) {
+            $formError = 'Die Telefonnummer ist zu lang.';
         } elseif (empty($nachricht) || strlen($nachricht) > 3000) {
             $formError = 'Bitte geben Sie eine Nachricht ein (max. 3000 Zeichen).';
         } elseif (!$dsgvo) {
@@ -41,8 +56,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $formError = 'Ungültige Branchenauswahl.';
         } else {
             /* TODO: replace with SMTP mailer (e.g. PHPMailer + config) */
-            $to      = 'info@visitfy.de'; /* TODO: verify recipient */
-            $subject = 'Neue Anfrage von ' . $name;
+            $to = 'info@visitfy.de'; /* TODO: verify recipient */
+            /* Strip CRLF from subject fields to prevent email header injection */
+            $safeSubjectName = str_replace(["\r", "\n"], '', $name);
+            $subject = 'Neue Anfrage von ' . $safeSubjectName;
             $body    = "Name: $name\nFirma: $firma\nE-Mail: $email\nTelefon: $telefon\nBranche: $branche\n\nNachricht:\n$nachricht";
             /* Sanitize email to prevent header injection: reject newlines */
             if (preg_match('/[\r\n]/', $email)) {
@@ -53,6 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 /* $sent = mail($to, $subject, $body, $headers); */
                 /* For now, always treat as sent (TODO: enable mail() on server) */
                 $formSent = true;
+                /* Regenerate CSRF token after successful submission */
+                $_SESSION['csrf_token'] = bin2hex(random_bytes(24));
             }
         }
     }
@@ -111,6 +130,8 @@ require __DIR__ . '/../partials/header.php';
 <?php endif; ?>
 
           <form method="post" action="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/kontakt.php" novalidate>
+            <!-- CSRF token -->
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
             <!-- Honeypot -->
             <div class="form-honeypot" aria-hidden="true">
               <label for="hp_website">Website</label>
