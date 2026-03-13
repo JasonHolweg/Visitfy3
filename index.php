@@ -138,9 +138,9 @@ if (!is_array($kpiItems) || !$kpiItems) {
         <?= htmlspecialchars((string)visitfy_get($contentConfig, 'mockup_text.sub', 'Ob Desktop, Tablet oder Smartphone – Ihr 360° Rundgang sieht überall perfekt aus.'), ENT_QUOTES, 'UTF-8') ?>
       </p>
 
-      <div class="mockup-devices">
+      <div class="mockup-devices" data-flyin-group>
         <!-- Laptop Mockup -->
-        <div class="mockup-laptop fly-in-left">
+        <div class="mockup-laptop mockup-device flyin-item flyin-item--left">
           <div class="mockup-laptop-screen">
 <?php if ($mockupDesktop !== '' && is_file(__DIR__ . '/' . $mockupDesktop)): ?>
             <img src="<?= htmlspecialchars(visitfy_url($mockupDesktop), ENT_QUOTES, 'UTF-8') ?>" alt="Rundgang auf Laptop" loading="lazy" decoding="async">
@@ -153,7 +153,7 @@ if (!is_array($kpiItems) || !$kpiItems) {
           </div>
         </div>
         <!-- Tablet Mockup -->
-        <div class="mockup-tablet fly-in-bottom">
+        <div class="mockup-tablet mockup-device flyin-item flyin-item--bottom">
           <div class="mockup-tablet-screen">
 <?php if ($mockupTablet !== '' && is_file(__DIR__ . '/' . $mockupTablet)): ?>
             <img src="<?= htmlspecialchars(visitfy_url($mockupTablet), ENT_QUOTES, 'UTF-8') ?>" alt="Rundgang auf Tablet" loading="lazy" decoding="async">
@@ -166,7 +166,7 @@ if (!is_array($kpiItems) || !$kpiItems) {
           </div>
         </div>
         <!-- Phone Mockup -->
-        <div class="mockup-phone fly-in-right">
+        <div class="mockup-phone mockup-device flyin-item flyin-item--right">
           <div class="mockup-phone-screen">
 <?php if ($mockupPhone !== '' && is_file(__DIR__ . '/' . $mockupPhone)): ?>
             <img src="<?= htmlspecialchars(visitfy_url($mockupPhone), ENT_QUOTES, 'UTF-8') ?>" alt="Rundgang auf Smartphone" loading="lazy" decoding="async">
@@ -198,9 +198,9 @@ if (!is_array($kpiItems) || !$kpiItems) {
         <?= htmlspecialchars((string)visitfy_get($contentConfig, 'vergleich.sub', 'Sehen Sie selbst, wie ein 360° Rundgang Ihre Präsenz verändert.'), ENT_QUOTES, 'UTF-8') ?>
       </p>
 
-      <div class="compare-grid fade-up delay-3">
+      <div class="compare-grid" data-flyin-group>
         <!-- Nur Fotos -->
-        <div class="compare-card compare-card--without">
+        <div class="compare-card compare-card--without flyin-item flyin-item--left">
           <div class="compare-card-header">
             <span class="compare-badge compare-badge--negative" aria-hidden="true">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
@@ -219,7 +219,7 @@ if (!is_array($kpiItems) || !$kpiItems) {
           </ul>
         </div>
         <!-- 360° Rundgang -->
-        <div class="compare-card compare-card--with">
+        <div class="compare-card compare-card--with flyin-item flyin-item--right">
           <div class="compare-card-header">
             <span class="compare-badge compare-badge--positive" aria-hidden="true">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
@@ -386,11 +386,11 @@ if (!is_array($kpiItems) || !$kpiItems) {
         <?= htmlspecialchars((string)visitfy_get($contentConfig, 'cases.sub', 'Echte Ergebnisse unserer Kunden – in Zahlen und Fakten.'), ENT_QUOTES, 'UTF-8') ?>
       </p>
 
-      <div class="cases-grid">
+      <div class="cases-grid" data-flyin-group>
 <?php foreach ($caseStudyItems as $ci => $cItem):
-  $delayC = 'delay-' . (($ci % 3) + 1);
+  $flyInClass = ['flyin-item--left', 'flyin-item--bottom', 'flyin-item--right'][$ci % 3];
 ?>
-        <article class="case-card glass fade-up <?= $delayC ?>">
+        <article class="case-card glass flyin-item <?= $flyInClass ?>">
           <div class="case-card-tag"><?= htmlspecialchars((string)($cItem['tag'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
           <h3 class="case-card-title"><?= htmlspecialchars((string)($cItem['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
           <p class="case-card-desc"><?= htmlspecialchars((string)($cItem['desc'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>
@@ -495,12 +495,12 @@ if (!is_array($kpiItems) || !$kpiItems) {
         <?= nl2br(htmlspecialchars((string)visitfy_get($contentConfig, 'ablauf.title', "So entsteht Ihr professioneller\n360° Rundgang"), ENT_QUOTES, 'UTF-8')) ?>
       </h2>
 
-      <div class="process-steps">
+      <div class="process-steps" data-flyin-group>
 <?php foreach ($ablaufSteps as $ai => $aStep):
-  $delayA = 'delay-' . (($ai % 3) + 1);
+  $flyInClass = ['flyin-item--left', 'flyin-item--bottom', 'flyin-item--right'][$ai % 3];
   $stepNum = sprintf('%02d', $ai + 1);
 ?>
-        <div class="process-card glass fade-up <?= $delayA ?>">
+        <div class="process-card glass flyin-item <?= $flyInClass ?>">
           <p class="process-num">SCHRITT <?= $stepNum ?></p>
           <div class="process-icon" aria-hidden="true"><?= htmlspecialchars((string)($aStep['emoji'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
           <h3><?= htmlspecialchars((string)($aStep['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>

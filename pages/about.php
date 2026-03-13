@@ -36,56 +36,22 @@ $jasonPhoto    = (string)visitfy_get($contentConfig, 'team.jason_photo', '');
 
 <main id="main-content">
 
-  <section class="page-hero">
-    <div class="container">
-      <p class="section-eyebrow fade-up"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.eyebrow', 'ÜBER UNS'), ENT_QUOTES, 'UTF-8') ?></p>
-      <h1 class="fade-up delay-1"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.title', 'Über Visitfy'), ENT_QUOTES, 'UTF-8') ?></h1>
-      <p class="fade-up delay-2">
-        <?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.paragraph_1', 'Visitfy ist ein spezialisierter Anbieter für professionelle 360° virtuelle Rundgänge.'), ENT_QUOTES, 'UTF-8') ?>
-      </p>
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="about-visitfy-heading">
-    <div class="container">
-      <h2 class="section-title fade-up" id="about-visitfy-heading"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.title', 'Über Visitfy'), ENT_QUOTES, 'UTF-8') ?></h2>
-
-      <div class="about-grid">
-        <div class="about-text fade-up delay-1">
-          <p><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.paragraph_2', ''), ENT_QUOTES, 'UTF-8') ?></p>
-          <p><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.paragraph_3', ''), ENT_QUOTES, 'UTF-8') ?></p>
-        </div>
-
-        <div class="fade-up delay-2">
-          <div class="glass about-panel">
-            <p class="about-panel-badge" aria-hidden="true">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              Erleben statt nur sehen
-            </p>
-            <h3 class="about-difference-title">
-<?php foreach (visitfy_split_lines((string)visitfy_get($contentConfig, 'about.difference_title', 'Der Visitfy-Unterschied:\nErleben statt nur sehen.')) as $line): ?>
-              <?= htmlspecialchars($line, ENT_QUOTES, 'UTF-8') ?><br>
-<?php endforeach; ?>
-            </h3>
-
-            <div class="about-features">
-              <h3><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.features_title', 'Was uns auszeichnet'), ENT_QUOTES, 'UTF-8') ?></h3>
-              <ul>
-<?php foreach ($aboutFeatures as $item): ?>
-                <li class="about-icon-item">
-                  <span class="about-item-icon" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
-                  <?= htmlspecialchars((string)$item, ENT_QUOTES, 'UTF-8') ?>
-                </li>
-<?php endforeach; ?>
-              </ul>
-            </div>
-          </div>
+  <section class="hero page-hero about-page-hero" aria-labelledby="about-hero-heading">
+    <canvas id="hero-canvas" aria-hidden="true"></canvas>
+    <div class="hero-overlay" aria-hidden="true"></div>
+    <div class="container hero-content">
+      <div class="hero-panel about-hero-panel fade-up">
+        <p class="hero-eyebrow"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.eyebrow', 'ÜBER UNS'), ENT_QUOTES, 'UTF-8') ?></p>
+        <h1 id="about-hero-heading"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.title', 'Über Visitfy'), ENT_QUOTES, 'UTF-8') ?></h1>
+        <div class="about-hero-copy">
+          <p class="fade-up delay-1"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.paragraph_1', 'Visitfy ist ein spezialisierter Anbieter für professionelle 360° virtuelle Rundgänge.'), ENT_QUOTES, 'UTF-8') ?></p>
+          <p class="fade-up delay-2"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.paragraph_2', ''), ENT_QUOTES, 'UTF-8') ?></p>
+          <p class="fade-up delay-3"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.paragraph_3', ''), ENT_QUOTES, 'UTF-8') ?></p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Perfection: 4 Icon-Boxen -->
   <section class="section" aria-labelledby="about-perfection-heading">
     <div class="container">
       <p class="section-eyebrow fade-up"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.perfection_title', 'Perfektion in jedem Detail'), ENT_QUOTES, 'UTF-8') ?></p>
@@ -101,13 +67,37 @@ $jasonPhoto    = (string)visitfy_get($contentConfig, 'team.jason_photo', '');
         </div>
 <?php endforeach; ?>
       </div>
+
+      <div class="glass about-panel fade-up delay-2">
+        <p class="about-panel-badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.panel_badge', 'Erleben statt nur sehen'), ENT_QUOTES, 'UTF-8') ?>
+        </p>
+        <h3 class="about-difference-title">
+<?php foreach (visitfy_split_lines((string)visitfy_get($contentConfig, 'about.difference_title', 'Der Visitfy-Unterschied:\nErleben statt nur sehen.')) as $line): ?>
+          <?= htmlspecialchars($line, ENT_QUOTES, 'UTF-8') ?><br>
+<?php endforeach; ?>
+        </h3>
+
+        <div class="about-features">
+          <h3><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.features_title', 'Was uns auszeichnet'), ENT_QUOTES, 'UTF-8') ?></h3>
+          <ul>
+<?php foreach ($aboutFeatures as $item): ?>
+            <li class="about-icon-item">
+              <span class="about-item-icon" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+              <?= htmlspecialchars((string)$item, ENT_QUOTES, 'UTF-8') ?>
+            </li>
+<?php endforeach; ?>
+          </ul>
+        </div>
+      </div>
     </div>
   </section>
 
   <section class="section" aria-labelledby="about-team-heading">
     <div class="container">
-      <p class="section-eyebrow fade-up">TEAM</p>
-      <h2 class="section-title fade-up delay-1" id="about-team-heading">Menschen hinter Visitfy</h2>
+      <p class="section-eyebrow fade-up"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'team.eyebrow', 'TEAM'), ENT_QUOTES, 'UTF-8') ?></p>
+      <h2 class="section-title fade-up delay-1" id="about-team-heading"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'team.title', 'Menschen hinter Visitfy'), ENT_QUOTES, 'UTF-8') ?></h2>
 
       <div class="about-team-grid">
         <article class="about-team-card glass fade-up delay-1">

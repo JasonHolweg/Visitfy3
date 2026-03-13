@@ -324,6 +324,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && admin_is_logged_in()) {
                     'paragraph_1' => (string)($_POST['about_p1'] ?? ''),
                     'paragraph_2' => (string)($_POST['about_p2'] ?? ''),
                     'paragraph_3' => (string)($_POST['about_p3'] ?? ''),
+                    'panel_badge' => (string)($_POST['about_panel_badge'] ?? ''),
                     'difference_title' => (string)($_POST['about_difference_title'] ?? ''),
                     'features_title' => (string)($_POST['about_features_title'] ?? ''),
                     'features' => $features,
@@ -331,6 +332,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && admin_is_logged_in()) {
                     'perfection_points' => $perfection,
                 ],
                 'team' => [
+                    'eyebrow' => (string)($_POST['team_eyebrow'] ?? ''),
+                    'title' => (string)($_POST['team_title'] ?? ''),
                     'kristian_name' => (string)($_POST['team_kristian_name'] ?? ''),
                     'kristian_role' => (string)($_POST['team_kristian_role'] ?? ''),
                     'kristian_text' => (string)($_POST['team_kristian_text'] ?? ''),
@@ -422,6 +425,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && admin_is_logged_in()) {
                     'sub' => (string)($_POST['faq_sub'] ?? ''),
                     'items' => $faqItems,
                     'button_text' => (string)($_POST['faq_button_text'] ?? ''),
+                ],
+                'partner' => [
+                    'hero_eyebrow' => (string)($_POST['partner_hero_eyebrow'] ?? ''),
+                    'hero_title' => (string)($_POST['partner_hero_title'] ?? ''),
+                    'hero_sub' => (string)($_POST['partner_hero_sub'] ?? ''),
+                    'hero_button_text' => (string)($_POST['partner_hero_button_text'] ?? ''),
+                    'proof_eyebrow' => (string)($_POST['partner_proof_eyebrow'] ?? ''),
+                    'proof_title' => (string)($_POST['partner_proof_title'] ?? ''),
+                    'proof_sub' => (string)($_POST['partner_proof_sub'] ?? ''),
+                    'card_1_kicker' => (string)($_POST['partner_card_1_kicker'] ?? ''),
+                    'card_1_title' => (string)($_POST['partner_card_1_title'] ?? ''),
+                    'card_1_text' => (string)($_POST['partner_card_1_text'] ?? ''),
+                    'card_2_kicker' => (string)($_POST['partner_card_2_kicker'] ?? ''),
+                    'card_2_title' => (string)($_POST['partner_card_2_title'] ?? ''),
+                    'card_2_text' => (string)($_POST['partner_card_2_text'] ?? ''),
+                    'card_3_kicker' => (string)($_POST['partner_card_3_kicker'] ?? ''),
+                    'card_3_title' => (string)($_POST['partner_card_3_title'] ?? ''),
+                    'card_3_text' => (string)($_POST['partner_card_3_text'] ?? ''),
+                    'fit_eyebrow' => (string)($_POST['partner_fit_eyebrow'] ?? ''),
+                    'fit_title' => (string)($_POST['partner_fit_title'] ?? ''),
+                    'fit_text' => (string)($_POST['partner_fit_text'] ?? ''),
+                    'fit_note' => (string)($_POST['partner_fit_note'] ?? ''),
+                    'form_eyebrow' => (string)($_POST['partner_form_eyebrow'] ?? ''),
+                    'form_title' => (string)($_POST['partner_form_title'] ?? ''),
+                    'form_sub' => (string)($_POST['partner_form_sub'] ?? ''),
+                    'form_name_label' => (string)($_POST['partner_form_name_label'] ?? ''),
+                    'form_name_placeholder' => (string)($_POST['partner_form_name_placeholder'] ?? ''),
+                    'form_company_label' => (string)($_POST['partner_form_company_label'] ?? ''),
+                    'form_company_placeholder' => (string)($_POST['partner_form_company_placeholder'] ?? ''),
+                    'form_email_label' => (string)($_POST['partner_form_email_label'] ?? ''),
+                    'form_email_placeholder' => (string)($_POST['partner_form_email_placeholder'] ?? ''),
+                    'form_role_label' => (string)($_POST['partner_form_role_label'] ?? ''),
+                    'form_role_placeholder' => (string)($_POST['partner_form_role_placeholder'] ?? ''),
+                    'form_role_option_1' => (string)($_POST['partner_form_role_option_1'] ?? ''),
+                    'form_role_option_2' => (string)($_POST['partner_form_role_option_2'] ?? ''),
+                    'form_role_option_3' => (string)($_POST['partner_form_role_option_3'] ?? ''),
+                    'form_role_option_4' => (string)($_POST['partner_form_role_option_4'] ?? ''),
+                    'form_message_label' => (string)($_POST['partner_form_message_label'] ?? ''),
+                    'form_message_placeholder' => (string)($_POST['partner_form_message_placeholder'] ?? ''),
+                    'form_privacy_prefix' => (string)($_POST['partner_form_privacy_prefix'] ?? ''),
+                    'form_privacy_link' => (string)($_POST['partner_form_privacy_link'] ?? ''),
+                    'form_privacy_suffix' => (string)($_POST['partner_form_privacy_suffix'] ?? ''),
+                    'form_submit_text' => (string)($_POST['partner_form_submit_text'] ?? ''),
                 ],
             ];
 
@@ -1238,6 +1284,90 @@ function admin_lines(array $src, string $path): string
             <div class="actions"><button class="kpi-add" id="faq-add" type="button">+ Frage hinzufügen</button></div>
           </section>
 
+          <section class="content-section" data-content-section="partner">
+            <h2>Partner Page</h2>
+            <p class="small">Sichtbare Inhalte der Partner-Seite inklusive Hero, Verkaufsargumente und Formulartexte.</p>
+
+            <h3 style="margin-top:1.5rem;margin-bottom:0.75rem;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;color:#999">Hero</h3>
+            <div class="field-grid">
+              <div><label>Hero Eyebrow</label><input type="text" name="partner_hero_eyebrow" value="<?= htmlspecialchars(admin_field($content, 'partner.hero_eyebrow'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>Hero Button Text</label><input type="text" name="partner_hero_button_text" value="<?= htmlspecialchars(admin_field($content, 'partner.hero_button_text'), ENT_QUOTES, 'UTF-8') ?>"></div>
+            </div>
+            <label>Hero Titel</label><textarea name="partner_hero_title"><?= htmlspecialchars(admin_field($content, 'partner.hero_title'), ENT_QUOTES, 'UTF-8') ?></textarea>
+            <label>Hero Untertitel</label><textarea name="partner_hero_sub"><?= htmlspecialchars(admin_field($content, 'partner.hero_sub'), ENT_QUOTES, 'UTF-8') ?></textarea>
+
+            <h3 style="margin-top:2rem;margin-bottom:0.75rem;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;color:#999">Intro</h3>
+            <div class="field-grid">
+              <div><label>Intro Eyebrow</label><input type="text" name="partner_proof_eyebrow" value="<?= htmlspecialchars(admin_field($content, 'partner.proof_eyebrow'), ENT_QUOTES, 'UTF-8') ?>"></div>
+            </div>
+            <label>Intro Titel</label><textarea name="partner_proof_title"><?= htmlspecialchars(admin_field($content, 'partner.proof_title'), ENT_QUOTES, 'UTF-8') ?></textarea>
+            <label>Intro Untertitel</label><textarea name="partner_proof_sub"><?= htmlspecialchars(admin_field($content, 'partner.proof_sub'), ENT_QUOTES, 'UTF-8') ?></textarea>
+
+            <h3 style="margin-top:2rem;margin-bottom:0.75rem;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;color:#999">Argument 1</h3>
+            <div class="field-grid">
+              <div><label>Kicker</label><input type="text" name="partner_card_1_kicker" value="<?= htmlspecialchars(admin_field($content, 'partner.card_1_kicker'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>Titel</label><input type="text" name="partner_card_1_title" value="<?= htmlspecialchars(admin_field($content, 'partner.card_1_title'), ENT_QUOTES, 'UTF-8') ?>"></div>
+            </div>
+            <label>Text</label><textarea name="partner_card_1_text"><?= htmlspecialchars(admin_field($content, 'partner.card_1_text'), ENT_QUOTES, 'UTF-8') ?></textarea>
+
+            <h3 style="margin-top:2rem;margin-bottom:0.75rem;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;color:#999">Argument 2</h3>
+            <div class="field-grid">
+              <div><label>Kicker</label><input type="text" name="partner_card_2_kicker" value="<?= htmlspecialchars(admin_field($content, 'partner.card_2_kicker'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>Titel</label><input type="text" name="partner_card_2_title" value="<?= htmlspecialchars(admin_field($content, 'partner.card_2_title'), ENT_QUOTES, 'UTF-8') ?>"></div>
+            </div>
+            <label>Text</label><textarea name="partner_card_2_text"><?= htmlspecialchars(admin_field($content, 'partner.card_2_text'), ENT_QUOTES, 'UTF-8') ?></textarea>
+
+            <h3 style="margin-top:2rem;margin-bottom:0.75rem;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;color:#999">Argument 3</h3>
+            <div class="field-grid">
+              <div><label>Kicker</label><input type="text" name="partner_card_3_kicker" value="<?= htmlspecialchars(admin_field($content, 'partner.card_3_kicker'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>Titel</label><input type="text" name="partner_card_3_title" value="<?= htmlspecialchars(admin_field($content, 'partner.card_3_title'), ENT_QUOTES, 'UTF-8') ?>"></div>
+            </div>
+            <label>Text</label><textarea name="partner_card_3_text"><?= htmlspecialchars(admin_field($content, 'partner.card_3_text'), ENT_QUOTES, 'UTF-8') ?></textarea>
+
+            <h3 style="margin-top:2rem;margin-bottom:0.75rem;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;color:#999">Qualifikation / Trust</h3>
+            <div class="field-grid">
+              <div><label>Eyebrow</label><input type="text" name="partner_fit_eyebrow" value="<?= htmlspecialchars(admin_field($content, 'partner.fit_eyebrow'), ENT_QUOTES, 'UTF-8') ?>"></div>
+            </div>
+            <label>Titel</label><textarea name="partner_fit_title"><?= htmlspecialchars(admin_field($content, 'partner.fit_title'), ENT_QUOTES, 'UTF-8') ?></textarea>
+            <label>Text</label><textarea name="partner_fit_text"><?= htmlspecialchars(admin_field($content, 'partner.fit_text'), ENT_QUOTES, 'UTF-8') ?></textarea>
+            <label>Hinweis / Trust-Satz</label><textarea name="partner_fit_note"><?= htmlspecialchars(admin_field($content, 'partner.fit_note'), ENT_QUOTES, 'UTF-8') ?></textarea>
+
+            <h3 style="margin-top:2rem;margin-bottom:0.75rem;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;color:#999">Formular Kopf</h3>
+            <div class="field-grid">
+              <div><label>Form Eyebrow</label><input type="text" name="partner_form_eyebrow" value="<?= htmlspecialchars(admin_field($content, 'partner.form_eyebrow'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>Submit Button Text</label><input type="text" name="partner_form_submit_text" value="<?= htmlspecialchars(admin_field($content, 'partner.form_submit_text'), ENT_QUOTES, 'UTF-8') ?>"></div>
+            </div>
+            <label>Form Titel</label><textarea name="partner_form_title"><?= htmlspecialchars(admin_field($content, 'partner.form_title'), ENT_QUOTES, 'UTF-8') ?></textarea>
+            <label>Form Untertitel</label><textarea name="partner_form_sub"><?= htmlspecialchars(admin_field($content, 'partner.form_sub'), ENT_QUOTES, 'UTF-8') ?></textarea>
+
+            <h3 style="margin-top:2rem;margin-bottom:0.75rem;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;color:#999">Formular Felder</h3>
+            <div class="field-grid">
+              <div><label>Name Label</label><input type="text" name="partner_form_name_label" value="<?= htmlspecialchars(admin_field($content, 'partner.form_name_label'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>Name Placeholder</label><input type="text" name="partner_form_name_placeholder" value="<?= htmlspecialchars(admin_field($content, 'partner.form_name_placeholder'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>Firma Label</label><input type="text" name="partner_form_company_label" value="<?= htmlspecialchars(admin_field($content, 'partner.form_company_label'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>Firma Placeholder</label><input type="text" name="partner_form_company_placeholder" value="<?= htmlspecialchars(admin_field($content, 'partner.form_company_placeholder'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>E-Mail Label</label><input type="text" name="partner_form_email_label" value="<?= htmlspecialchars(admin_field($content, 'partner.form_email_label'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>E-Mail Placeholder</label><input type="text" name="partner_form_email_placeholder" value="<?= htmlspecialchars(admin_field($content, 'partner.form_email_placeholder'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>Rolle Label</label><input type="text" name="partner_form_role_label" value="<?= htmlspecialchars(admin_field($content, 'partner.form_role_label'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>Rolle Placeholder</label><input type="text" name="partner_form_role_placeholder" value="<?= htmlspecialchars(admin_field($content, 'partner.form_role_placeholder'), ENT_QUOTES, 'UTF-8') ?>"></div>
+            </div>
+            <div class="field-grid">
+              <div><label>Rollenoption 1</label><input type="text" name="partner_form_role_option_1" value="<?= htmlspecialchars(admin_field($content, 'partner.form_role_option_1'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>Rollenoption 2</label><input type="text" name="partner_form_role_option_2" value="<?= htmlspecialchars(admin_field($content, 'partner.form_role_option_2'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>Rollenoption 3</label><input type="text" name="partner_form_role_option_3" value="<?= htmlspecialchars(admin_field($content, 'partner.form_role_option_3'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>Rollenoption 4</label><input type="text" name="partner_form_role_option_4" value="<?= htmlspecialchars(admin_field($content, 'partner.form_role_option_4'), ENT_QUOTES, 'UTF-8') ?>"></div>
+            </div>
+            <label>Nachricht Label</label><input type="text" name="partner_form_message_label" value="<?= htmlspecialchars(admin_field($content, 'partner.form_message_label'), ENT_QUOTES, 'UTF-8') ?>">
+            <label>Nachricht Placeholder</label><textarea name="partner_form_message_placeholder"><?= htmlspecialchars(admin_field($content, 'partner.form_message_placeholder'), ENT_QUOTES, 'UTF-8') ?></textarea>
+
+            <h3 style="margin-top:2rem;margin-bottom:0.75rem;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;color:#999">Datenschutz-Text</h3>
+            <div class="field-grid">
+              <div><label>Prefix</label><input type="text" name="partner_form_privacy_prefix" value="<?= htmlspecialchars(admin_field($content, 'partner.form_privacy_prefix'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>Link Text</label><input type="text" name="partner_form_privacy_link" value="<?= htmlspecialchars(admin_field($content, 'partner.form_privacy_link'), ENT_QUOTES, 'UTF-8') ?>"></div>
+            </div>
+            <label>Suffix</label><textarea name="partner_form_privacy_suffix"><?= htmlspecialchars(admin_field($content, 'partner.form_privacy_suffix'), ENT_QUOTES, 'UTF-8') ?></textarea>
+          </section>
+
           <section class="content-section" data-content-section="about">
             <h2>About</h2>
             <div class="field-grid">
@@ -1253,6 +1383,7 @@ function admin_lines(array $src, string $path): string
             <label>Paragraph 1</label><textarea name="about_p1"><?= htmlspecialchars(admin_field($content, 'about.paragraph_1'), ENT_QUOTES, 'UTF-8') ?></textarea>
             <label>Paragraph 2</label><textarea name="about_p2"><?= htmlspecialchars(admin_field($content, 'about.paragraph_2'), ENT_QUOTES, 'UTF-8') ?></textarea>
             <label>Paragraph 3</label><textarea name="about_p3"><?= htmlspecialchars(admin_field($content, 'about.paragraph_3'), ENT_QUOTES, 'UTF-8') ?></textarea>
+            <label>Panel Badge</label><input type="text" name="about_panel_badge" value="<?= htmlspecialchars(admin_field($content, 'about.panel_badge'), ENT_QUOTES, 'UTF-8') ?>">
             <label>Unterschied Titel (Zeilenumbruch möglich)</label><textarea name="about_difference_title"><?= htmlspecialchars(admin_field($content, 'about.difference_title'), ENT_QUOTES, 'UTF-8') ?></textarea>
             <label>Features Titel</label><input type="text" name="about_features_title" value="<?= htmlspecialchars(admin_field($content, 'about.features_title'), ENT_QUOTES, 'UTF-8') ?>">
             <label>Features Liste (1 Zeile = 1 Punkt)</label><textarea name="about_features"><?= htmlspecialchars(admin_lines($content, 'about.features'), ENT_QUOTES, 'UTF-8') ?></textarea>
@@ -1262,6 +1393,10 @@ function admin_lines(array $src, string $path): string
 
           <section class="content-section" data-content-section="team">
             <h2>Team</h2>
+            <div class="field-grid">
+              <div><label>Team Eyebrow</label><input type="text" name="team_eyebrow" value="<?= htmlspecialchars(admin_field($content, 'team.eyebrow'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>Team Titel</label><input type="text" name="team_title" value="<?= htmlspecialchars(admin_field($content, 'team.title'), ENT_QUOTES, 'UTF-8') ?>"></div>
+            </div>
 
             <h3 style="margin-top:1.5rem;margin-bottom:0.5rem;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;color:#999">Kristian</h3>
             <div class="field-grid">

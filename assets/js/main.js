@@ -200,6 +200,9 @@
     /* ── Scroll Reveal (IntersectionObserver) ──────────────── */
     initFadeUps();
 
+    /* ── Section fly-ins ───────────────────────────────────── */
+    initFlyInGroups();
+
     /* ── KPI Count-Up ──────────────────────────────────────── */
     initCountUp();
 
@@ -236,15 +239,12 @@
      SCROLL-REVEAL
   ═══════════════════════════════════════════════════════════ */
   function initFadeUps() {
-    const allSelectors = '.fade-up, .slide-left, .slide-right, .fly-in-left, .fly-in-right, .fly-in-bottom';
+    const allSelectors = '.fade-up, .slide-left, .slide-right';
     if (prefersReduced) {
       document.querySelectorAll(allSelectors).forEach(el => el.classList.add('visible'));
       return;
     }
-    const items = document.querySelectorAll(
-      '.fade-up:not(.visible), .slide-left:not(.visible), .slide-right:not(.visible), ' +
-      '.fly-in-left:not(.visible), .fly-in-right:not(.visible), .fly-in-bottom:not(.visible)'
-    );
+    const items = document.querySelectorAll('.fade-up:not(.visible), .slide-left:not(.visible), .slide-right:not(.visible)');
     if (!items.length) return;
     const io = new IntersectionObserver(entries => {
       entries.forEach(entry => {
@@ -255,6 +255,53 @@
       });
     }, { threshold: 0.15 });
     items.forEach(el => io.observe(el));
+
+  }
+
+  function initFlyInGroups() {
+    const groups = document.querySelectorAll('[data-flyin-group]');
+    if (!groups.length) return;
+
+    groups.forEach(group => {
+      const items = group.querySelectorAll('.flyin-item');
+      if (!items.length) return;
+
+      if (prefersReduced) {
+        group.classList.add('flyin-complete');
+        return;
+      }
+
+      group.classList.add('flyin-pending');
+
+      const totalAnimations = items.length;
+      let completedAnimations = 0;
+      let hasStarted = false;
+
+      items.forEach(item => {
+        item.addEventListener('animationend', () => {
+          completedAnimations += 1;
+          if (completedAnimations !== totalAnimations) return;
+
+          group.classList.remove('flyin-pending', 'flyin-animate');
+          group.classList.add('flyin-complete');
+        }, { once: true });
+      });
+
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting || hasStarted) return;
+
+          hasStarted = true;
+          group.classList.add('flyin-animate');
+          io.unobserve(entry.target);
+        });
+      }, {
+        threshold: 0.25,
+        rootMargin: '0px 0px -10% 0px'
+      });
+
+      io.observe(group);
+    });
   }
 
 
