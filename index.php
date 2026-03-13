@@ -39,10 +39,6 @@ $toursJson = file_get_contents(__DIR__ . '/assets/data/tours.json');
 $tours     = $toursJson ? json_decode($toursJson, true) : [];
 if (!is_array($tours)) $tours = [];
 
-/* Load script config for tour display mode */
-$scriptCfg       = visitfy_load_json(__DIR__ . '/assets/data/script-config.json', []);
-$tourDisplayMode = (string)visitfy_get($scriptCfg, 'main.tour_display_style', 'stack');
-
 /* Load client logos for marquee */
 $clientLogoFiles = glob(__DIR__ . '/assets/img/client-logos/*.{png,jpg,jpeg,webp,avif,svg}', GLOB_BRACE);
 if (!is_array($clientLogoFiles)) {
@@ -287,7 +283,7 @@ if (!is_array($kpiItems) || !$kpiItems) {
 
 
   <!-- ══ 5) LIVE DEMOS ══════════════════════════════════════ -->
-  <section class="section scroll-stack-section" id="tours" aria-labelledby="tours-heading" data-tour-mode="<?= htmlspecialchars($tourDisplayMode, ENT_QUOTES, 'UTF-8') ?>">
+  <section class="section scroll-stack-section" id="tours" aria-labelledby="tours-heading">
     <div class="container">
       <div class="scroll-stack-intro">
         <p class="section-eyebrow fade-up"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'tours_text.eyebrow', 'Live-Demos'), ENT_QUOTES, 'UTF-8') ?></p>
@@ -296,8 +292,12 @@ if (!is_array($kpiItems) || !$kpiItems) {
           <?= htmlspecialchars((string)visitfy_get($contentConfig, 'tours_text.sub', 'Erlebe unsere Arbeit direkt – immersiv, interaktiv und hochauflösend. Scrolle durch die Rundgänge.'), ENT_QUOTES, 'UTF-8') ?>
         </p>
       </div>
+    </div>
 
-      <div class="stack-container" aria-label="Rundgang-Beispiele">
+    <!-- Spacer: JS sets height so there's enough scroll room -->
+    <div class="stack-spacer">
+      <div class="stack-viewport">
+        <div class="stack-container" aria-label="Rundgang-Beispiele">
 <?php foreach ($tours as $i => $tour):
   $title  = htmlspecialchars($tour['title']       ?? 'Rundgang', ENT_QUOTES, 'UTF-8');
   $tag    = htmlspecialchars($tour['tag']         ?? '',         ENT_QUOTES, 'UTF-8');
@@ -341,64 +341,8 @@ if (!is_array($kpiItems) || !$kpiItems) {
           </div>
         </article>
 <?php endforeach; ?>
-      </div>
-
-      <!-- Card-Swap alternative layout -->
-      <div class="cardswap-wrapper" aria-label="Rundgang-Beispiele (Card Swap)">
-        <div class="cardswap-anchor">
-          <div class="cardswap-viewport">
-            <div class="cardswap-deck">
-<?php foreach ($tours as $i => $tour):
-  $title  = htmlspecialchars($tour['title']       ?? 'Rundgang', ENT_QUOTES, 'UTF-8');
-  $tag    = htmlspecialchars($tour['tag']         ?? '',         ENT_QUOTES, 'UTF-8');
-  $desc   = htmlspecialchars($tour['description'] ?? '',         ENT_QUOTES, 'UTF-8');
-  $url    = $tour['matterportUrl'] ?? '';
-  $safeUrl = '';
-  if (preg_match('#^https://my\.matterport\.com/show/\?m=[a-zA-Z0-9]+$#', $url)) {
-      $safeUrl = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
-  }
-  $num = $i + 1;
-?>
-              <div class="cardswap-card" data-swap-index="<?= $i + 1 ?>">
-                <div class="stack-card-header">
-                  <div>
-                    <p style="font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.3rem">Rundgang <?= sprintf('%02d', $num) ?></p>
-                    <h3 class="stack-card-title"><?= $title ?></h3>
-                  </div>
-<?php if ($tag): ?>
-                  <span class="stack-card-tag"><?= $tag ?></span>
-<?php endif; ?>
-                </div>
-<?php if ($desc): ?>
-                <p class="stack-card-desc"><?= $desc ?></p>
-<?php endif; ?>
-                <div class="iframe-wrap">
-<?php if ($safeUrl): ?>
-                  <iframe
-                    src="<?= $safeUrl ?>"
-                    title="360° Rundgang – <?= $title ?>"
-                    allow="fullscreen; xr-spatial-tracking;"
-                    allowfullscreen
-                    referrerpolicy="strict-origin-when-cross-origin"
-                    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation"
-                    loading="eager"
-                  ></iframe>
-<?php else: ?>
-                  <div class="iframe-placeholder" aria-label="Kein Rundgang verfügbar"></div>
-<?php endif; ?>
-                </div>
-              </div>
-<?php endforeach; ?>
-            </div>
-            <div class="cardswap-dots">
-<?php foreach ($tours as $i => $tour): ?>
-              <span class="cardswap-dot<?= $i === 0 ? ' active' : '' ?>"></span>
-<?php endforeach; ?>
-            </div>
-          </div>
         </div>
       </div>
-
     </div>
   </section>
 

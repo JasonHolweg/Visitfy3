@@ -206,13 +206,8 @@
     /* ── Logo Marquee ──────────────────────────────────────── */
     initMarquee();
 
-    /* ── Scroll-Stack or Card-Swap ────────────────────────── */
-    const tourMode = scriptCfg.tour_display_style || 'stack';
-    if (tourMode === 'cardswap') {
-      initCardSwap();
-    } else {
-      initScrollStack();
-    }
+    /* ── Scroll-Stack (GSAP) ─────────────────────────────── */
+    initScrollStack();
 
     /* ── FAQ Accordion ─────────────────────────────────────── */
     initAccordion();
@@ -354,117 +349,69 @@
 
 
   /* ═══════════════════════════════════════════════════════════
-      SCROLL-STACK
-     Each .stack-item is CSS sticky; JS adds subtle rotation
-     transform as items accumulate at top.
-     When the section ends, all cards are "frozen" into absolute
-     positioning so they scroll away together (no stagger).
+      SCROLL-STACK  (CSS sticky + GSAP scrub)
+     Cards stack on top of each other one by one as you scroll.
+     Uses CSS position:sticky for the pinning (no GSAP pin),
+     GSAP ScrollTrigger only drives the card animations via scrub.
+     Once all cards are stacked, the sticky constraint releases
+     and the entire block scrolls away together.
   ═══════════════════════════════════════════════════════════ */
   function initScrollStack() {
+    const spacer    = document.querySelector('.stack-spacer');
+    const viewport  = document.querySelector('.stack-viewport');
     const container = document.querySelector('.stack-container');
-    const items = document.querySelectorAll('.stack-item');
-    if (!items.length || !container) return;
+    const items     = Array.from(document.querySelectorAll('.stack-item'));
+    if (!spacer || !viewport || !container || items.length < 2) return;
 
-    /* Config (matching the CSS vars) */
-    const ROTATION_AMOUNT = Number(scriptCfg.stack_rotation_amount ?? 0.5); /* deg */
-    const ITEM_STACK_DIST = Number(scriptCfg.stack_item_stack_dist ?? 15);  /* px, vertical offset per stacked card */
+    /* Bail out if GSAP isn't loaded */
+    if (typeof gsap === 'undefined' || !gsap.registerPlugin) return;
+    gsap.registerPlugin(ScrollTrigger);
 
-    if (!prefersReduced) {
-      /* Apply subtle rotation + offset as cards stack */
-      window.addEventListener('scroll', () => {
-        items.forEach((item, idx) => {
-          const rect = item.getBoundingClientRect();
-          const card = item.querySelector('.stack-card');
-          if (!card) return;
-          /* Is this card currently stuck at its sticky position? */
-          const stickyTop = parseFloat(getComputedStyle(item).top) || 0;
-          const isStuck   = rect.top <= stickyTop + 2;
-          if (isStuck) {
-            /* Count cards stacked ON TOP of this one (higher z-index, later in DOM).
-               The topmost card (last in DOM) gets stackCount=0 and no offset;
-               background cards get progressively larger offset so they peek from below. */
-            let stackCount = 0;
-            items.forEach((other, j) => {
-              if (j <= idx) return;
-              const otherRect = other.getBoundingClientRect();
-              const otherTop  = parseFloat(getComputedStyle(other).top) || 0;
-              if (otherRect.top <= otherTop + 2) stackCount++;
-            });
-            const rot    = (idx % 2 === 0 ? 1 : -1) * ROTATION_AMOUNT * Math.min(stackCount, 3) * 0.5;
-            const offset = stackCount * ITEM_STACK_DIST;
-            card.style.transform = `translateY(${offset}px) rotate(${rot}deg)`;
-          } else {
-            card.style.transform = '';
-          }
-        });
-      }, { passive: true });
-    }
+    /* ── Sizing: give the spacer enough height for all card transitions ── */
+    const SCROLL_PER_CARD = window.innerHeight * 0.8;  /* 80vh per card */
+    const HOLD            = window.innerHeight * 0.6;   /* 60vh hold at end */
+    const totalScroll     = (items.length - 1) * SCROLL_PER_CARD + HOLD + window.innerHeight;
+    spacer.style.height   = totalScroll + 'px';
 
-    updateDots(0);
+    /* Recalculate on resize */
+    window.addEventListener('resize', () => {
+      const spc = window.innerHeight * 0.8;
+      const hld = window.innerHeight * 0.6;
+      spacer.style.height = ((items.length - 1) * spc + hld + window.innerHeight) + 'px';
+      ScrollTrigger.refresh();
+    });
 
-    window.addEventListener('scroll', () => {
-      const anchorRect = anchor.getBoundingClientRect();
-      /* How far we've scrolled into the anchor */
-      const scrolled = -anchorRect.top;
+    /* ── Initial state: all cards except the first start below ── */
+    items.forEach((item, i) => {
+      if (i === 0) return;
+      gsap.set(item, { yPercent: 120 });
+    });
 
-      if (scrolled < 0 || scrolled > totalScroll) {
-        /* Reset: show all cards normally when outside range */
-        cards.forEach((card, i) => {
-          card.style.transform = i === 0 ? '' : `translateY(${i * 6}px) scale(${1 - i * 0.02})`;
-          card.style.opacity   = i === 0 ? '1' : `${1 - i * 0.08}`;
-        });
-        updateDots(scrolled <= 0 ? 0 : cardCount - 1);
-        return;
+    /* ── Build a scrub-only timeline (NO pin) ── */
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger:  spacer,
+        start:    'top top',
+        end:      'bottom bottom',
+        scrub:    0.3,
+        invalidateOnRefresh: true,
       }
+    });
 
-      /* Which card index is transitioning? */
-      const rawIndex = scrolled / SCROLL_PER;
-      const currentIdx = Math.min(Math.floor(rawIndex), cardCount - 2);
-      const progress   = rawIndex - currentIdx; /* 0..1 within current transition */
-
-      const newActive = Math.min(Math.round(rawIndex), cardCount - 1);
-      if (newActive !== activeIndex) {
-        activeIndex = newActive;
-        updateDots(activeIndex);
-      }
-
-      cards.forEach((card, i) => {
-        if (i < currentIdx) {
-          /* Already swiped away */
-          card.style.transform = 'translateY(-40px) scale(0.92)';
-          card.style.opacity   = '0';
-          card.style.pointerEvents = 'none';
-        } else if (i === currentIdx) {
-          /* Currently swiping away */
-          const scale   = 1 - progress * 0.08;
-          const moveY   = -progress * 40;
-          const opacity = 1 - progress;
-          card.style.transform = `translateY(${moveY}px) scale(${scale})`;
-          card.style.opacity   = `${Math.max(opacity, 0)}`;
-          card.style.pointerEvents = progress > 0.5 ? 'none' : '';
-        } else if (i === currentIdx + 1) {
-          /* Next card rising into view */
-          const behind  = (i - currentIdx - 1);
-          const yStart  = 6;
-          const scStart = 0.98;
-          const moveY   = yStart * (1 - progress);
-          const scale   = scStart + progress * (1 - scStart);
-          const opacity = 0.92 + progress * 0.08;
-          card.style.transform = `translateY(${moveY}px) scale(${scale})`;
-          card.style.opacity   = `${opacity}`;
-          card.style.pointerEvents = progress > 0.5 ? '' : 'none';
-        } else {
-          /* Further behind cards */
-          const behind = i - currentIdx - 1;
-          const moveY  = behind * 6;
-          const scale  = 1 - behind * 0.02;
-          const opacity = 1 - behind * 0.08;
-          card.style.transform = `translateY(${moveY}px) scale(${scale})`;
-          card.style.opacity   = `${Math.max(opacity, 0.5)}`;
-          card.style.pointerEvents = 'none';
-        }
+    /* Animate each card (except the first) sliding up into the stack */
+    items.forEach((item, i) => {
+      if (i === 0) return;
+      tl.to(item, {
+        yPercent: 0,
+        duration: 1,
+        ease: 'power2.out',
       });
-    }, { passive: true });
+      /* Brief pause so the freshly stacked card is visible */
+      tl.to({}, { duration: 0.25 });
+    });
+
+    /* Hold at the end so the full stack is visible before scrolling away */
+    tl.to({}, { duration: 0.4 });
   }
 
 

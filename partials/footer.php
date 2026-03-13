@@ -165,6 +165,10 @@ window.VISITFY_SCRIPT_CONFIG = <?= json_encode($scriptConfig, JSON_UNESCAPED_UNI
 </style>
 <?php endif; ?>
 
+<!-- GSAP + ScrollTrigger (free CDN) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
 <script src="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>assets/js/main.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/main.js') ?>"></script>
 <script src="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>assets/js/intro.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/intro.js') ?>"></script>
 </body>
