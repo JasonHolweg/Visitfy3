@@ -89,6 +89,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && admin_is_logged_in()) {
                 }
             }
 
+            /* ── Handle team photo uploads ─────────────────────── */
+            $teamDir = admin_absolute_path('assets/img/team');
+            if (!is_dir($teamDir)) {
+                @mkdir($teamDir, 0775, true);
+            }
+            $teamAllowedExt = ['png', 'jpg', 'jpeg', 'webp', 'avif'];
+            $teamMembers = ['kristian', 'jason'];
+            foreach ($teamMembers as $member) {
+                $fileKey = 'team_' . $member . '_photo_file';
+                if (
+                    isset($_FILES[$fileKey]) &&
+                    is_array($_FILES[$fileKey]) &&
+                    ($_FILES[$fileKey]['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK &&
+                    ($_FILES[$fileKey]['tmp_name'] ?? '') !== ''
+                ) {
+                    $origName = basename((string)($_FILES[$fileKey]['name'] ?? ''));
+                    $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
+                    if (in_array($ext, $teamAllowedExt, true)) {
+                        $destName = $member . '.' . $ext;
+                        $destAbs  = $teamDir . '/' . $destName;
+                        if (move_uploaded_file($_FILES[$fileKey]['tmp_name'], $destAbs)) {
+                            $_POST['team_' . $member . '_photo'] = 'assets/img/team/' . $destName;
+                        }
+                    }
+                }
+            }
+
             $features = preg_split('/\r\n|\r|\n/', (string)($_POST['about_features'] ?? '')) ?: [];
             $features = array_values(array_filter(array_map(static fn($v) => trim((string)$v), $features), static fn($v) => $v !== ''));
 
@@ -307,9 +334,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && admin_is_logged_in()) {
                     'kristian_name' => (string)($_POST['team_kristian_name'] ?? ''),
                     'kristian_role' => (string)($_POST['team_kristian_role'] ?? ''),
                     'kristian_text' => (string)($_POST['team_kristian_text'] ?? ''),
+                    'kristian_photo' => (string)($_POST['team_kristian_photo'] ?? ''),
                     'jason_name' => (string)($_POST['team_jason_name'] ?? ''),
                     'jason_role' => (string)($_POST['team_jason_role'] ?? ''),
                     'jason_text' => (string)($_POST['team_jason_text'] ?? ''),
+                    'jason_photo' => (string)($_POST['team_jason_photo'] ?? ''),
                     'jason_link_text' => (string)($_POST['team_jason_link_text'] ?? ''),
                     'jason_link_url' => (string)($_POST['team_jason_link_url'] ?? ''),
                 ],
@@ -1233,17 +1262,33 @@ function admin_lines(array $src, string $path): string
 
           <section class="content-section" data-content-section="team">
             <h2>Team</h2>
+
+            <h3 style="margin-top:1.5rem;margin-bottom:0.5rem;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;color:#999">Kristian</h3>
             <div class="field-grid">
-              <div><label>Kristian Name</label><input type="text" name="team_kristian_name" value="<?= htmlspecialchars(admin_field($content, 'team.kristian_name'), ENT_QUOTES, 'UTF-8') ?>"></div>
-              <div><label>Kristian Rolle</label><input type="text" name="team_kristian_role" value="<?= htmlspecialchars(admin_field($content, 'team.kristian_role'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>Name</label><input type="text" name="team_kristian_name" value="<?= htmlspecialchars(admin_field($content, 'team.kristian_name'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>Rolle</label><input type="text" name="team_kristian_role" value="<?= htmlspecialchars(admin_field($content, 'team.kristian_role'), ENT_QUOTES, 'UTF-8') ?>"></div>
             </div>
             <label>Kristian Text</label><textarea name="team_kristian_text"><?= htmlspecialchars(admin_field($content, 'team.kristian_text'), ENT_QUOTES, 'UTF-8') ?></textarea>
+            <label>Kristian Foto</label>
+            <input type="file" name="team_kristian_photo_file" accept="image/png,image/jpeg,image/webp,image/avif">
+            <input type="hidden" name="team_kristian_photo" value="<?= htmlspecialchars(admin_field($content, 'team.kristian_photo'), ENT_QUOTES, 'UTF-8') ?>">
+<?php $kPhoto = admin_field($content, 'team.kristian_photo'); if ($kPhoto): ?>
+            <p style="font-size:0.8rem;color:#888;margin-top:0.25rem">Aktuell: <?= htmlspecialchars($kPhoto, ENT_QUOTES, 'UTF-8') ?></p>
+<?php endif; ?>
+
+            <h3 style="margin-top:2rem;margin-bottom:0.5rem;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;color:#999">Jason</h3>
             <div class="field-grid">
-              <div><label>Jason Name</label><input type="text" name="team_jason_name" value="<?= htmlspecialchars(admin_field($content, 'team.jason_name'), ENT_QUOTES, 'UTF-8') ?>"></div>
-              <div><label>Jason Rolle</label><input type="text" name="team_jason_role" value="<?= htmlspecialchars(admin_field($content, 'team.jason_role'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>Name</label><input type="text" name="team_jason_name" value="<?= htmlspecialchars(admin_field($content, 'team.jason_name'), ENT_QUOTES, 'UTF-8') ?>"></div>
+              <div><label>Rolle</label><input type="text" name="team_jason_role" value="<?= htmlspecialchars(admin_field($content, 'team.jason_role'), ENT_QUOTES, 'UTF-8') ?>"></div>
             </div>
             <label>Jason Text</label><textarea name="team_jason_text"><?= htmlspecialchars(admin_field($content, 'team.jason_text'), ENT_QUOTES, 'UTF-8') ?></textarea>
-            <div class="field-grid">
+            <label>Jason Foto</label>
+            <input type="file" name="team_jason_photo_file" accept="image/png,image/jpeg,image/webp,image/avif">
+            <input type="hidden" name="team_jason_photo" value="<?= htmlspecialchars(admin_field($content, 'team.jason_photo'), ENT_QUOTES, 'UTF-8') ?>">
+<?php $jPhoto = admin_field($content, 'team.jason_photo'); if ($jPhoto): ?>
+            <p style="font-size:0.8rem;color:#888;margin-top:0.25rem">Aktuell: <?= htmlspecialchars($jPhoto, ENT_QUOTES, 'UTF-8') ?></p>
+<?php endif; ?>
+            <div class="field-grid" style="margin-top:1rem">
               <div><label>Jason Link Text</label><input type="text" name="team_jason_link_text" value="<?= htmlspecialchars(admin_field($content, 'team.jason_link_text'), ENT_QUOTES, 'UTF-8') ?>"></div>
               <div><label>Jason Link URL</label><input type="text" name="team_jason_link_url" value="<?= htmlspecialchars(admin_field($content, 'team.jason_link_url'), ENT_QUOTES, 'UTF-8') ?>"></div>
             </div>

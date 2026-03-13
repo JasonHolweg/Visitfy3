@@ -20,6 +20,20 @@ require __DIR__ . '/../partials/head.php';
 require __DIR__ . '/../partials/header.php';
 ?>
 
+<?php
+/* Perfection box SVG icons – mapped by index */
+$perfectionIcons = [
+  '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>', /* Expertise */
+  '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/></svg>', /* Qualität */
+  '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>', /* Beratung */
+  '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>', /* Schnell */
+];
+
+/* Team photos */
+$kristianPhoto = (string)visitfy_get($contentConfig, 'team.kristian_photo', '');
+$jasonPhoto    = (string)visitfy_get($contentConfig, 'team.jason_photo', '');
+?>
+
 <main id="main-content">
 
   <section class="page-hero">
@@ -38,7 +52,6 @@ require __DIR__ . '/../partials/header.php';
 
       <div class="about-grid">
         <div class="about-text fade-up delay-1">
-          <p><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.paragraph_1', ''), ENT_QUOTES, 'UTF-8') ?></p>
           <p><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.paragraph_2', ''), ENT_QUOTES, 'UTF-8') ?></p>
           <p><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.paragraph_3', ''), ENT_QUOTES, 'UTF-8') ?></p>
         </div>
@@ -67,21 +80,26 @@ require __DIR__ . '/../partials/header.php';
               </ul>
             </div>
           </div>
-
-          <div class="glass about-panel">
-            <div class="about-features" style="margin-top:0;">
-              <h3><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.perfection_title', 'Perfektion in jedem Detail'), ENT_QUOTES, 'UTF-8') ?></h3>
-              <ul>
-<?php foreach ($aboutPerfection as $item): ?>
-                <li class="about-icon-item about-icon-item--perf">
-                  <span class="about-item-icon" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
-                  <?= htmlspecialchars((string)$item, ENT_QUOTES, 'UTF-8') ?>
-                </li>
-<?php endforeach; ?>
-              </ul>
-            </div>
-          </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Perfection: 4 Icon-Boxen -->
+  <section class="section" aria-labelledby="about-perfection-heading">
+    <div class="container">
+      <p class="section-eyebrow fade-up"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.perfection_title', 'Perfektion in jedem Detail'), ENT_QUOTES, 'UTF-8') ?></p>
+      <h2 class="section-title fade-up delay-1" id="about-perfection-heading"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.perfection_title', 'Perfektion in jedem Detail'), ENT_QUOTES, 'UTF-8') ?></h2>
+
+      <div class="perfection-grid">
+<?php foreach ($aboutPerfection as $i => $item): ?>
+        <div class="perfection-box glass fade-up delay-<?= ($i % 4) + 1 ?>">
+          <div class="perfection-icon" aria-hidden="true">
+            <?= $perfectionIcons[$i] ?? $perfectionIcons[0] ?>
+          </div>
+          <p class="perfection-text"><?= htmlspecialchars((string)$item, ENT_QUOTES, 'UTF-8') ?></p>
+        </div>
+<?php endforeach; ?>
       </div>
     </div>
   </section>
@@ -93,18 +111,30 @@ require __DIR__ . '/../partials/header.php';
 
       <div class="about-team-grid">
         <article class="about-team-card glass fade-up delay-1">
+<?php if ($kristianPhoto): ?>
+          <div class="about-team-photo">
+            <img src="<?= htmlspecialchars($root . $kristianPhoto, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)visitfy_get($contentConfig, 'team.kristian_name', 'Kristian Meister'), ENT_QUOTES, 'UTF-8') ?>" loading="lazy">
+          </div>
+<?php else: ?>
           <div class="about-team-avatar" aria-hidden="true">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </div>
+<?php endif; ?>
           <p class="about-team-role"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'team.kristian_role', 'Geschäftsführer'), ENT_QUOTES, 'UTF-8') ?></p>
           <h3><?= htmlspecialchars((string)visitfy_get($contentConfig, 'team.kristian_name', 'Kristian Meister'), ENT_QUOTES, 'UTF-8') ?></h3>
           <p><?= htmlspecialchars((string)visitfy_get($contentConfig, 'team.kristian_text', ''), ENT_QUOTES, 'UTF-8') ?></p>
         </article>
 
         <article class="about-team-card glass fade-up delay-2">
+<?php if ($jasonPhoto): ?>
+          <div class="about-team-photo">
+            <img src="<?= htmlspecialchars($root . $jasonPhoto, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)visitfy_get($contentConfig, 'team.jason_name', 'Jason Holweg'), ENT_QUOTES, 'UTF-8') ?>" loading="lazy">
+          </div>
+<?php else: ?>
           <div class="about-team-avatar" aria-hidden="true">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </div>
+<?php endif; ?>
           <p class="about-team-role"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'team.jason_role', 'Entwickler'), ENT_QUOTES, 'UTF-8') ?></p>
           <h3><?= htmlspecialchars((string)visitfy_get($contentConfig, 'team.jason_name', 'Jason Holweg'), ENT_QUOTES, 'UTF-8') ?></h3>
           <p><?= htmlspecialchars((string)visitfy_get($contentConfig, 'team.jason_text', ''), ENT_QUOTES, 'UTF-8') ?></p>
