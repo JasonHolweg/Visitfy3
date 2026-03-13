@@ -236,11 +236,15 @@
      SCROLL-REVEAL
   ═══════════════════════════════════════════════════════════ */
   function initFadeUps() {
+    const allSelectors = '.fade-up, .slide-left, .slide-right, .fly-in-left, .fly-in-right, .fly-in-bottom';
     if (prefersReduced) {
-      document.querySelectorAll('.fade-up, .slide-left, .slide-right').forEach(el => el.classList.add('visible'));
+      document.querySelectorAll(allSelectors).forEach(el => el.classList.add('visible'));
       return;
     }
-    const items = document.querySelectorAll('.fade-up:not(.visible), .slide-left:not(.visible), .slide-right:not(.visible)');
+    const items = document.querySelectorAll(
+      '.fade-up:not(.visible), .slide-left:not(.visible), .slide-right:not(.visible), ' +
+      '.fly-in-left:not(.visible), .fly-in-right:not(.visible), .fly-in-bottom:not(.visible)'
+    );
     if (!items.length) return;
     const io = new IntersectionObserver(entries => {
       entries.forEach(entry => {
@@ -249,7 +253,7 @@
           io.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.15 });
     items.forEach(el => io.observe(el));
   }
 
@@ -349,69 +353,50 @@
 
 
   /* ═══════════════════════════════════════════════════════════
-      SCROLL-STACK  (CSS sticky + GSAP scrub)
-     Cards stack on top of each other one by one as you scroll.
-     Uses CSS position:sticky for the pinning (no GSAP pin),
-     GSAP ScrollTrigger only drives the card animations via scrub.
-     Once all cards are stacked, the sticky constraint releases
-     and the entire block scrolls away together.
+      SCROLL-STACK  (GSAP pin per card-wrapper)
+     Each .stack-item is individually pinned with pinSpacing:false.
+     As cards scroll into position they shrink + tilt, creating
+     a "stacking" depth effect.  The last card stays at full scale.
+     When all cards have arrived the section scrolls away naturally.
   ═══════════════════════════════════════════════════════════ */
   function initScrollStack() {
-    const spacer    = document.querySelector('.stack-spacer');
-    const viewport  = document.querySelector('.stack-viewport');
-    const container = document.querySelector('.stack-container');
-    const items     = Array.from(document.querySelectorAll('.stack-item'));
-    if (!spacer || !viewport || !container || items.length < 2) return;
+    const wrappers = gsap.utils.toArray('.stack-item');
+    const cards    = gsap.utils.toArray('.stack-card');
+    if (!wrappers.length || !cards.length) return;
 
     /* Bail out if GSAP isn't loaded */
     if (typeof gsap === 'undefined' || !gsap.registerPlugin) return;
     gsap.registerPlugin(ScrollTrigger);
 
-    /* ── Sizing: give the spacer enough height for all card transitions ── */
-    const SCROLL_PER_CARD = window.innerHeight * 0.8;  /* 80vh per card */
-    const HOLD            = window.innerHeight * 0.6;   /* 60vh hold at end */
-    const totalScroll     = (items.length - 1) * SCROLL_PER_CARD + HOLD + window.innerHeight;
-    spacer.style.height   = totalScroll + 'px';
+    wrappers.forEach(function (wrapper, i) {
+      var card = cards[i];
+      if (!card) return;
 
-    /* Recalculate on resize */
-    window.addEventListener('resize', () => {
-      const spc = window.innerHeight * 0.8;
-      const hld = window.innerHeight * 0.6;
-      spacer.style.height = ((items.length - 1) * spc + hld + window.innerHeight) + 'px';
-      ScrollTrigger.refresh();
-    });
-
-    /* ── Initial state: all cards except the first start below ── */
-    items.forEach((item, i) => {
-      if (i === 0) return;
-      gsap.set(item, { yPercent: 120 });
-    });
-
-    /* ── Build a scrub-only timeline (NO pin) ── */
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger:  spacer,
-        start:    'top top',
-        end:      'bottom bottom',
-        scrub:    0.3,
-        invalidateOnRefresh: true,
+      /* Last card keeps full size; earlier cards shrink + tilt */
+      var scale    = 1;
+      var rotation = 0;
+      if (i !== cards.length - 1) {
+        scale    = 0.9 + 0.025 * i;
+        rotation = -10;
       }
-    });
 
-    /* Animate each card (except the first) sliding up into the stack */
-    items.forEach((item, i) => {
-      if (i === 0) return;
-      tl.to(item, {
-        yPercent: 0,
-        duration: 1,
-        ease: 'power2.out',
+      gsap.to(card, {
+        scale: scale,
+        rotationX: rotation,
+        transformOrigin: 'top center',
+        ease: 'none',
+        scrollTrigger: {
+          trigger:    wrapper,
+          start:      'top ' + (60 + 10 * i),
+          end:        'bottom ' + (window.innerHeight * 1.0),
+          endTrigger: '.stack-wrapper',
+          scrub:      true,
+          pin:        wrapper,
+          pinSpacing: false,
+          invalidateOnRefresh: true
+        }
       });
-      /* Brief pause so the freshly stacked card is visible */
-      tl.to({}, { duration: 0.25 });
     });
-
-    /* Hold at the end so the full stack is visible before scrolling away */
-    tl.to({}, { duration: 0.4 });
   }
 
 

@@ -138,9 +138,9 @@ if (!is_array($kpiItems) || !$kpiItems) {
         <?= htmlspecialchars((string)visitfy_get($contentConfig, 'mockup_text.sub', 'Ob Desktop, Tablet oder Smartphone – Ihr 360° Rundgang sieht überall perfekt aus.'), ENT_QUOTES, 'UTF-8') ?>
       </p>
 
-      <div class="mockup-devices fade-up delay-3">
+      <div class="mockup-devices">
         <!-- Laptop Mockup -->
-        <div class="mockup-laptop">
+        <div class="mockup-laptop fly-in-left">
           <div class="mockup-laptop-screen">
 <?php if ($mockupDesktop !== '' && is_file(__DIR__ . '/' . $mockupDesktop)): ?>
             <img src="<?= htmlspecialchars(visitfy_url($mockupDesktop), ENT_QUOTES, 'UTF-8') ?>" alt="Rundgang auf Laptop" loading="lazy" decoding="async">
@@ -153,7 +153,7 @@ if (!is_array($kpiItems) || !$kpiItems) {
           </div>
         </div>
         <!-- Tablet Mockup -->
-        <div class="mockup-tablet">
+        <div class="mockup-tablet fly-in-bottom">
           <div class="mockup-tablet-screen">
 <?php if ($mockupTablet !== '' && is_file(__DIR__ . '/' . $mockupTablet)): ?>
             <img src="<?= htmlspecialchars(visitfy_url($mockupTablet), ENT_QUOTES, 'UTF-8') ?>" alt="Rundgang auf Tablet" loading="lazy" decoding="async">
@@ -166,7 +166,7 @@ if (!is_array($kpiItems) || !$kpiItems) {
           </div>
         </div>
         <!-- Phone Mockup -->
-        <div class="mockup-phone">
+        <div class="mockup-phone fly-in-right">
           <div class="mockup-phone-screen">
 <?php if ($mockupPhone !== '' && is_file(__DIR__ . '/' . $mockupPhone)): ?>
             <img src="<?= htmlspecialchars(visitfy_url($mockupPhone), ENT_QUOTES, 'UTF-8') ?>" alt="Rundgang auf Smartphone" loading="lazy" decoding="async">
@@ -294,10 +294,8 @@ if (!is_array($kpiItems) || !$kpiItems) {
       </div>
     </div>
 
-    <!-- Spacer: JS sets height so there's enough scroll room -->
-    <div class="stack-spacer">
-      <div class="stack-viewport">
-        <div class="stack-container" aria-label="Rundgang-Beispiele">
+    <div class="stack-wrapper">
+      <div class="stack-cards" aria-label="Rundgang-Beispiele">
 <?php foreach ($tours as $i => $tour):
   $title  = htmlspecialchars($tour['title']       ?? 'Rundgang', ENT_QUOTES, 'UTF-8');
   $tag    = htmlspecialchars($tour['tag']         ?? '',         ENT_QUOTES, 'UTF-8');
@@ -309,8 +307,8 @@ if (!is_array($kpiItems) || !$kpiItems) {
   }
   $num = $i + 1;
 ?>
-        <article class="stack-item" aria-label="<?= $title ?>">
-          <div class="stack-card">
+        <div class="stack-item">
+          <article class="stack-card" aria-label="<?= $title ?>">
             <div class="stack-card-header">
               <div>
                 <p style="font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.3rem">Rundgang <?= sprintf('%02d', $num) ?></p>
@@ -338,10 +336,9 @@ if (!is_array($kpiItems) || !$kpiItems) {
               <div class="iframe-placeholder" aria-label="Kein Rundgang verfügbar"></div>
 <?php endif; ?>
             </div>
-          </div>
-        </article>
-<?php endforeach; ?>
+          </article>
         </div>
+<?php endforeach; ?>
       </div>
     </div>
   </section>
