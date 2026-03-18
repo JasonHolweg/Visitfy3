@@ -42,12 +42,13 @@ The website includes:
 
 ## 🛠️ Tech Stack
 
-* HTML5
-* CSS3 (custom styling / modern layout techniques)
-* JavaScript (vanilla)
-* Responsive design principles
-
-*(Adjust this section if you use frameworks like Tailwind, Bootstrap, etc.)*
+* **PHP** – Server-side rendering, form handling, JSON-based CMS
+* **HTML5 / CSS3** – Custom styling, modern layout (Flexbox/Grid), animations
+* **JavaScript (vanilla)** – Intro animation, scroll effects, rotating text, cookie consent
+* **GSAP + ScrollTrigger** – Smooth scroll-driven animations
+* **Mailgun API** – Transactional email delivery for contact forms
+* **Cloudflare Turnstile** – Bot protection on forms
+* **JSON** – Flat-file content storage (no database)
 
 ---
 
@@ -103,8 +104,9 @@ Feel free to open an issue or submit a pull request.
 
 ## 📄 License
 
-This project is currently not licensed for public redistribution.
-(Adjust if you plan to add a license like MIT.)
+This project is proprietary. You may view the code for reference, but copying, redistribution, or reuse of any kind requires explicit written permission.
+
+See [LICENSE](LICENSE) for full details.
 
 ---
 
