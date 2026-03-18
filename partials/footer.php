@@ -176,5 +176,69 @@ window.VISITFY_SCRIPT_CONFIG = <?= json_encode($scriptConfig, JSON_UNESCAPED_UNI
 
 <script src="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>assets/js/main.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/main.js') ?>"></script>
 <script src="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>assets/js/intro.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/intro.js') ?>"></script>
+
+<!-- Cookie Consent Banner -->
+<div id="cookie-banner" role="dialog" aria-label="Cookie-Einstellungen" hidden>
+  <p class="cookie-banner-text">
+    Für die beste Nutzererfahrung verwenden wir Cookies.
+    <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/datenschutz.php">Mehr erfahren</a>
+  </p>
+  <div class="cookie-banner-actions">
+    <button class="cookie-btn-accept" id="cookie-accept">Alle akzeptieren</button>
+    <button class="cookie-btn-decline" id="cookie-decline">Nur notwendige</button>
+  </div>
+</div>
+<script>
+(function () {
+  var COOKIE_NAME = 'visitfy_consent';
+  var COOKIE_DAYS = 365;
+
+  function getCookie(name) {
+    var match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+    return match ? decodeURIComponent(match[1]) : null;
+  }
+
+  function setCookie(name, value, days) {
+    var expires = new Date(Date.now() + days * 864e5).toUTCString();
+    document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/; SameSite=Lax';
+  }
+
+  function hideBanner(banner) {
+    banner.classList.remove('is-visible');
+    banner.classList.add('is-hiding');
+    setTimeout(function () { banner.hidden = true; }, 400);
+  }
+
+  var banner = document.getElementById('cookie-banner');
+  if (!banner) return;
+
+  if (getCookie(COOKIE_NAME) === null) {
+    function showBanner() {
+      banner.hidden = false;
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { banner.classList.add('is-visible'); });
+      });
+    }
+
+    if (document.getElementById('intro')) {
+      document.addEventListener('visitfy:intro-done', function () {
+        setTimeout(showBanner, 700);
+      }, { once: true });
+    } else {
+      setTimeout(showBanner, 700);
+    }
+  }
+
+  document.getElementById('cookie-accept').addEventListener('click', function () {
+    setCookie(COOKIE_NAME, '1', COOKIE_DAYS);
+    hideBanner(banner);
+  });
+
+  document.getElementById('cookie-decline').addEventListener('click', function () {
+    setCookie(COOKIE_NAME, '0', COOKIE_DAYS);
+    hideBanner(banner);
+  });
+}());
+</script>
 </body>
 </html>

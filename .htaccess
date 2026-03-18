@@ -10,6 +10,11 @@ Options -Indexes
   Require all denied
 </FilesMatch>
 
+# ── Deny direct access to personal inquiry data ──────────────
+<Files "inquiries.json">
+  Require all denied
+</Files>
+
 # ── Security headers ─────────────────────────────────────────
 <IfModule mod_headers.c>
   # Prevent clickjacking

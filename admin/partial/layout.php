@@ -993,6 +993,23 @@ if (!defined('ADMIN_LAYOUT_GUARD')) define('ADMIN_LAYOUT_GUARD', true);
       </div>
 
       <div class="nav-group">
+        <div class="nav-label">Anfragen</div>
+        <a href="?p=anfragen" class="nav-item <?= ($currentPage ?? '') === 'anfragen' ? 'active' : '' ?>">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 3h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/>
+            <path d="M1 4l7 5 7-5"/>
+          </svg>
+          Anfragen
+          <?php
+          $__iqPath = admin_root_path() . '/assets/data/inquiries.json';
+          $__iqCount = count(admin_read_json($__iqPath, []));
+          if ($__iqCount > 0): ?>
+          <span style="margin-left:auto;background:rgba(255,255,255,0.1);border-radius:10px;padding:1px 7px;font-size:11px;font-weight:600"><?= $__iqCount ?></span>
+          <?php endif; ?>
+        </a>
+      </div>
+
+      <div class="nav-group">
         <div class="nav-label">Inhalt</div>
         <a href="?p=content" class="nav-item <?= ($currentPage ?? '') === 'content' ? 'active' : '' ?>">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">

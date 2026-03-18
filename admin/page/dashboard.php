@@ -12,6 +12,8 @@ $content = admin_read_json(admin_content_config_path(), []);
 $tours = admin_read_json(admin_root_path() . '/assets/data/tours.json', []);
 $mailSettings = admin_read_mail_settings();
 $script = admin_read_json(admin_script_config_path(), []);
+$inquiries = admin_read_json(admin_root_path() . '/assets/data/inquiries.json', []);
+$inquiryCount = count($inquiries);
 
 // Count media files
 $mediaCount = 0;
@@ -71,6 +73,17 @@ ob_start();
 
   <!-- Quick Stats -->
   <div class="widget-grid">
+    <div class="widget" style="cursor:pointer" onclick="location.href='?p=anfragen'">
+      <div class="widget-icon">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 3h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/>
+          <path d="M1 4l7 5 7-5"/>
+        </svg>
+      </div>
+      <div class="widget-value"><?= $inquiryCount ?></div>
+      <div class="widget-label">Anfragen</div>
+    </div>
+
     <div class="widget">
       <div class="widget-icon">
         <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">

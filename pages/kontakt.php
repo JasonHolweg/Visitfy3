@@ -208,6 +208,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     error_log('Visitfy confirmation mail failed: ' . $confirmationResult['error']);
                 }
 
+                /* Save inquiry to JSON if user has given cookie consent */
+                if (($_COOKIE['visitfy_consent'] ?? '') === '1') {
+                    $inquiriesPath = __DIR__ . '/../assets/data/inquiries.json';
+                    $inquiries = visitfy_load_json($inquiriesPath, []);
+                    $maxId = 0;
+                    foreach ($inquiries as $inq) { if (isset($inq['id']) && (int)$inq['id'] > $maxId) $maxId = (int)$inq['id']; }
+                    $inquiries[] = [
+                        'id'        => $maxId + 1,
+                        'timestamp' => date('c'),
+                        'date'      => date('d.m.Y H:i'),
+                        'name'      => $safeName,
+                        'firma'     => $safeFirma,
+                        'email'     => $safeEmail,
+                        'telefon'   => $safeTelefon,
+                        'branche'   => $safeBranche,
+                        'nachricht' => $nachricht,
+                        'source'    => 'kontakt',
+                    ];
+                    $encoded = json_encode($inquiries, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+                    if (is_string($encoded)) {
+                        file_put_contents($inquiriesPath, $encoded . PHP_EOL, LOCK_EX);
+                    }
+                }
+
                 $formSent = true;
                 $_SESSION['csrf_token'] = bin2hex(random_bytes(24));
             }

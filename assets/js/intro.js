@@ -275,6 +275,7 @@
       main.style.opacity = '1';
     }
     triggerFadeUps();
+    document.dispatchEvent(new CustomEvent('visitfy:intro-done'));
   }
 
   /* ── Skip ───────────────────────────────────────────────── */

@@ -112,7 +112,7 @@ if (!is_array($kpiItems) || !$kpiItems) {
         <!-- H1: "Mehr [rotierendes Wort]" + statische zweite Zeile -->
         <h1 id="hero-heading" class="fade-up delay-2"
             aria-label="<?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.prefix', 'Mehr') . ' ' . implode(' / ', $heroWords) . ' – ' . (string)visitfy_get($contentConfig, 'hero.headline', 'Durch 360° Rundgänge.'), ENT_QUOTES, 'UTF-8') ?>">
-          <span class="hero-rotating-prefix"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.prefix', 'Mehr'), ENT_QUOTES, 'UTF-8') ?> </span><span class="hero-rotating-word" data-hero-rotate-word><?= htmlspecialchars((string)($heroWords[0] ?? 'SICHTBARKEIT.'), ENT_QUOTES, 'UTF-8') ?></span><br>
+          <span class="hero-rotating-prefix"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.prefix', 'Mehr'), ENT_QUOTES, 'UTF-8') ?> </span><br><span class="hero-rotating-word" data-hero-rotate-word><?= htmlspecialchars((string)($heroWords[0] ?? 'SICHTBARKEIT.'), ENT_QUOTES, 'UTF-8') ?></span><br>
           <span><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.headline', 'Durch 360° Rundgänge.'), ENT_QUOTES, 'UTF-8') ?></span>
         </h1>
 
