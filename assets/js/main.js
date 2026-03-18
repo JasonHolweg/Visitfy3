@@ -27,7 +27,14 @@
   (function initParticles() {
     const heroCanvas = document.getElementById('hero-canvas');
     if (!heroCanvas) return;
-    if (prefersReduced) return; /* skip animation on reduced-motion */
+    const heroSection = document.querySelector('.hero');
+    if (prefersReduced) {
+      if (heroSection) {
+        heroSection.style.setProperty('--hero-parallax-x', '0px');
+        heroSection.style.setProperty('--hero-parallax-y', '0px');
+      }
+      return; /* skip animation on reduced-motion */
+    }
 
     const ctx = heroCanvas.getContext('2d');
     let W, H, dpr, particles, animFrame;
@@ -133,15 +140,22 @@
     window.addEventListener('resize', () => { resize(); }, { passive: true });
 
     /* Mouse parallax (on hero only) */
-    const heroSection = document.querySelector('.hero');
     if (heroSection) {
       heroSection.addEventListener('mousemove', e => {
         const rect = heroSection.getBoundingClientRect();
         mouse.x = e.clientX - rect.left;
         mouse.y = e.clientY - rect.top;
+        const offsetX = ((mouse.x / rect.width) - 0.5) * 20;
+        const offsetY = ((mouse.y / rect.height) - 0.5) * 20;
+        heroSection.style.setProperty('--hero-parallax-x', `${offsetX}px`);
+        heroSection.style.setProperty('--hero-parallax-y', `${offsetY}px`);
+        heroSection.style.setProperty('--hero-glow-opacity', '0.28');
       }, { passive: true });
       heroSection.addEventListener('mouseleave', () => {
         mouse.x = -9999; mouse.y = -9999;
+        heroSection.style.setProperty('--hero-parallax-x', '0px');
+        heroSection.style.setProperty('--hero-parallax-y', '0px');
+        heroSection.style.setProperty('--hero-glow-opacity', '0.2');
       }, { passive: true });
     }
   })();
@@ -489,7 +503,12 @@
     /* Basic client-side validation */
     let valid = true;
     form.querySelectorAll('[required]').forEach(field => {
-      if (!field.value.trim()) {
+      const isCheckbox = field.type === 'checkbox';
+      const isRadio = field.type === 'radio';
+      const isEmpty = isCheckbox ? !field.checked : !field.value.trim();
+      const radioUnchecked = isRadio && !form.querySelector(`[name="${field.name}"]:checked`);
+
+      if (isEmpty || radioUnchecked) {
         field.style.borderColor = 'rgba(255,100,100,0.5)';
         valid = false;
       } else {

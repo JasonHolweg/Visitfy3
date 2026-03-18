@@ -4,6 +4,7 @@
  * Contact page with form, server-side validation, honeypot, CSRF, DSGVO checkbox.
  */
 require __DIR__ . '/../partials/cms.php';
+require __DIR__ . '/../partials/mail.php';
 
 /* ── Session for CSRF token ────────────────────────────── */
 if (session_status() === PHP_SESSION_NONE) {
@@ -19,8 +20,25 @@ if (empty($_SESSION['csrf_token'])) {
 }
 
 $root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? visitfy_base_path() : '../';
+$contentConfig = visitfy_load_json(__DIR__ . '/../assets/data/content.json', []);
 $pageTitle = 'Kontakt | Visitfy – 360° Rundgänge anfragen';
 $pageDesc  = 'Kontaktieren Sie Visitfy für ein unverbindliches Angebot für Ihren 360° Rundgang. Nutzen Sie unser Kontaktformular oder schreiben Sie direkt.';
+
+$contactEmail = trim((string)visitfy_get($contentConfig, 'kontakt_text.email', visitfy_get($contentConfig, 'footer.contact_email', 'info@visitfy.de')));
+if ($contactEmail === '') {
+    $contactEmail = 'info@visitfy.de';
+}
+
+$mailConfig = visitfy_load_mail_config();
+if (($mailConfig['MAILGUN_FROM_EMAIL'] ?? '') === '') {
+    $mailConfig['MAILGUN_FROM_EMAIL'] = $contactEmail;
+}
+if (($mailConfig['MAILGUN_TO_EMAIL'] ?? '') === '') {
+    $mailConfig['MAILGUN_TO_EMAIL'] = $contactEmail;
+}
+if (($mailConfig['MAILGUN_FROM_NAME'] ?? '') === '') {
+    $mailConfig['MAILGUN_FROM_NAME'] = 'Visitfy';
+}
 
 /* ── Server-side form handling ─────────────────────────── */
 $formSent  = false;
@@ -59,9 +77,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $formError = 'Bitte akzeptieren Sie die Datenschutzerklärung.';
         } elseif (!in_array($branche, $allowedBranchen, true)) {
             $formError = 'Ungültige Branchenauswahl.';
+        } elseif (preg_match('/[\r\n]/', $email)) {
+            $formError = 'Ungültige E-Mail-Adresse.';
+        } elseif (!visitfy_mail_is_configured($mailConfig)) {
+            $formError = 'Das Kontaktformular ist im Moment noch nicht vollständig eingerichtet. Bitte schreiben Sie uns direkt an ' . $contactEmail . '.';
         } else {
-            /* TODO: replace with SMTP mailer (e.g. PHPMailer + config) */
-            $to = 'info@visitfy.de'; /* TODO: verify recipient */
             /* Strip CRLF from all user fields to prevent email header/body injection */
             $safeSubjectName = str_replace(["\r", "\n"], '', $name);
             $safeName        = str_replace(["\r", "\n"], '', $name);
@@ -69,18 +89,119 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $safeEmail       = str_replace(["\r", "\n"], '', $email);
             $safeTelefon     = str_replace(["\r", "\n"], '', $telefon);
             $safeBranche     = str_replace(["\r", "\n"], '', $branche);
-            $subject = 'Neue Anfrage von ' . $safeSubjectName;
-            $body    = "Name: $safeName\nFirma: $safeFirma\nE-Mail: $safeEmail\nTelefon: $safeTelefon\nBranche: $safeBranche\n\nNachricht:\n$nachricht";
-            /* Sanitize email to prevent header injection: reject newlines */
-            if (preg_match('/[\r\n]/', $email)) {
-                $formError = 'Ungültige E-Mail-Adresse.';
+            $subject = '[Visitfy] Neue Anfrage von ' . $safeSubjectName;
+            $body = "Name: $safeName\n"
+                . "Firma: $safeFirma\n"
+                . "E-Mail: $safeEmail\n"
+                . "Telefon: $safeTelefon\n"
+                . "Branche: $safeBranche\n\n"
+                . "Nachricht:\n$nachricht\n";
+
+            $escapedMessage = nl2br(htmlspecialchars($nachricht, ENT_QUOTES, 'UTF-8'));
+
+            /* ── Admin notification email ── */
+            $row = static function (string $label, string $value): string {
+                return '<tr>'
+                    . '<td style="padding:10px 16px 10px 0;font-size:13px;font-weight:700;letter-spacing:0.06em;'
+                    .   'text-transform:uppercase;color:rgba(255,255,255,0.4);white-space:nowrap;vertical-align:top;">'
+                    . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . '</td>'
+                    . '<td style="padding:10px 0;font-size:15px;color:#ffffff;vertical-align:top;">'
+                    . $value . '</td>'
+                    . '</tr>';
+            };
+            $adminInner =
+                '<p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.15em;'
+                .   'text-transform:uppercase;color:rgba(255,255,255,0.4);">Neue Anfrage</p>'
+                . '<h1 style="margin:0 0 32px;font-size:24px;font-weight:700;color:#ffffff;line-height:1.3;">'
+                . htmlspecialchars($safeName, ENT_QUOTES, 'UTF-8') . ' hat eine Anfrage gesendet.</h1>'
+                . '<table cellpadding="0" cellspacing="0" role="presentation" width="100%"'
+                .   ' style="border-collapse:collapse;border-top:1px solid rgba(255,255,255,0.08);">'
+                . $row('Name',    htmlspecialchars($safeName, ENT_QUOTES, 'UTF-8'))
+                . $row('Firma',   htmlspecialchars($safeFirma !== '' ? $safeFirma : '—', ENT_QUOTES, 'UTF-8'))
+                . $row('E-Mail',  '<a href="mailto:' . htmlspecialchars($safeEmail, ENT_QUOTES, 'UTF-8') . '"'
+                    . ' style="color:#ffffff;">' . htmlspecialchars($safeEmail, ENT_QUOTES, 'UTF-8') . '</a>')
+                . $row('Telefon', htmlspecialchars($safeTelefon !== '' ? $safeTelefon : '—', ENT_QUOTES, 'UTF-8'))
+                . $row('Branche', htmlspecialchars($safeBranche !== '' ? $safeBranche : '—', ENT_QUOTES, 'UTF-8'))
+                . '</table>'
+                . '<table width="100%" cellpadding="0" cellspacing="0" role="presentation">'
+                . '<tr><td style="height:1px;background-color:rgba(255,255,255,0.08);padding:0;font-size:0;line-height:0;">&nbsp;</td></tr>'
+                . '</table>'
+                . '<p style="margin:24px 0 8px;font-size:11px;font-weight:700;letter-spacing:0.15em;'
+                .   'text-transform:uppercase;color:rgba(255,255,255,0.4);">Nachricht</p>'
+                . '<p style="margin:0;font-size:15px;color:rgba(255,255,255,0.85);line-height:1.7;">'
+                . $escapedMessage . '</p>'
+                . '<p style="margin:32px 0 0;">'
+                . '<a href="mailto:' . htmlspecialchars($safeEmail, ENT_QUOTES, 'UTF-8') . '"'
+                .   ' style="display:inline-block;padding:12px 28px;background-color:#ffffff;color:#000000;'
+                .   'font-size:14px;font-weight:700;text-decoration:none;border-radius:10px;">Antworten</a>'
+                . '</p>';
+
+            $adminFooter = '<p style="margin:0;font-size:12px;color:rgba(255,255,255,0.28);line-height:1.6;">'
+                . 'Visitfy Admin &middot; Diese E-Mail wurde automatisch generiert.</p>';
+
+            $adminHtml = visitfy_email_wrap($adminInner, $adminFooter);
+
+            $adminPayload = [
+                'from' => visitfy_format_from_header((string)$mailConfig['MAILGUN_FROM_NAME'], (string)$mailConfig['MAILGUN_FROM_EMAIL']),
+                'to' => (string)$mailConfig['MAILGUN_TO_EMAIL'],
+                'subject' => $subject,
+                'text' => $body,
+                'html' => $adminHtml,
+                'h:Reply-To' => $safeEmail,
+            ];
+
+            $sendResult = visitfy_send_contact_mail($mailConfig, $adminPayload);
+
+            if (!$sendResult['ok']) {
+                error_log('Visitfy contact mail failed: ' . $sendResult['error']);
+                $formError = 'Ihre Anfrage konnte gerade nicht gesendet werden. Bitte versuchen Sie es erneut oder schreiben Sie direkt an ' . $contactEmail . '.';
             } else {
-                $headers = 'From: noreply@visitfy.de' . "\r\n" . 'Reply-To: ' . $email;
-                /* @mail() – server must be configured for mail delivery */
-                /* $sent = mail($to, $subject, $body, $headers); */
-                /* For now, always treat as sent (TODO: enable mail() on server) */
+                $safeName_html = htmlspecialchars($safeName, ENT_QUOTES, 'UTF-8');
+                $confirmInner =
+                    '<p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.15em;'
+                    .   'text-transform:uppercase;color:rgba(255,255,255,0.4);">Bestätigung</p>'
+                    . '<h1 style="margin:0 0 28px;font-size:24px;font-weight:700;color:#ffffff;line-height:1.3;">'
+                    . 'Ihre Anfrage ist eingegangen.</h1>'
+                    . '<p style="margin:0 0 16px;font-size:16px;color:rgba(255,255,255,0.75);line-height:1.7;">'
+                    . 'Hallo ' . $safeName_html . ',</p>'
+                    . '<p style="margin:0 0 16px;font-size:16px;color:rgba(255,255,255,0.75);line-height:1.7;">'
+                    . 'vielen Dank für Ihre Anfrage! Wir haben Ihre Nachricht erhalten und melden uns '
+                    . '<strong style="color:#ffffff;">in Kürze</strong> bei Ihnen.</p>'
+                    . '<p style="margin:0 0 36px;font-size:16px;color:rgba(255,255,255,0.75);line-height:1.7;">'
+                    . 'In der Regel antworten wir innerhalb von <strong style="color:#ffffff;">24 Stunden</strong> '
+                    . 'an Werktagen.</p>'
+                    . '<table width="100%" cellpadding="0" cellspacing="0" role="presentation">'
+                    . '<tr><td style="height:1px;background-color:rgba(255,255,255,0.08);font-size:0;line-height:0;">&nbsp;</td></tr>'
+                    . '</table>'
+                    . '<p style="margin:28px 0 4px;font-size:15px;color:rgba(255,255,255,0.5);">Viele Grüße</p>'
+                    . '<p style="margin:0;font-size:16px;font-weight:700;color:#ffffff;">Das Visitfy Team</p>';
+
+                $confirmFooter =
+                    '<p style="margin:0;font-size:12px;color:rgba(255,255,255,0.28);line-height:1.6;">'
+                    . 'Visitfy &middot; Flensburg, Deutschland &middot; '
+                    . '<a href="mailto:' . htmlspecialchars($contactEmail, ENT_QUOTES, 'UTF-8') . '"'
+                    .   ' style="color:rgba(255,255,255,0.4);text-decoration:none;">'
+                    . htmlspecialchars($contactEmail, ENT_QUOTES, 'UTF-8') . '</a></p>'
+                    . '<p style="margin:6px 0 0;font-size:11px;color:rgba(255,255,255,0.18);">'
+                    . 'Sie erhalten diese E-Mail, weil Sie das Kontaktformular auf visitfy.de ausgefüllt haben.</p>';
+
+                $confirmHtml = visitfy_email_wrap($confirmInner, $confirmFooter);
+
+                $confirmationPayload = [
+                    'from' => visitfy_format_from_header((string)$mailConfig['MAILGUN_FROM_NAME'], (string)$mailConfig['MAILGUN_FROM_EMAIL']),
+                    'to' => $safeEmail,
+                    'subject' => 'Ihre Anfrage bei Visitfy ist eingegangen',
+                    'text' => "Hallo $safeName,\n\nvielen Dank für Ihre Anfrage bei Visitfy! Wir haben Ihre Nachricht erhalten und melden uns in Kürze bei Ihnen.\n\nIn der Regel antworten wir innerhalb von 24 Stunden an Werktagen.\n\nViele Grüße\nDas Visitfy Team",
+                    'html' => $confirmHtml,
+                    'h:Reply-To' => (string)$mailConfig['MAILGUN_TO_EMAIL'],
+                ];
+
+                $confirmationResult = visitfy_send_contact_mail($mailConfig, $confirmationPayload);
+                if (!$confirmationResult['ok']) {
+                    error_log('Visitfy confirmation mail failed: ' . $confirmationResult['error']);
+                }
+
                 $formSent = true;
-                /* Regenerate CSRF token after successful submission */
                 $_SESSION['csrf_token'] = bin2hex(random_bytes(24));
             }
         }
@@ -95,10 +216,10 @@ require __DIR__ . '/../partials/header.php';
 
   <section class="page-hero">
     <div class="container">
-      <p class="section-eyebrow fade-up">Kontakt</p>
-      <h1 class="fade-up delay-1">Angebot anfragen</h1>
+      <p class="section-eyebrow fade-up"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'kontakt_text.eyebrow', 'Kontakt'), ENT_QUOTES, 'UTF-8') ?></p>
+      <h1 class="fade-up delay-1"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'kontakt_text.title', 'Angebot anfragen'), ENT_QUOTES, 'UTF-8') ?></h1>
       <p class="fade-up delay-2">
-        Unverbindlich, persönlich und kostenlos. Wir melden uns innerhalb von 24 Stunden.
+        <?= htmlspecialchars((string)visitfy_get($contentConfig, 'kontakt_text.sub', 'Unverbindlich, persönlich und kostenlos. Wir melden uns innerhalb von 24 Stunden.'), ENT_QUOTES, 'UTF-8') ?>
       </p>
     </div>
   </section>
@@ -109,21 +230,20 @@ require __DIR__ . '/../partials/header.php';
 
         <!-- Contact info -->
         <div class="contact-info fade-up">
-          <h3>So erreichen Sie uns</h3>
+          <h3><?= htmlspecialchars((string)visitfy_get($contentConfig, 'kontakt_text.sidebar_heading', 'So erreichen Sie uns'), ENT_QUOTES, 'UTF-8') ?></h3>
           <p>
-            Nutzen Sie das Formular für eine schnelle Anfrage – oder schreiben Sie uns
-            direkt per E-Mail.
+            <?= htmlspecialchars((string)visitfy_get($contentConfig, 'kontakt_text.sidebar_text', 'Nutzen Sie das Formular für eine schnelle Anfrage – oder schreiben Sie uns direkt per E-Mail.'), ENT_QUOTES, 'UTF-8') ?>
           </p>
           <p style="margin-top:1.5rem">
-            <a href="mailto:info@visitfy.de">info@visitfy.de</a><!-- TODO: verify -->
+            <a href="mailto:<?= htmlspecialchars($contactEmail, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($contactEmail, ENT_QUOTES, 'UTF-8') ?></a>
           </p>
           <div style="margin-top:2.5rem">
-            <p style="font-size:0.78rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.75rem">Antwortzeit</p>
-            <p>In der Regel innerhalb von 24 Stunden an Werktagen.</p>
+            <p style="font-size:0.78rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.75rem"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'kontakt_text.response_label', 'Antwortzeit'), ENT_QUOTES, 'UTF-8') ?></p>
+            <p><?= htmlspecialchars((string)visitfy_get($contentConfig, 'kontakt_text.response_text', 'In der Regel innerhalb von 24 Stunden an Werktagen.'), ENT_QUOTES, 'UTF-8') ?></p>
           </div>
           <div style="margin-top:2rem">
-            <p style="font-size:0.78rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.75rem">Standort</p>
-            <p>Flensburg, Deutschland<!-- TODO: Adresse ergänzen --></p>
+            <p style="font-size:0.78rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.75rem"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'kontakt_text.location_label', 'Standort'), ENT_QUOTES, 'UTF-8') ?></p>
+            <p><?= htmlspecialchars((string)visitfy_get($contentConfig, 'kontakt_text.location_text', 'Flensburg, Deutschland'), ENT_QUOTES, 'UTF-8') ?></p>
           </div>
         </div>
 

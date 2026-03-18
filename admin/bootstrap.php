@@ -48,11 +48,22 @@ function admin_read_env_file(string $path): array
 
 function admin_password(): string
 {
+    // 1. Check config.admin.php (highest priority - set via admin panel)
+    $configPath = admin_config_path();
+    if (is_file($configPath)) {
+        $loaded = @require $configPath;
+        if (is_array($loaded) && isset($loaded['password']) && (string)$loaded['password'] !== '') {
+            return (string)$loaded['password'];
+        }
+    }
+
+    // 2. Check VISITFY_ADMIN_PASSWORD env var
     $fromEnv = getenv('VISITFY_ADMIN_PASSWORD');
     if (is_string($fromEnv) && $fromEnv !== '') {
         return $fromEnv;
     }
 
+    // 3. Check .deploy.env
     $envFileVars = admin_read_env_file(admin_root_path() . '/.deploy.env');
     if (!empty($envFileVars['VISITFY_ADMIN_PASSWORD'])) {
         return (string)$envFileVars['VISITFY_ADMIN_PASSWORD'];
@@ -62,6 +73,7 @@ function admin_password(): string
         return (string)$envFileVars['ADMIN_PASSWORD'];
     }
 
+    // 4. Fallback
     return 'visitfy-admin';
 }
 
@@ -150,6 +162,11 @@ function admin_script_config_path(): string
     return admin_root_path() . '/assets/data/script-config.json';
 }
 
+function admin_mail_config_path(): string
+{
+    return admin_root_path() . '/config.mail.php';
+}
+
 function admin_read_json(string $path, array $fallback = []): array
 {
     if (!is_file($path)) {
@@ -178,6 +195,59 @@ function admin_absolute_path(string $relativePath): string
     return $root . '/' . ltrim($relativePath, '/');
 }
 
+function admin_mail_settings_defaults(): array
+{
+    return [
+        'MAILGUN_API_KEY' => '',
+        'MAILGUN_DOMAIN' => '',
+        'MAILGUN_API_BASE' => 'https://api.mailgun.net',
+        'MAILGUN_FROM_EMAIL' => 'info@visitfy.de',
+        'MAILGUN_FROM_NAME' => 'Visitfy',
+        'MAILGUN_TO_EMAIL' => 'info@visitfy.de',
+    ];
+}
+
+function admin_read_mail_settings(): array
+{
+    $settings = admin_mail_settings_defaults();
+    $configPath = admin_mail_config_path();
+
+    if (is_file($configPath)) {
+        $loaded = require $configPath;
+        if (is_array($loaded)) {
+            foreach ($settings as $key => $defaultValue) {
+                if (array_key_exists($key, $loaded)) {
+                    $settings[$key] = trim((string)$loaded[$key]);
+                }
+            }
+        }
+    }
+
+    foreach (array_keys($settings) as $key) {
+        $envValue = getenv($key);
+        if ($envValue !== false && $envValue !== '') {
+            $settings[$key] = trim((string)$envValue);
+        }
+    }
+
+    return $settings;
+}
+
+function admin_write_mail_settings(array $settings): bool
+{
+    $defaults = admin_mail_settings_defaults();
+    $normalized = [];
+
+    foreach ($defaults as $key => $defaultValue) {
+        $normalized[$key] = trim((string)($settings[$key] ?? $defaultValue));
+    }
+
+    $export = var_export($normalized, true);
+    $php = "<?php\nreturn " . $export . ";\n";
+
+    return file_put_contents(admin_mail_config_path(), $php, LOCK_EX) !== false;
+}
+
 function admin_safe_relative_path(string $path): string
 {
     $path = trim($path);
@@ -185,4 +255,56 @@ function admin_safe_relative_path(string $path): string
     $path = ltrim($path, '/');
     $path = preg_replace('#/+#', '/', $path) ?? '';
     return $path;
+}
+
+function admin_config_path(): string
+{
+    return dirname(__DIR__) . '/config.admin.php';
+}
+
+function admin_write_password(string $password): bool
+{
+    $export = var_export(['password' => $password], true);
+    $php = "<?php\nreturn " . $export . ";\n";
+    return file_put_contents(admin_config_path(), $php, LOCK_EX) !== false;
+}
+
+if (!function_exists('admin_field')) {
+    function admin_field(array $src, string $path, string $fallback = ''): string
+    {
+        $parts = explode('.', $path);
+        $cur = $src;
+        foreach ($parts as $p) {
+            if (!is_array($cur) || !array_key_exists($p, $cur)) return $fallback;
+            $cur = $cur[$p];
+        }
+        return is_scalar($cur) ? (string)$cur : $fallback;
+    }
+}
+
+if (!function_exists('admin_lines')) {
+    function admin_lines(array $src, string $path): string
+    {
+        $parts = explode('.', $path);
+        $cur = $src;
+        foreach ($parts as $p) {
+            if (!is_array($cur) || !array_key_exists($p, $cur)) return '';
+            $cur = $cur[$p];
+        }
+        if (is_array($cur)) return implode("\n", $cur);
+        return is_scalar($cur) ? (string)$cur : '';
+    }
+}
+
+if (!function_exists('admin_bool_field')) {
+    function admin_bool_field(array $src, string $path, bool $fallback = false): bool
+    {
+        $parts = explode('.', $path);
+        $cur = $src;
+        foreach ($parts as $p) {
+            if (!is_array($cur) || !array_key_exists($p, $cur)) return $fallback;
+            $cur = $cur[$p];
+        }
+        return (bool)$cur;
+    }
 }

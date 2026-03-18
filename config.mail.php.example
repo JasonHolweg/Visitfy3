@@ -1,0 +1,14 @@
+<?php
+/**
+ * Mailgun-Konfiguration für Visitfy.
+ * Diese Datei nach config.mail.php umbenennen und Werte eintragen.
+ * config.mail.php darf NICHT ins Repository eingecheckt werden (.gitignore).
+ */
+return [
+    'MAILGUN_API_KEY'    => 'key-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+    'MAILGUN_DOMAIN'     => 'mg.visitfy.de',          // verifizierte Mailgun-Domain
+    'MAILGUN_API_BASE'   => 'https://api.mailgun.net', // EU: https://api.eu.mailgun.net
+    'MAILGUN_FROM_EMAIL' => 'info@visitfy.de',
+    'MAILGUN_FROM_NAME'  => 'Visitfy',
+    'MAILGUN_TO_EMAIL'   => 'info@visitfy.de',         // wo Kontaktanfragen landen
+];

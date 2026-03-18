@@ -104,16 +104,16 @@ if (!is_array($kpiItems) || !$kpiItems) {
     <div class="hero-overlay" aria-hidden="true"></div>
 
     <div class="container hero-content">
-      <div class="hero-panel fade-up">
-        <p class="hero-eyebrow"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.eyebrow', '360° Rundgänge für moderne Unternehmen'), ENT_QUOTES, 'UTF-8') ?></p>
-        <h1 id="hero-heading" class="hero-rotating-text" aria-label="<?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.prefix', 'MEHR') . ' ' . implode(' ', $heroWords), ENT_QUOTES, 'UTF-8') ?>">
+      <div class="hero-panel fade-up" data-hero-panel>
+        <p class="hero-eyebrow fade-up delay-1"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.eyebrow', '360° Rundgänge für moderne Unternehmen'), ENT_QUOTES, 'UTF-8') ?></p>
+        <h1 id="hero-heading" class="hero-rotating-text fade-up delay-2" aria-label="<?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.prefix', 'MEHR') . ' ' . implode(' ', $heroWords), ENT_QUOTES, 'UTF-8') ?>">
           <span class="hero-rotating-prefix"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.prefix', 'MEHR'), ENT_QUOTES, 'UTF-8') ?></span><br>
           <span class="hero-rotating-word" data-hero-rotate-word><?= htmlspecialchars((string)($heroWords[0] ?? 'SICHTBARKEIT.'), ENT_QUOTES, 'UTF-8') ?></span>
         </h1>
-        <p class="hero-desc">
+        <p class="hero-desc fade-up delay-3">
           <?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.desc', 'Visitfy entwickelt hochwertige 360° Erlebnisse für Unternehmen jeder Branche – realistisch, hochwertig und sofort einsatzbereit für Website und Google Business.'), ENT_QUOTES, 'UTF-8') ?>
         </p>
-        <div class="hero-actions">
+        <div class="hero-actions fade-up delay-4">
           <a href="<?= htmlspecialchars(visitfy_url((string)visitfy_get($contentConfig, 'hero.button_primary_link', 'pages/kontakt.php')), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-primary js-btnfx-hero-primary"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.button_primary_text', 'Beratung anfragen'), ENT_QUOTES, 'UTF-8') ?></a>
           <a href="<?= htmlspecialchars(visitfy_url((string)visitfy_get($contentConfig, 'hero.button_secondary_link', '#tours')), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-secondary js-btnfx-hero-secondary"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.button_secondary_text', 'Unsere Ergebnisse'), ENT_QUOTES, 'UTF-8') ?></a>
         </div>
