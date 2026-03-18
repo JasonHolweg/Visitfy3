@@ -13,6 +13,11 @@ deploy
 deploy.sh
 config.mail.php
 config.admin.php
+config.turnstile.php
+
+# Runtime data – wird nur über Admin-Panel bearbeitet, nie per Git deployed
+assets/data/content.json
+assets/data/tours.json
 
 # IDE
 .idea/

@@ -24,6 +24,7 @@ if ($page !== '' && isset($allowed[$page])) {
 
 /* ── Homepage ────────────────────────────────────────────── */
 require __DIR__ . '/partials/cms.php';
+require_once __DIR__ . '/partials/turnstile.php';
 $root      = visitfy_base_path();
 
 $contentConfig = visitfy_load_json(__DIR__ . '/assets/data/content.json', []);
@@ -105,17 +106,39 @@ if (!is_array($kpiItems) || !$kpiItems) {
 
     <div class="container hero-content">
       <div class="hero-panel fade-up" data-hero-panel>
-        <p class="hero-eyebrow fade-up delay-1"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.eyebrow', '360° Rundgänge für moderne Unternehmen'), ENT_QUOTES, 'UTF-8') ?></p>
-        <h1 id="hero-heading" class="hero-rotating-text fade-up delay-2" aria-label="<?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.prefix', 'MEHR') . ' ' . implode(' ', $heroWords), ENT_QUOTES, 'UTF-8') ?>">
-          <span class="hero-rotating-prefix"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.prefix', 'MEHR'), ENT_QUOTES, 'UTF-8') ?></span><br>
-          <span class="hero-rotating-word" data-hero-rotate-word><?= htmlspecialchars((string)($heroWords[0] ?? 'SICHTBARKEIT.'), ENT_QUOTES, 'UTF-8') ?></span>
+        <!-- Zielgruppen-Signal: sofortige Selbstidentifikation -->
+        <p class="hero-eyebrow fade-up delay-1"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.eyebrow', 'Gastronomie · Hotels · Praxen · Showrooms'), ENT_QUOTES, 'UTF-8') ?></p>
+
+        <!-- H1: "Mehr [rotierendes Wort]" + statische zweite Zeile -->
+        <h1 id="hero-heading" class="fade-up delay-2"
+            aria-label="<?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.prefix', 'Mehr') . ' ' . implode(' / ', $heroWords) . ' – ' . (string)visitfy_get($contentConfig, 'hero.headline', 'Durch 360° Rundgänge.'), ENT_QUOTES, 'UTF-8') ?>">
+          <span class="hero-rotating-prefix"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.prefix', 'Mehr'), ENT_QUOTES, 'UTF-8') ?> </span><span class="hero-rotating-word" data-hero-rotate-word><?= htmlspecialchars((string)($heroWords[0] ?? 'SICHTBARKEIT.'), ENT_QUOTES, 'UTF-8') ?></span><br>
+          <span><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.headline', 'Durch 360° Rundgänge.'), ENT_QUOTES, 'UTF-8') ?></span>
         </h1>
-        <p class="hero-desc fade-up delay-3">
-          <?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.desc', 'Visitfy entwickelt hochwertige 360° Erlebnisse für Unternehmen jeder Branche – realistisch, hochwertig und sofort einsatzbereit für Website und Google Business.'), ENT_QUOTES, 'UTF-8') ?>
+
+        <!-- Subline: Mechanismus + Geschwindigkeit als Differenzierungsmerkmal -->
+        <p class="hero-subline fade-up delay-3">
+          <?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.subline', 'Visitfy digitalisiert Ihre Location – professionell, in unter 3 Tagen live.'), ENT_QUOTES, 'UTF-8') ?>
         </p>
-        <div class="hero-actions fade-up delay-4">
-          <a href="<?= htmlspecialchars(visitfy_url((string)visitfy_get($contentConfig, 'hero.button_primary_link', 'pages/kontakt.php')), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-primary js-btnfx-hero-primary"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.button_primary_text', 'Beratung anfragen'), ENT_QUOTES, 'UTF-8') ?></a>
-          <a href="<?= htmlspecialchars(visitfy_url((string)visitfy_get($contentConfig, 'hero.button_secondary_link', '#tours')), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-secondary js-btnfx-hero-secondary"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.button_secondary_text', 'Unsere Ergebnisse'), ENT_QUOTES, 'UTF-8') ?></a>
+
+        <!-- Trust-Row: Einwände abbauen, bevor der Besucher abspringt -->
+<?php
+  $heroTrustItems = visitfy_get($contentConfig, 'hero.trust_items', ['Kostenlos & unverbindlich', 'In 3 Werktagen live', 'Antwort in unter 24h']);
+  if (!is_array($heroTrustItems) || !$heroTrustItems) $heroTrustItems = ['Kostenlos & unverbindlich', 'In 3 Werktagen live', 'Antwort in unter 24h'];
+?>
+        <div class="hero-trust-row fade-up delay-4">
+<?php foreach ($heroTrustItems as $heroTrustItem): ?>
+          <span class="hero-trust-pill">
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8l3.5 3.5L13 4"/></svg>
+            <?= htmlspecialchars(trim((string)$heroTrustItem), ENT_QUOTES, 'UTF-8') ?>
+          </span>
+<?php endforeach; ?>
+        </div>
+
+        <!-- CTAs: Primary stark, Secondary klar nachgeordnet -->
+        <div class="hero-actions fade-up delay-5">
+          <a href="<?= htmlspecialchars(visitfy_url((string)visitfy_get($contentConfig, 'hero.button_primary_link', 'pages/kontakt.php')), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-primary js-btnfx-hero-primary"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.button_primary_text', 'Kostenloses Angebot anfragen'), ENT_QUOTES, 'UTF-8') ?></a>
+          <a href="<?= htmlspecialchars(visitfy_url((string)visitfy_get($contentConfig, 'hero.button_secondary_link', '#tours')), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-secondary js-btnfx-hero-secondary"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.button_secondary_text', 'Live-Demos ansehen'), ENT_QUOTES, 'UTF-8') ?></a>
         </div>
       </div>
     </div>
@@ -585,20 +608,22 @@ if (!is_array($kpiItems) || !$kpiItems) {
             </div>
 
             <div class="form-group">
-              <label for="h_nachricht">Nachricht *</label>
-              <textarea id="h_nachricht" name="nachricht" required rows="5"
-                        placeholder="Beschreiben Sie kurz Ihre Location und was Sie sich vorstellen…"></textarea>
+              <label for="h_nachricht">Ihre Anfrage *</label>
+              <textarea id="h_nachricht" name="nachricht" required rows="4"
+                        placeholder="Was möchten Sie digitalisieren? Kurz reicht – wir melden uns persönlich."></textarea>
             </div>
 
             <div class="form-check">
               <input type="checkbox" id="h_dsgvo" name="dsgvo" required>
               <label for="h_dsgvo">
                 Ich habe die <a href="<?= htmlspecialchars(visitfy_url('pages/datenschutz.php'), ENT_QUOTES, 'UTF-8') ?>">Datenschutzerklärung</a> gelesen und bin mit der
-                Verarbeitung meiner Daten zur Bearbeitung meiner Anfrage einverstanden. *
+                Verarbeitung meiner Daten einverstanden. *
               </label>
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width:100%">Anfrage absenden</button>
+            <?= visitfy_turnstile_widget() ?>
+            <button type="submit" class="btn btn-primary" style="width:100%">Kostenloses Angebot anfragen</button>
+            <p class="form-reassurance">Kostenlos &amp; unverbindlich · Persönliche Rückmeldung in unter 24h</p>
           </form>
         </div>
       </div>

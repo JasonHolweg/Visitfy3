@@ -269,6 +269,49 @@ function admin_write_password(string $password): bool
     return file_put_contents(admin_config_path(), $php, LOCK_EX) !== false;
 }
 
+function admin_turnstile_config_path(): string
+{
+    return admin_root_path() . '/config.turnstile.php';
+}
+
+function admin_turnstile_settings_defaults(): array
+{
+    return [
+        'TURNSTILE_SITE_KEY'   => '',
+        'TURNSTILE_SECRET_KEY' => '',
+        'TURNSTILE_ENABLED'    => '0',
+    ];
+}
+
+function admin_read_turnstile_settings(): array
+{
+    $settings = admin_turnstile_settings_defaults();
+    $path = admin_turnstile_config_path();
+    if (is_file($path)) {
+        $loaded = @require $path;
+        if (is_array($loaded)) {
+            foreach ($settings as $key => $val) {
+                if (array_key_exists($key, $loaded)) {
+                    $settings[$key] = (string)$loaded[$key];
+                }
+            }
+        }
+    }
+    return $settings;
+}
+
+function admin_write_turnstile_settings(array $settings): bool
+{
+    $defaults = admin_turnstile_settings_defaults();
+    $normalized = [];
+    foreach ($defaults as $key => $val) {
+        $normalized[$key] = trim((string)($settings[$key] ?? $val));
+    }
+    $export = var_export($normalized, true);
+    $php = "<?php\nreturn " . $export . ";\n";
+    return file_put_contents(admin_turnstile_config_path(), $php, LOCK_EX) !== false;
+}
+
 if (!function_exists('admin_field')) {
     function admin_field(array $src, string $path, string $fallback = ''): string
     {

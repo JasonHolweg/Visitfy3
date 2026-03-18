@@ -2,7 +2,7 @@
 /**
  * Visitfy Admin – Content Editor
  */
-require dirname(__DIR__) . '/bootstrap.php';
+require_once dirname(__DIR__) . '/bootstrap.php';
 admin_require_login();
 
 $notice = '';
@@ -69,6 +69,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && admin_validate_csrf($_POST['csrf'] 
 
         $heroWords = preg_split('/\r\n|\r|\n/', (string)($_POST['hero_rotating_words'] ?? '')) ?: [];
         $heroWords = array_values(array_filter(array_map(fn($v) => trim((string)$v), $heroWords), fn($v) => $v !== ''));
+
+        $heroTrustItems = preg_split('/\r\n|\r|\n/', (string)($_POST['hero_trust_items'] ?? '')) ?: [];
+        $heroTrustItems = array_values(array_filter(array_map(fn($v) => trim((string)$v), $heroTrustItems), fn($v) => $v !== ''));
 
         /* ── Button FX ────────────────────────────────────────── */
         $allowedButtonFxTargets = ['kontakt_submit', 'partner_submit', 'hero_primary', 'hero_secondary', 'cta_primary', 'cta_secondary'];
@@ -194,6 +197,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && admin_validate_csrf($_POST['csrf'] 
             ],
             'hero' => [
                 'eyebrow' => (string)($_POST['hero_eyebrow'] ?? ''),
+                'headline' => (string)($_POST['hero_headline'] ?? ''),
+                'subline' => (string)($_POST['hero_subline'] ?? ''),
+                'trust_items' => $heroTrustItems,
                 'prefix' => (string)($_POST['hero_prefix'] ?? ''),
                 'rotating_words' => $heroWords,
                 'desc' => (string)($_POST['hero_desc'] ?? ''),
@@ -512,22 +518,35 @@ ob_start();
                 <div class="card-desc" style="margin-bottom:0">Hauptbereich der Startseite</div>
               </div>
             </div>
+            <div class="field">
+              <label>Eyebrow (Zielgruppen-Zeile über dem Titel)</label>
+              <input type="text" name="hero_eyebrow" value="<?= he(admin_field($content, 'hero.eyebrow')) ?>">
+            </div>
+            <div class="field mt-12">
+              <label>Zweite Zeile H1 (statisch, z.B. "Durch 360° Rundgänge.")</label>
+              <input type="text" name="hero_headline" value="<?= he(admin_field($content, 'hero.headline')) ?>">
+            </div>
+            <div class="field mt-12">
+              <label>Subline (Zeile unter der Headline)</label>
+              <input type="text" name="hero_subline" value="<?= he(admin_field($content, 'hero.subline')) ?>">
+            </div>
+            <div class="field mt-12">
+              <label>Trust-Punkte (einer pro Zeile, z.B. "Kostenlos &amp; unverbindlich")</label>
+              <textarea name="hero_trust_items"><?= he(admin_lines($content, 'hero.trust_items')) ?></textarea>
+            </div>
+            <hr class="divider">
             <div class="form-row">
               <div class="field">
-                <label>Eyebrow (über dem Titel)</label>
-                <input type="text" name="hero_eyebrow" value="<?= he(admin_field($content, 'hero.eyebrow')) ?>">
-              </div>
-              <div class="field">
-                <label>Prefix (vor dem rotierenden Wort)</label>
+                <label>Prefix (vor rotierendem Wort, Legacy)</label>
                 <input type="text" name="hero_prefix" value="<?= he(admin_field($content, 'hero.prefix')) ?>">
               </div>
+              <div class="field">
+                <label>Rotierende Wörter (eines pro Zeile, Legacy)</label>
+                <textarea name="hero_rotating_words" rows="3"><?= he(admin_lines($content, 'hero.rotating_words')) ?></textarea>
+              </div>
             </div>
             <div class="field mt-12">
-              <label>Rotierende Wörter (eines pro Zeile)</label>
-              <textarea name="hero_rotating_words"><?= he(admin_lines($content, 'hero.rotating_words')) ?></textarea>
-            </div>
-            <div class="field mt-12">
-              <label>Beschreibungstext</label>
+              <label>Beschreibungstext (unter Subline, optional)</label>
               <textarea name="hero_desc"><?= he(admin_field($content, 'hero.desc')) ?></textarea>
             </div>
             <hr class="divider">

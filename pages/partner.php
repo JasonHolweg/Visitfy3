@@ -4,6 +4,7 @@
  * Partner-werden Seite
  */
 require __DIR__ . '/../partials/cms.php';
+require_once __DIR__ . '/../partials/turnstile.php';
 $root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? visitfy_base_path() : '../';
 $contentConfig = visitfy_load_json(__DIR__ . '/../assets/data/content.json', []);
 $pageTitle = 'Partner werden | Visitfy – 360° Rundgänge';
@@ -128,6 +129,7 @@ require __DIR__ . '/../partials/header.php';
               </label>
             </div>
 
+            <?= visitfy_turnstile_widget() ?>
             <button type="submit" class="btn btn-primary js-btnfx-partner" style="width:100%"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'partner.form_submit_text', 'Jetzt Partner werden'), ENT_QUOTES, 'UTF-8') ?></button>
             <div class="form-status" role="alert"></div>
           </form>

@@ -6,6 +6,7 @@
  */
 if (!isset($root)) $root = '';
 require_once __DIR__ . '/cms.php';
+require_once __DIR__ . '/turnstile.php';
 
 $contentConfig = visitfy_load_json(__DIR__ . '/../assets/data/content.json', []);
 $scriptConfig = visitfy_load_json(__DIR__ . '/../assets/data/script-config.json', []);
@@ -163,6 +164,10 @@ window.VISITFY_SCRIPT_CONFIG = <?= json_encode($scriptConfig, JSON_UNESCAPED_UNI
   }
 <?php endif; ?>
 </style>
+<?php endif; ?>
+
+<?php if (visitfy_turnstile_is_enabled()): ?>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <?php endif; ?>
 
 <!-- GSAP + ScrollTrigger (free CDN) -->

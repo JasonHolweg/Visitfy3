@@ -2,7 +2,7 @@
 /**
  * Visitfy Admin – Integrations (Mailgun)
  */
-require dirname(__DIR__) . '/bootstrap.php';
+require_once dirname(__DIR__) . '/bootstrap.php';
 admin_require_login();
 
 $notice = '';
@@ -14,10 +14,29 @@ function he(string $v): string {
     return htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
 }
 
-$mailSettings = admin_read_mail_settings();
+$mailSettings      = admin_read_mail_settings();
+$turnstileSettings = admin_read_turnstile_settings();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && admin_validate_csrf($_POST['csrf'] ?? null)) {
     $action = (string)($_POST['action'] ?? '');
+
+    // ── Save Turnstile settings ──────────────────────────────────
+    if ($action === 'save_turnstile') {
+        $siteKey   = trim((string)($_POST['turnstile_site_key']   ?? ''));
+        $secretKey = trim((string)($_POST['turnstile_secret_key'] ?? ''));
+        $enabled   = !empty($_POST['turnstile_enabled']) ? '1' : '0';
+
+        if (!admin_write_turnstile_settings([
+            'TURNSTILE_SITE_KEY'   => $siteKey,
+            'TURNSTILE_SECRET_KEY' => $secretKey,
+            'TURNSTILE_ENABLED'    => $enabled,
+        ])) {
+            $error = 'Turnstile-Konfiguration konnte nicht gespeichert werden.';
+        } else {
+            $notice = 'Turnstile-Konfiguration gespeichert.';
+        }
+        $turnstileSettings = admin_read_turnstile_settings();
+    }
 
     // ── Save Mailgun settings ────────────────────────────────────
     if ($action === 'save_mailgun') {
@@ -86,7 +105,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && admin_validate_csrf($_POST['csrf'] 
     $mailSettings = admin_read_mail_settings();
 }
 
-$mailgunOk = ($mailSettings['MAILGUN_API_KEY'] ?? '') !== '' && ($mailSettings['MAILGUN_DOMAIN'] ?? '') !== '';
+$mailgunOk    = ($mailSettings['MAILGUN_API_KEY'] ?? '') !== '' && ($mailSettings['MAILGUN_DOMAIN'] ?? '') !== '';
+$turnstileOk  = ($turnstileSettings['TURNSTILE_SITE_KEY'] ?? '') !== ''
+    && ($turnstileSettings['TURNSTILE_SECRET_KEY'] ?? '') !== ''
+    && ($turnstileSettings['TURNSTILE_ENABLED'] ?? '0') === '1';
 
 ob_start();
 ?>
@@ -97,6 +119,12 @@ ob_start();
     <span class="badge badge-green">Mailgun aktiv</span>
     <?php else: ?>
     <span class="badge badge-red">Mailgun nicht konfiguriert</span>
+    <?php endif; ?>
+    &nbsp;
+    <?php if ($turnstileOk): ?>
+    <span class="badge badge-green">Turnstile aktiv</span>
+    <?php else: ?>
+    <span class="badge badge-red">Turnstile inaktiv</span>
     <?php endif; ?>
   </div>
 </div>
@@ -204,6 +232,71 @@ ob_start();
           Testmail senden
         </button>
       </form>
+    </div>
+  </div>
+
+  <!-- Turnstile Card -->
+  <div class="card" style="margin-top:16px">
+    <div class="card-header">
+      <div class="card-header-left">
+        <div class="card-title">Cloudflare Turnstile (Bot-Schutz)</div>
+        <div class="card-desc" style="margin-bottom:0">
+          Schützt alle Kontaktformulare vor Spam-Bots ohne sichtbares CAPTCHA für echte Nutzer.
+        </div>
+      </div>
+      <div>
+        <?php if ($turnstileOk): ?>
+        <span class="badge badge-green">Aktiv</span>
+        <?php elseif (($turnstileSettings['TURNSTILE_SITE_KEY'] ?? '') !== ''): ?>
+        <span class="badge badge-red">Deaktiviert</span>
+        <?php else: ?>
+        <span class="badge badge-red">Nicht konfiguriert</span>
+        <?php endif; ?>
+      </div>
+    </div>
+
+    <form method="post" action="?p=integrations">
+      <input type="hidden" name="csrf" value="<?= he($csrf) ?>">
+      <input type="hidden" name="action" value="save_turnstile">
+
+      <div class="form-row">
+        <div class="field">
+          <label>Site Key</label>
+          <input type="text" name="turnstile_site_key"
+            value="<?= he($turnstileSettings['TURNSTILE_SITE_KEY'] ?? '') ?>"
+            placeholder="0x4AAAAAAxxxxxxxxxxxxxxxxx">
+          <span style="font-size:11px;color:var(--text-2);margin-top:4px">Aus dem Cloudflare Dashboard unter Turnstile.</span>
+        </div>
+        <div class="field">
+          <label>Secret Key</label>
+          <input type="password" name="turnstile_secret_key"
+            value="<?= he($turnstileSettings['TURNSTILE_SECRET_KEY'] ?? '') ?>"
+            placeholder="0x4AAAAAAxxxxxxxxxxxxxxxxx"
+            autocomplete="new-password">
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;margin-top:14px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px">
+          <input type="checkbox" name="turnstile_enabled" value="1" style="width:16px;height:16px"
+            <?= ($turnstileSettings['TURNSTILE_ENABLED'] ?? '0') === '1' ? 'checked' : '' ?>>
+          Turnstile aktivieren
+        </label>
+      </div>
+
+      <div style="margin-top:20px">
+        <button type="submit" class="btn btn-primary">Einstellungen speichern</button>
+      </div>
+    </form>
+
+    <hr class="divider">
+
+    <div style="font-size:12px;color:var(--text-2);line-height:1.7">
+      <strong style="color:var(--text)">Einrichtung:</strong>
+      Registriere eine Domain auf
+      <a href="https://dash.cloudflare.com/?to=/:account/turnstile" target="_blank" style="color:var(--text);text-decoration:underline">dash.cloudflare.com → Turnstile</a>,
+      kopiere Site Key und Secret Key, trage sie oben ein und aktiviere den Schutz.<br>
+      Der Widget-Typ <em>Managed</em> wird empfohlen – unsichtbar für echte Nutzer, effektiv gegen Bots.
     </div>
   </div>
 

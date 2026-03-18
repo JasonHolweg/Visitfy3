@@ -2,7 +2,7 @@
 /**
  * Visitfy Admin – Media / Image Management
  */
-require dirname(__DIR__) . '/bootstrap.php';
+require_once dirname(__DIR__) . '/bootstrap.php';
 admin_require_login();
 
 $notice = '';

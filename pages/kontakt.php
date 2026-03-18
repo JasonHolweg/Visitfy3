@@ -5,6 +5,7 @@
  */
 require __DIR__ . '/../partials/cms.php';
 require __DIR__ . '/../partials/mail.php';
+require_once __DIR__ . '/../partials/turnstile.php';
 
 /* ── Session for CSRF token ────────────────────────────── */
 if (session_status() === PHP_SESSION_NONE) {
@@ -53,6 +54,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!empty($_POST['hp_website'])) {
         /* Silent reject */
         $formSent = true;
+    /* Turnstile check */
+    } elseif (visitfy_turnstile_is_enabled() && !visitfy_turnstile_verify(
+        (string)($_POST['cf-turnstile-response'] ?? ''),
+        (string)($_SERVER['REMOTE_ADDR'] ?? '')
+    )) {
+        $formError = 'Bitte bestätigen Sie, dass Sie kein Roboter sind.';
     } else {
         /* Sanitize & validate */
         $name     = trim(strip_tags($_POST['name']     ?? ''));
@@ -335,6 +342,7 @@ require __DIR__ . '/../partials/header.php';
               </label>
             </div>
 
+            <?= visitfy_turnstile_widget() ?>
             <button type="submit" class="btn btn-primary js-btnfx-kontakt" style="width:100%">Anfrage absenden</button>
           </form>
         </div>

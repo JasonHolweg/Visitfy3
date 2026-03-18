@@ -2,7 +2,7 @@
 /**
  * Visitfy Admin – Router + Login
  */
-require __DIR__ . '/bootstrap.php';
+require_once __DIR__ . '/bootstrap.php';
 
 $notice = '';
 $error = '';
