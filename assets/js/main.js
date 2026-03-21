@@ -232,6 +232,9 @@
     /* ── Contact forms ─────────────────────────────────────── */
     initForms();
 
+    /* ── Tour Fullscreen Modal ────────────────────────────── */
+    initTourModal();
+
   });
 
 
@@ -556,6 +559,68 @@
     el.className = 'form-status ' + type;
     el.textContent = msg;
     setTimeout(() => { el.className = 'form-status'; }, 7000);
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     TOUR FULLSCREEN MODAL
+  ═══════════════════════════════════════════════════════════ */
+  function initTourModal() {
+    var modal   = document.getElementById('tour-modal');
+    var iframe  = document.getElementById('tour-modal-iframe');
+    var closeBtn = modal ? modal.querySelector('.tour-modal-close') : null;
+    var backdrop = modal ? modal.querySelector('.tour-modal-backdrop') : null;
+    if (!modal || !iframe) return;
+
+    var scrollY = 0;
+
+    function openModal(url, title) {
+      scrollY = window.pageYOffset;
+      iframe.src = url;
+      iframe.title = '360° Rundgang – ' + title;
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = '-' + scrollY + 'px';
+      document.body.style.width = '100%';
+    }
+
+    function closeModal() {
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      window.scrollTo(0, scrollY);
+      /* Clear iframe after transition to stop playback */
+      setTimeout(function () { iframe.src = ''; }, 350);
+    }
+
+    /* Open buttons */
+    document.querySelectorAll('.tour-fullscreen-btn').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var url   = btn.getAttribute('data-tour-url');
+        var title = btn.getAttribute('data-tour-title') || '';
+        if (url) openModal(url, title);
+      });
+    });
+
+    /* Close: X button */
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+    /* Close: backdrop */
+    if (backdrop) backdrop.addEventListener('click', closeModal);
+
+    /* Close: ESC key */
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+        closeModal();
+      }
+    });
   }
 
 

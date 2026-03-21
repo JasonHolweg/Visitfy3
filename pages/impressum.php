@@ -2,7 +2,6 @@
 /**
  * Visitfy3 – pages/impressum.php
  * Rechtssicherer Impressumsaufbau (§ 5 TMG) ohne falsche Zusicherungen.
- * TODO: Reale Angaben eintragen vor Veröffentlichung.
  */
 require __DIR__ . '/../partials/cms.php';
 $root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? visitfy_base_path() : '../';
@@ -27,30 +26,29 @@ require __DIR__ . '/../partials/header.php';
 
         <h2>Angaben gemäß § 5 TMG</h2>
         <p>
-          <!-- TODO: Vollständige Angaben vor Veröffentlichung eintragen -->
-          Visitfy<br>
-          [Vor- und Nachname des Inhabers / Firma]<br>
-          [Straße und Hausnummer]<br>
-          [PLZ] Flensburg<br>
+          Kristian Meister<br>
+          Flensburger Str. 25<br>
+          24976 Handewitt<br>
           Deutschland
         </p>
 
         <h2>Kontakt</h2>
         <p>
-          E-Mail: <a href="mailto:info@visitfy.de">info@visitfy.de</a><!-- TODO: verify --><br>
-          <!-- TODO: Telefonnummer ergänzen falls vorhanden -->
+          Telefon: <a href="tel:+4915206955260">+49 1520 6955260</a><br>
+          E-Mail: <a href="mailto:info@visitfy.de">info@visitfy.de</a><br>
+          Internet: <a href="https://visitfy.de" target="_blank" rel="noopener noreferrer">visitfy.de</a>
         </p>
 
         <h2>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
         <p>
-          <!-- TODO: Name und Anschrift der verantwortlichen Person -->
-          [Name und Anschrift]
+          Kristian Meister<br>
+          Flensburger Str. 25<br>
+          24976 Handewitt
         </p>
 
         <h2>Umsatzsteuer-Identifikationsnummer</h2>
         <p>
-          <!-- TODO: USt-IdNr. eintragen falls vorhanden -->
-          gemäß § 27a UStG: [USt-IdNr. oder „Nicht vorhanden"]
+          Umsatzsteueridentifikationsnummer gemäß § 27a Umsatzsteuergesetz: DE363387743
         </p>
 
         <h2>Streitschlichtung</h2>

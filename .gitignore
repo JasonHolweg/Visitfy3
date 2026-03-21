@@ -15,6 +15,10 @@ config.mail.php
 config.admin.php
 config.turnstile.php
 
+# Rechtliche Seiten – enthalten echte Kontaktdaten, nicht öffentlich versionieren
+pages/impressum.php
+pages/datenschutz.php
+
 # Runtime data – wird nur über Admin-Panel bearbeitet, nie per Git deployed
 assets/data/content.json
 assets/data/tours.json

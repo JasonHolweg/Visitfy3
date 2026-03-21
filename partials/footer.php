@@ -170,6 +170,17 @@ window.VISITFY_SCRIPT_CONFIG = <?= json_encode($scriptConfig, JSON_UNESCAPED_UNI
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <?php endif; ?>
 
+<!-- Tour Fullscreen Modal -->
+<div id="tour-modal" class="tour-modal" role="dialog" aria-label="360° Rundgang" aria-hidden="true">
+  <div class="tour-modal-backdrop"></div>
+  <div class="tour-modal-content">
+    <button class="tour-modal-close" aria-label="Schließen">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <iframe id="tour-modal-iframe" src="" title="" allow="fullscreen; xr-spatial-tracking;" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation"></iframe>
+  </div>
+</div>
+
 <!-- GSAP + ScrollTrigger (free CDN) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
