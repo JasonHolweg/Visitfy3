@@ -142,6 +142,31 @@ if (!is_array($kpiItems) || !$kpiItems) {
           <a href="<?= htmlspecialchars(visitfy_url((string)visitfy_get($contentConfig, 'hero.button_secondary_link', '#tours')), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-secondary js-btnfx-hero-secondary"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.button_secondary_text', 'Live-Demos ansehen'), ENT_QUOTES, 'UTF-8') ?></a>
         </div>
       </div>
+
+      <!-- Hero Tour Teasers: floating thumbnails as decorative hint -->
+<?php
+  $heroTeasers = array_slice(array_values($tours), 0, 3);
+?>
+<?php if ($heroTeasers): ?>
+      <aside class="hero-tours" aria-label="Vorschau: Beispiel-Rundgänge">
+<?php foreach ($heroTeasers as $tIdx => $teaser):
+  $teaserUrl = (string)($teaser['matterportUrl'] ?? '');
+  $teaserModel = '';
+  if (preg_match('#m=([a-zA-Z0-9]+)#', $teaserUrl, $tm)) $teaserModel = $tm[1];
+  if ($teaserModel === '') continue;
+  $teaserTitle = trim((string)($teaser['title'] ?? ''));
+  $teaserTag   = trim((string)($teaser['tag']   ?? ''));
+  $teaserThumb = 'https://my.matterport.com/api/v1/player/models/' . $teaserModel . '/thumb?width=720&dis=1';
+?>
+        <a class="hero-tour-card hero-tour-<?= $tIdx + 1 ?>" href="#tours" aria-label="Rundgang ansehen: <?= htmlspecialchars($teaserTitle, ENT_QUOTES, 'UTF-8') ?>">
+          <img src="<?= htmlspecialchars($teaserThumb, ENT_QUOTES, 'UTF-8') ?>" alt="" loading="eager" decoding="async" onerror="this.classList.add('is-broken')">
+<?php if ($teaserTag !== ''): ?>
+          <span class="hero-tour-tag"><?= htmlspecialchars($teaserTag, ENT_QUOTES, 'UTF-8') ?></span>
+<?php endif; ?>
+        </a>
+<?php endforeach; ?>
+      </aside>
+<?php endif; ?>
     </div>
 
     <div class="hero-scroll" aria-hidden="true">Scroll</div>

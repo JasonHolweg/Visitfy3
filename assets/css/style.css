@@ -592,6 +592,101 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   flex-shrink: 0;
 }
 
+/* ── Hero Tour Teasers – floating thumbnails (desktop only) ── */
+.hero-tours {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .hero-tours {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: clamp(1.5rem, 4vw, 4rem);
+    width: clamp(20rem, 32vw, 30rem);
+    z-index: 1;
+    display: block;
+    pointer-events: none;
+  }
+}
+
+.hero-tour-card {
+  --r: 0deg;
+  position: absolute;
+  display: block;
+  aspect-ratio: 16 / 10;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01)),
+    radial-gradient(circle at 30% 20%, rgba(120, 150, 200, 0.18), transparent 60%),
+    #131313;
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transform: rotate(var(--r));
+  transition: transform 0.35s var(--ease-out), opacity 0.25s ease, box-shadow 0.35s ease;
+  pointer-events: auto;
+}
+
+.hero-tour-card:hover {
+  transform: rotate(var(--r)) translateY(-3px);
+  box-shadow:
+    0 30px 70px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.hero-tour-card img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.4s ease;
+}
+
+.hero-tour-card img.is-broken {
+  opacity: 0;
+}
+
+.hero-tour-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.5) 100%);
+  pointer-events: none;
+}
+
+.hero-tour-tag {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 2;
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px 10px;
+  border-radius: 980px;
+}
+
+/* Cluster positions – subtle layered look */
+.hero-tour-1 { --r: 2deg;    width: 58%; top: 8%;  right: 0; }
+.hero-tour-2 { --r: -1.5deg; width: 46%; top: 40%; right: -6%; }
+.hero-tour-3 { --r: 1.5deg;  width: 62%; bottom: 8%; right: 4%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-tour-card { --r: 0deg; }
+  .hero-tour-card:hover { transform: none; }
+}
+
 /* Responsive ─ Tablet: content fills more, still left ──── */
 @media (max-width: 1024px) {
   .hero-text { max-width: 100%; }
