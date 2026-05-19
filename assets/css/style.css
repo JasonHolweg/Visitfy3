@@ -680,7 +680,7 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 /* Cluster positions – subtle layered look */
 .hero-tour-1 { --r: 2deg;    width: 58%; top: 8%;  right: 0; }
 .hero-tour-2 { --r: -1.5deg; width: 46%; top: 40%; right: -6%; }
-.hero-tour-3 { --r: 1.5deg;  width: 62%; bottom: 8%; right: 4%; }
+.hero-tour-3 { --r: 1.5deg;  width: 62%; bottom: 2%; right: 4%; }
 
 @media (prefers-reduced-motion: reduce) {
   .hero-tour-card { --r: 0deg; }
