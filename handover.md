@@ -61,6 +61,11 @@ Stand: 2026-05-19 · Branch: `claude/elegant-sammet-caa710` (Auto-Deploy aktiv)
   - [x] 10k Bundle: −5.21 kB CSS, +0.51 kB JS, +0.77 kB Head (Fonts) → netto −1.97 kB
 - [x] **Phase 11 – Auto-Deploy Workflow**
   - [x] 11a Memory-Regel "immer direkt deployn" (commit → merge `main` → `deploy.sh`)
+  - [x] 11b `deploy.sh` `EXCLUDE_PATTERNS` um `.claude` / `.claude/**` ergänzt (Worktree-Leak verhindern)
+- [x] **Phase 12 – Hero Tour-Teaser**
+  - [x] 12a 3 floating Tour-Thumbnails rechts im Hero ab `min-width: 1024px`, geschichtet mit subtilen Rotationen
+  - [x] 12b Matterport Thumb-Endpoint (`/api/v1/player/models/{id}/thumb?width=720&dis=1`) als Image-Quelle, Gradient-Card als Fallback (`onerror → opacity: 0`)
+  - [x] 12c Klick führt zu `#tours`; Apple-feel: 18 px Border-Radius, `box-shadow`-Hover, `translateY(-3px)`
 
 ## Offen / Roadmap
 
