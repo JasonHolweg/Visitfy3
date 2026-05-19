@@ -66,6 +66,11 @@ Stand: 2026-05-19 · Branch: `claude/elegant-sammet-caa710` (Auto-Deploy aktiv)
   - [x] 12a 3 floating Tour-Thumbnails rechts im Hero ab `min-width: 1024px`, geschichtet mit subtilen Rotationen
   - [x] 12b Matterport Thumb-Endpoint (`/api/v1/player/models/{id}/thumb?width=720&dis=1`) als Image-Quelle, Gradient-Card als Fallback (`onerror → opacity: 0`)
   - [x] 12c Klick führt zu `#tours`; Apple-feel: 18 px Border-Radius, `box-shadow`-Hover, `translateY(-3px)`
+  - [x] 12d Card 3 nach unten (`bottom: 8%` → `2%`) um Überlappung mit H1 zu vermeiden
+- [x] **Phase 13 – Snap-Scroll**
+  - [x] 13a `scroll-snap-type: y proximity` auf `html`, `scroll-padding-top: 56px` für Nav
+  - [x] 13b Snap-Targets: `.hero` + `.mockup-section` (Hero → nächste Section); spätere Sections bleiben frei wegen GSAP-Pin in `.scroll-stack-section`
+  - [x] 13c Reduced-Motion: Snap komplett deaktiviert
 
 ## Offen / Roadmap
 
