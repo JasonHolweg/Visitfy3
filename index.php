@@ -101,11 +101,12 @@ if (!is_array($kpiItems) || !$kpiItems) {
 
   <!-- ══ 1) HERO ════════════════════════════════════════════ -->
   <section class="hero" aria-labelledby="hero-heading">
-    <canvas id="hero-canvas" aria-hidden="true"></canvas>
-    <div class="hero-overlay" aria-hidden="true"></div>
+    <div class="hero-canvas-wrap" aria-hidden="true">
+      <canvas id="hero-canvas" aria-hidden="true"></canvas>
+    </div>
 
-    <div class="container hero-content">
-      <div class="hero-panel fade-up" data-hero-panel>
+    <div class="hero-inner">
+      <div class="hero-text">
         <!-- Zielgruppen-Signal: sofortige Selbstidentifikation -->
         <p class="hero-eyebrow fade-up delay-1"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.eyebrow', 'Gastronomie · Hotels · Praxen · Showrooms'), ENT_QUOTES, 'UTF-8') ?></p>
 
@@ -129,7 +130,7 @@ if (!is_array($kpiItems) || !$kpiItems) {
         <div class="hero-trust-row fade-up delay-4">
 <?php foreach ($heroTrustItems as $heroTrustItem): ?>
           <span class="hero-trust-pill">
-            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8l3.5 3.5L13 4"/></svg>
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8l3.5 3.5L13 4"/></svg>
             <?= htmlspecialchars(trim((string)$heroTrustItem), ENT_QUOTES, 'UTF-8') ?>
           </span>
 <?php endforeach; ?>

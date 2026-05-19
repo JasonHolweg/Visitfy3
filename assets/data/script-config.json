@@ -7,11 +7,11 @@
     "skip_click_delay": 300
   },
   "main": {
-    "particle_count": 500,
-    "particle_max_speed": 0.45,
-    "particle_max_line_dist": 90,
-    "particle_mouse_radius": 120,
-    "particle_mouse_force": 0.012,
+    "particle_count": 850,
+    "particle_max_speed": 0.4,
+    "particle_max_line_dist": 70,
+    "particle_mouse_radius": 100,
+    "particle_mouse_force": 0.008,
     "hero_words": [
       "SICHTBARKEIT.",
       "VERTRAUEN.",

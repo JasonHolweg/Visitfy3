@@ -36,16 +36,16 @@
       return; /* skip animation on reduced-motion */
     }
 
-    const ctx = heroCanvas.getContext('2d');
+    const ctx = heroCanvas.getContext('2d', { willReadFrequently: false });
     let W, H, dpr, particles, animFrame;
 
     /* Config */
-    const PARTICLE_COUNT    = Number(scriptCfg.particle_count ?? 500);
-    const MAX_SPEED         = Number(scriptCfg.particle_max_speed ?? 0.45);
-    const MAX_LINE_DIST     = Number(scriptCfg.particle_max_line_dist ?? 90);
+    const PARTICLE_COUNT    = Number(scriptCfg.particle_count ?? 850);
+    const MAX_SPEED         = Number(scriptCfg.particle_max_speed ?? 0.4);
+    const MAX_LINE_DIST     = Number(scriptCfg.particle_max_line_dist ?? 70);
     const MAX_LINE_DIST_SQ  = MAX_LINE_DIST * MAX_LINE_DIST;
-    const MOUSE_RADIUS      = Number(scriptCfg.particle_mouse_radius ?? 120);
-    const MOUSE_FORCE       = Number(scriptCfg.particle_mouse_force ?? 0.012);
+    const MOUSE_RADIUS      = Number(scriptCfg.particle_mouse_radius ?? 100);
+    const MOUSE_FORCE       = Number(scriptCfg.particle_mouse_force ?? 0.008);
 
     let mouse = { x: -9999, y: -9999 };
 
@@ -56,8 +56,8 @@
         this.y    = randomY ? Math.random() * H : -5;
         this.vx   = (Math.random() - 0.5) * MAX_SPEED;
         this.vy   = (Math.random() - 0.5) * MAX_SPEED;
-        this.r    = Math.random() * 1.4 + 0.4;
-        this.a    = Math.random() * 0.55 + 0.2;
+        this.r    = Math.random() * 0.8 + 0.3;
+        this.a    = Math.random() * 0.3 + 0.18;
       }
       update() {
         /* Mouse attraction (very subtle) */
@@ -116,7 +116,7 @@
           const dy = p.y - q.y;
           const dSq = dx * dx + dy * dy;
           if (dSq > MAX_LINE_DIST_SQ) continue;
-          const alpha = (1 - dSq / MAX_LINE_DIST_SQ) * 0.12;
+          const alpha = (1 - dSq / MAX_LINE_DIST_SQ) * 0.08;
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(q.x, q.y);
@@ -156,6 +156,18 @@
         heroSection.style.setProperty('--hero-parallax-x', '0px');
         heroSection.style.setProperty('--hero-parallax-y', '0px');
         heroSection.style.setProperty('--hero-glow-opacity', '0.2');
+      }, { passive: true });
+
+      /* Subtle scroll-based parallax on canvas wrapper (not in render loop) */
+      let scrollTicking = false;
+      window.addEventListener('scroll', () => {
+        if (scrollTicking) return;
+        scrollTicking = true;
+        requestAnimationFrame(() => {
+          const y = Math.min(window.scrollY, window.innerHeight);
+          heroSection.style.setProperty('--hero-scroll-y', (y * 0.18) + 'px');
+          scrollTicking = false;
+        });
       }, { passive: true });
     }
   })();
