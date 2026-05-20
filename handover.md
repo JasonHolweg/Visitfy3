@@ -73,6 +73,7 @@ Stand: 2026-05-19 · Branch: `claude/elegant-sammet-caa710` (Auto-Deploy aktiv)
   - [x] 13b Snap-Targets: `.hero` + `.mockup-section` (Hero → nächste Section); spätere Sections bleiben frei wegen GSAP-Pin in `.scroll-stack-section`
   - [x] 13c Reduced-Motion: Snap komplett deaktiviert
   - [x] 13d Auf alle Sections ausgeweitet (`mandatory`, früheres Einrasten); `.scroll-stack-section` per `snap-align: none` ausgenommen damit GSAP-Pin frei läuft
+  - [x] 13e Zurück auf `proximity` + `.scroll-stack-section` bekommt `snap-align: start` (oben anrasten, dann GSAP-Pin übernimmt) — sonst skippte mandatory die Rundgänge-Section
 
 ## Offen / Roadmap
 

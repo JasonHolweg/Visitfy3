@@ -45,22 +45,23 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-snap-type: y mandatory;
+  scroll-snap-type: y proximity;
   scroll-padding-top: 56px;
   -webkit-text-size-adjust: 100%;
   overflow-x: clip;
 }
 
-/* Snap targets: alle Sections — bis auf .scroll-stack-section
-   (GSAP-Pin per Karte würde mit Snap kollidieren). */
+/* Snap-Targets auf alle Sections.
+   `proximity` rastet nur ein, wenn man nah genug an einem Anker ist —
+   im GSAP-gepinnten Bereich (Karten in .scroll-stack-section) bleibt
+   damit der Scroll frei, statt zu skippen oder rauszuziehen.
+   .scroll-stack-section bekommt den Anker an ihrer Oberkante, damit
+   man sauber dort landet, bevor GSAP übernimmt. */
 .hero,
-.section {
+.section,
+.scroll-stack-section {
   scroll-snap-align: start;
   scroll-snap-stop: normal;
-}
-
-.scroll-stack-section {
-  scroll-snap-align: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
