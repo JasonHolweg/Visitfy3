@@ -74,6 +74,15 @@ Stand: 2026-05-19 · Branch: `claude/elegant-sammet-caa710` (Auto-Deploy aktiv)
   - [x] 13c Reduced-Motion: Snap komplett deaktiviert
   - [x] 13d Auf alle Sections ausgeweitet (`mandatory`, früheres Einrasten); `.scroll-stack-section` per `snap-align: none` ausgenommen damit GSAP-Pin frei läuft
   - [x] 13e Zurück auf `proximity` + `.scroll-stack-section` bekommt `snap-align: start` (oben anrasten, dann GSAP-Pin übernimmt) — sonst skippte mandatory die Rundgänge-Section
+- [x] **Phase 14 – Apple-Style Sweep Sections 2+**
+  - [x] 14a Section-Typo: title weight `600` (war 800), eyebrow `12px/0.2em/opacity 0.5`, sub `rgba(255,255,255,0.62)`
+  - [x] 14b Section padding-bug gefixt (`clamp(4rem,10vw,4rem)` → `clamp(5rem,9vw,9rem)`) → spürbar generöseres Spacing
+  - [x] 14c `--glass-*` Tokens zentral abgeflacht: bg `0.025`, border `0.06/0.12`, blur 12 px, shadow `none`
+  - [x] 14d Compare-Cards monochrom (kein grün-/rot-Border-Tint), Akzent-Grün nur noch auf Positive-Badge/Check als „Recommended"-Signal
+  - [x] 14e Cards-Sweep (KPI/Feature/Case/Testimonial/Process/Stack): Hover-Lift `-4px → -1px`, kein Shadow-Pop, Headlines weight 600, Text `rgba(255,255,255,0.62)`, Tag-Pills auf 980 px-Pill mit weight 500
+  - [x] 14f Marquee-Borders & FAQ-Items subtiler, FAQ-Question weight 500
+  - [x] 14g Form-Inputs/Labels Apple-Style: 12 px Radius, Label weight 500 ohne uppercase, weichere Border/Focus
+  - [x] 14h Mockup-Geräteborders `2px var(--line-strong)` → `1.5px rgba(255,255,255,0.12)`
 
 ## Offen / Roadmap
 

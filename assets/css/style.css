@@ -19,15 +19,15 @@
 
   --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
 
-  /* Glass */
-  --glass-bg:      rgba(255,255,255,0.055);
-  --glass-bg-s:    rgba(255,255,255,0.08);
-  --glass-border:  rgba(255,255,255,0.12);
-  --glass-border-h:rgba(255,255,255,0.25);
-  --glass-blur:    18px;
-  --glass-blur-s:  22px;
-  --glass-shadow:  0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.12);
-  --glass-shadow-h:0 15px 40px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.18);
+  /* Glass (Apple: flach, kaum Material) */
+  --glass-bg:      rgba(255,255,255,0.025);
+  --glass-bg-s:    rgba(255,255,255,0.04);
+  --glass-border:  rgba(255,255,255,0.06);
+  --glass-border-h:rgba(255,255,255,0.12);
+  --glass-blur:    12px;
+  --glass-blur-s:  18px;
+  --glass-shadow:  none;
+  --glass-shadow-h:none;
 
   --radius:    20px;
   --radius-sm: 12px;
@@ -107,37 +107,38 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 
 /* ── Section spacing ────────────────────────────────────── */
 .section {
-  padding-block: clamp(4rem, 10vw, 4rem);
+  padding-block: clamp(5rem, 9vw, 9rem);
 }
 
-/* ── Typography ─────────────────────────────────────────── */
+/* ── Typography (Apple-style: präzise, ruhig) ───────────── */
 .section-eyebrow {
   display: block;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 1.25rem;
   text-align: center;
 }
 
 .section-title {
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  font-weight: 800;
-  line-height: 1.08;
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  font-weight: 600;
+  line-height: 1.05;
   letter-spacing: -0.03em;
   margin-bottom: 1rem;
   text-align: center;
 }
 
 .section-sub {
-  font-size: clamp(1rem, 1.8vw, 1.15rem);
-  color: var(--text-dim);
+  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  color: rgba(255, 255, 255, 0.62);
   max-width: 56ch;
-  margin-bottom: 3rem;
+  margin-bottom: 3.5rem;
   text-align: center;
   margin-inline: auto;
+  line-height: 1.55;
 }
 
 /* ── Buttons ────────────────────────────────────────────── */
@@ -176,23 +177,23 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   opacity: 0.95;
 }
 
-/* ── Glass utility ──────────────────────────────────────── */
+/* ── Glass utility (Apple: flach, subtil) ───────────────── */
 .glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(140%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
+  background: rgba(255, 255, 255, 0.025);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: none;
 }
 
 /* Fallback for unsupported backdrop-filter */
 @supports not (backdrop-filter: blur(1px)) {
-  .glass { background: rgba(20,20,20,0.9); }
+  .glass { background: rgba(255, 255, 255, 0.04); }
 }
 
 .glass:hover {
-  border-color: var(--glass-border-h);
-  box-shadow: var(--glass-shadow-h);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
 }
 
 /* ── Divider ────────────────────────────────────────────── */
@@ -828,7 +829,7 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 .mockup-laptop-screen {
   position: relative;
   border-radius: 12px 12px 0 0;
-  border: 2px solid var(--line-strong);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
   border-bottom: none;
   background: var(--surface-2);
   aspect-ratio: 16 / 10;
@@ -840,7 +841,7 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   display: block;
   height: 14px;
   border-radius: 0 0 8px 8px;
-  border: 2px solid var(--line-strong);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
   border-top: none;
   background: var(--surface-3);
   position: relative;
@@ -865,7 +866,7 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 .mockup-tablet-screen {
   position: relative;
   border-radius: 14px;
-  border: 2px solid var(--line-strong);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
   background: var(--surface-2);
   aspect-ratio: 3 / 4;
   overflow: hidden;
@@ -888,7 +889,7 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 .mockup-phone-screen {
   position: relative;
   border-radius: 16px;
-  border: 2px solid var(--line-strong);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
   background: var(--surface-2);
   aspect-ratio: 9 / 19;
   overflow: hidden;
@@ -1059,28 +1060,25 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 .compare-card {
   padding: 2rem;
   border-radius: var(--radius);
-  background: var(--surface-2);
-  border: 1px solid var(--line);
-  transition: transform 0.35s var(--ease-out), border-color 0.25s, box-shadow 0.35s;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform 0.35s var(--ease-out), border-color 0.25s, opacity 0.25s;
 }
 
 .compare-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--line-strong);
-  box-shadow: 0 12px 36px rgba(0,0,0,0.4);
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
-.compare-card--with {
-  border-color: rgba(80, 255, 120, 0.18);
-}
-.compare-card--without {
-  border-color: rgba(255, 80, 80, 0.18);
-}
-.compare-card--with:hover {
-  border-color: rgba(80, 255, 120, 0.35);
-}
+.compare-card--with,
+.compare-card--without,
+.compare-card--with:hover,
 .compare-card--without:hover {
-  border-color: rgba(255, 80, 80, 0.35);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+.compare-card--with:hover,
+.compare-card--without:hover {
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .compare-card-header {
@@ -1100,23 +1098,29 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 }
 
 .compare-badge--negative {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--line);
-  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  text-transform: none;
 }
 
 .compare-badge--negative svg {
-  color: rgba(255, 100, 100, 0.8);
+  color: rgba(255, 255, 255, 0.35);
 }
 
 .compare-badge--positive {
-  background: rgba(80, 255, 120, 0.08);
-  border: 1px solid rgba(80, 255, 120, 0.25);
-  color: rgba(140, 255, 170, 0.95);
+  background: rgba(52, 199, 89, 0.1);
+  border: 1px solid rgba(52, 199, 89, 0.22);
+  color: rgba(140, 230, 170, 0.95);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  text-transform: none;
 }
 
 .compare-badge--positive svg {
-  color: rgba(80, 255, 120, 0.9);
+  color: rgba(52, 199, 89, 0.9);
 }
 
 /* List */
@@ -1158,8 +1162,8 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 }
 
 .compare-check--muted {
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.3);
 }
 
 .compare-check--muted svg {
@@ -1167,8 +1171,8 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 }
 
 .compare-check--green {
-  background: rgba(80, 255, 120, 0.12);
-  color: rgba(80, 255, 120, 0.9);
+  background: rgba(52, 199, 89, 0.1);
+  color: rgba(52, 199, 89, 0.85);
 }
 
 /* Positive card items slightly brighter */
@@ -1191,7 +1195,7 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 }
 
 .case-card {
-  padding: 2rem;
+  padding: 2.25rem;
   border-radius: var(--radius);
   transition: transform 0.35s var(--ease-out), border-color 0.25s;
   display: flex;
@@ -1199,36 +1203,35 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 }
 
 .case-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--glass-border-h);
-  box-shadow: var(--glass-shadow-h);
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .case-card-tag {
   display: inline-block;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--text-muted);
-  padding: 0.3em 0.8em;
-  border: 1px solid var(--line);
-  border-radius: 50px;
-  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 980px;
+  margin-bottom: 1.25rem;
   align-self: flex-start;
 }
 
 .case-card-title {
-  font-size: 1.15rem;
-  font-weight: 700;
+  font-size: 1.2rem;
+  font-weight: 600;
   letter-spacing: -0.02em;
   margin-bottom: 0.6rem;
 }
 
 .case-card-desc {
-  font-size: 0.9rem;
-  color: var(--text-dim);
-  line-height: 1.65;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.62);
+  line-height: 1.6;
   margin-bottom: 1.5rem;
   flex-grow: 1;
 }
@@ -1247,16 +1250,16 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 }
 
 .case-stat-value {
-  font-size: 1.5rem;
-  font-weight: 900;
+  font-size: 1.55rem;
+  font-weight: 600;
   letter-spacing: -0.03em;
   line-height: 1;
 }
 
 .case-stat-label {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  letter-spacing: 0.04em;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: -0.005em;
 }
 
 /* ============================================================
@@ -1272,21 +1275,20 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 }
 
 .kpi-card {
-  padding: 2rem 1.75rem;
+  padding: 2.25rem 1.75rem;
   border-radius: var(--radius);
   text-align: center;
-  transition: transform 0.35s var(--ease-out), border-color 0.25s, box-shadow 0.35s;
+  transition: transform 0.35s var(--ease-out), border-color 0.25s;
 }
 
 .kpi-card:hover {
-  transform: translateY(-4px) scale(1.01);
-  border-color: var(--glass-border-h);
-  box-shadow: var(--glass-shadow-h);
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .kpi-number {
   font-size: clamp(2.8rem, 6vw, 4.5rem);
-  font-weight: 900;
+  font-weight: 600;
   letter-spacing: -0.04em;
   line-height: 1;
   margin-bottom: 0.5rem;
@@ -1294,9 +1296,9 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 
 .kpi-label {
   font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--text-dim);
-  letter-spacing: 0.04em;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.62);
+  letter-spacing: -0.005em;
 }
 
 /* ============================================================
@@ -1348,34 +1350,34 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 }
 
 .feature-card {
-  padding: 2rem;
+  padding: 2.25rem;
   border-radius: var(--radius);
-  transition: transform 0.35s var(--ease-out), border-color 0.25s, box-shadow 0.35s;
+  transition: transform 0.35s var(--ease-out), border-color 0.25s;
 }
 
 .feature-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--glass-border-h);
-  box-shadow: var(--glass-shadow-h);
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .feature-icon {
-  font-size: 1.8rem;
-  margin-bottom: 1.25rem;
+  font-size: 1.6rem;
+  margin-bottom: 1.5rem;
   line-height: 1;
+  opacity: 0.85;
 }
 
 .feature-card h3 {
-  font-size: 1.15rem;
-  font-weight: 700;
+  font-size: 1.2rem;
+  font-weight: 600;
   letter-spacing: -0.02em;
   margin-bottom: 0.6rem;
 }
 
 .feature-card p {
-  font-size: 0.9rem;
-  color: var(--text-dim);
-  line-height: 1.65;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.62);
+  line-height: 1.6;
 }
 
 @media (max-width: 768px) {
@@ -1435,9 +1437,9 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 .stack-card {
   width: 100%;
   border-radius: var(--radius-lg);
-  background: var(--surface-2);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
   overflow: hidden;
   transform-origin: top center;
   will-change: transform;
@@ -1453,27 +1455,27 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 }
 
 .stack-card-title {
-  font-size: 1.35rem;
-  font-weight: 700;
+  font-size: 1.4rem;
+  font-weight: 600;
   letter-spacing: -0.02em;
 }
 
 .stack-card-tag {
   font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
+  font-weight: 500;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--text-muted);
-  padding: 0.35em 0.9em;
-  border: 1px solid var(--line);
-  border-radius: 50px;
+  color: rgba(255, 255, 255, 0.55);
+  padding: 4px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 980px;
 }
 
 .stack-card-desc {
   padding: 0 2rem 1.25rem;
-  font-size: 0.9rem;
-  color: var(--text-dim);
-  line-height: 1.65;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.62);
+  line-height: 1.6;
 }
 
 /* iFrame container 16:9 */
@@ -1665,20 +1667,20 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
    LOGO MARQUEE
    ============================================================ */
 .marquee-section {
-  padding-block: 3rem;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  padding-block: 4rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   overflow: hidden;
 }
 
 .marquee-label {
   text-align: center;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 2rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 2.25rem;
 }
 
 .marquee-track-wrap {
@@ -1768,41 +1770,42 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 }
 
 .process-card {
-  padding: 2rem;
+  padding: 2.25rem;
   border-radius: var(--radius);
   transition: transform 0.35s var(--ease-out), border-color 0.25s;
 }
 
 .process-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--glass-border-h);
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .process-num {
-  font-size: 0.72rem;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 500;
   letter-spacing: 0.2em;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.5);
   margin-bottom: 1rem;
 }
 
 .process-icon {
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   margin-bottom: 1rem;
   line-height: 1;
+  opacity: 0.85;
 }
 
 .process-card h3 {
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 1.15rem;
+  font-weight: 600;
   letter-spacing: -0.02em;
   margin-bottom: 0.75rem;
 }
 
 .process-card p {
-  font-size: 0.88rem;
-  color: var(--text-dim);
-  line-height: 1.7;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.62);
+  line-height: 1.6;
 }
 
 /* ============================================================
@@ -1816,14 +1819,14 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 }
 
 .testimonial-card {
-  padding: 2rem;
+  padding: 2.25rem;
   border-radius: var(--radius);
   transition: transform 0.35s var(--ease-out), border-color 0.25s;
 }
 
 .testimonial-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--glass-border-h);
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .stars {
@@ -1840,10 +1843,10 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 }
 
 .testimonial-text {
-  font-size: 0.92rem;
-  color: var(--text-dim);
-  line-height: 1.7;
-  font-style: italic;
+  font-size: 0.96rem;
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.65;
+  font-style: normal;
   margin-bottom: 1.5rem;
   quotes: "\201E" "\201C";
 }
@@ -1852,16 +1855,16 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 .testimonial-text::after  { content: close-quote; }
 
 .testimonial-author {
-  font-weight: 700;
+  font-weight: 600;
   font-size: 0.92rem;
   letter-spacing: -0.01em;
 }
 
 .testimonial-company {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-top: 0.2rem;
-  letter-spacing: 0.04em;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 0.25rem;
+  letter-spacing: -0.005em;
 }
 
 /* ============================================================
@@ -2368,22 +2371,23 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 }
 
 .faq-item {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
   overflow: hidden;
-  background: var(--glass-bg);
+  background: rgba(255, 255, 255, 0.02);
   transition: border-color 0.25s;
 }
-.faq-item.open { border-color: var(--line-strong); }
+.faq-item.open { border-color: rgba(255, 255, 255, 0.14); }
 
 .faq-question {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.1rem 1.5rem;
-  font-size: 0.95rem;
-  font-weight: 600;
+  padding: 1.25rem 1.5rem;
+  font-size: 0.98rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
   text-align: left;
   gap: 1rem;
   transition: color 0.2s;
@@ -2392,9 +2396,9 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 
 .faq-arrow {
   flex-shrink: 0;
-  width: 20px;
-  height: 20px;
-  border: 1px solid var(--line);
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -2405,8 +2409,8 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 
 .faq-item.open .faq-arrow {
   transform: rotate(180deg);
-  background: rgba(255,255,255,0.08);
-  border-color: var(--line-strong);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.16);
 }
 
 .faq-answer {
@@ -2418,11 +2422,10 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 .faq-item.open .faq-answer { max-height: 600px; }
 
 .faq-answer-inner {
-  padding: 0 1.5rem 1.25rem;
-  font-size: 0.9rem;
-  color: var(--text-dim);
-  line-height: 1.75;
-  border-top: 1px solid var(--line);
+  padding: 0.5rem 1.5rem 1.5rem;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.62);
+  line-height: 1.65;
 }
 
 .faq-answer-inner ul {
@@ -2466,13 +2469,12 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 .contact-info a:hover { color: var(--text); border-color: var(--line-strong); }
 
 .contact-form-box {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: var(--radius);
   padding: 2.5rem;
-  box-shadow: var(--glass-shadow);
 }
 
 .form-group {
@@ -2487,23 +2489,24 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 
 label {
   display: block;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  text-transform: none;
+  color: rgba(255, 255, 255, 0.72);
+  margin-bottom: 0.5rem;
 }
 
 input, select, textarea {
   width: 100%;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  padding: 0.8em 1em;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.9em 1em;
   color: var(--text);
   font: inherit;
-  font-size: 0.92rem;
+  font-size: 0.94rem;
+  letter-spacing: -0.005em;
   transition: border-color 0.2s, background 0.2s;
   -webkit-appearance: none;
 }
@@ -2517,8 +2520,8 @@ input[type="checkbox"] {
 input::placeholder, textarea::placeholder { color: var(--text-muted); }
 input:focus, select:focus, textarea:focus {
   outline: none;
-  border-color: rgba(255,255,255,0.4);
-  background: rgba(255,255,255,0.06);
+  border-color: rgba(255, 255, 255, 0.32);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 select option { background: #111; color: #fff; }
