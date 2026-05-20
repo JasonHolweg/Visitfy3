@@ -90,6 +90,8 @@ Stand: 2026-05-19 · Branch: `claude/elegant-sammet-caa710` (Auto-Deploy aktiv)
   - [x] 15c Copy ergebnis-orientiert neu geschrieben („Mehr Anfragen. Sofort.", „Vertrauen, bevor der Anruf kommt.", …) statt Feature-Aufzählung
   - [x] 15d Slide-Left/Right Reveal-Animation bleibt erhalten (JS-Hook)
   - [x] 15e CMS-Hinweis: Falls live `content.json` noch alte `warum360.cards` mit Emojis hat, werden die Emojis stillschweigend verworfen; PHP-Defaults zeigen die neue Apple-Copy nur wenn der Key leer ist — ggf. im Admin aktualisieren
+  - [x] 15f Sequentieller Reveal (Stagger 0/0.18/0.36/0.54 s) mit Headline-Pop (Scale `0.94 → 1`, cubic-bezier `0.34, 1.32, 0.64, 1` — leichter Overshoot)
+  - [x] 15g Nummer (`01`–`04`) mit kontinuierlichem Chrome-Shimmer (220 %-Gradient-Sweep, 5 s linear, `background-clip: text`); Reduced-Motion: statisch
 
 ## Offen / Roadmap
 

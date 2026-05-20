@@ -315,12 +315,11 @@ if (!is_array($kpiItems) || !$kpiItems) {
 
       <div class="value-grid">
 <?php foreach (array_slice(array_values($w360Cards), 0, 4) as $wi => $wCard):
-  $slideClass = $wi % 2 === 0 ? 'slide-left' : 'slide-right';
-  $slideDelay = floor($wi / 2) * 0.12;
+  $revealDelay = $wi * 0.18;
   $num = sprintf('%02d', $wi + 1);
 ?>
-        <article class="value-panel <?= $slideClass ?>" style="--slide-delay: <?= $slideDelay ?>s">
-          <span class="value-panel-num"><?= $num ?></span>
+        <article class="value-panel fade-up" style="--reveal-delay: <?= $revealDelay ?>s">
+          <span class="value-panel-num" aria-hidden="true"><?= $num ?></span>
           <h3 class="value-panel-title"><?= htmlspecialchars((string)($wCard['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
           <p class="value-panel-text"><?= htmlspecialchars((string)($wCard['text'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>
         </article>
