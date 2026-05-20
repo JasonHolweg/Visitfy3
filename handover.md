@@ -83,6 +83,13 @@ Stand: 2026-05-19 · Branch: `claude/elegant-sammet-caa710` (Auto-Deploy aktiv)
   - [x] 14f Marquee-Borders & FAQ-Items subtiler, FAQ-Question weight 500
   - [x] 14g Form-Inputs/Labels Apple-Style: 12 px Radius, Label weight 500 ohne uppercase, weichere Border/Focus
   - [x] 14h Mockup-Geräteborders `2px var(--line-strong)` → `1.5px rgba(255,255,255,0.12)`
+  - [x] 14i Stack-Cards (Live-Demos): solider `#1a1a1a` BG statt 2 %-Transparenz — gestapelte Karten scheinten sonst durcheinander durch
+- [x] **Phase 15 – „Warum 360°" als Apple-Sales-Section**
+  - [x] 15a Bento-Grid + Emoji-Icons komplett raus (KI-Slop)
+  - [x] 15b Neuer `.value-grid` (2×2) mit `.value-panel`: kleines `01`–`04` oben, große Claim-Headline (`clamp(1.6rem, 3vw, 2.5rem)`, weight 600) am Boden, kompakter Supporting-Text
+  - [x] 15c Copy ergebnis-orientiert neu geschrieben („Mehr Anfragen. Sofort.", „Vertrauen, bevor der Anruf kommt.", …) statt Feature-Aufzählung
+  - [x] 15d Slide-Left/Right Reveal-Animation bleibt erhalten (JS-Hook)
+  - [x] 15e CMS-Hinweis: Falls live `content.json` noch alte `warum360.cards` mit Emojis hat, werden die Emojis stillschweigend verworfen; PHP-Defaults zeigen die neue Apple-Copy nur wenn der Key leer ist — ggf. im Admin aktualisieren
 
 ## Offen / Roadmap
 

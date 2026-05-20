@@ -1302,94 +1302,66 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 }
 
 /* ============================================================
-   FEATURE CARDS – BENTO GRID (Value Proposition)
+   VALUE PANELS – „Warum 360°"  (Apple-style claim panels)
    ============================================================ */
-.bento-grid {
+.value-grid {
   display: grid;
-  grid-template-columns: 1.45fr 1fr;
-  grid-template-rows: auto auto;
-  gap: var(--gap);
-  margin-top: 3rem;
-  overflow: hidden;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1rem, 1.6vw, 1.5rem);
+  margin-top: 3.5rem;
 }
 
-/* Row 2 flips: square left, wide right */
-.bento-grid .bento-square:nth-of-type(2) { order: 2; }
-.bento-grid .bento-wide:nth-of-type(2)   { order: 2; }
-
-/* Second row: square first, wide second */
-.bento-grid > :nth-child(3) { grid-column: 1; }
-.bento-grid > :nth-child(4) { grid-column: 2; }
-
-/* Row 2: swap proportions */
-.bento-grid > :nth-child(3) { /* square */ }
-.bento-grid > :nth-child(4) { /* wide   */ }
-
-/* Actual 2-column bento: wide=~60%, square=~40%, then swap */
-@media (min-width: 769px) {
-  .bento-grid {
-    grid-template-columns: 1.45fr 1fr;
-    grid-template-rows: auto auto;
-  }
-  /* Row 1: wide left, square right */
-  .bento-grid > :nth-child(1) { grid-column: 1; grid-row: 1; }
-  .bento-grid > :nth-child(2) { grid-column: 2; grid-row: 1; }
-  /* Row 2: square left, wide right */
-  .bento-grid > :nth-child(3) { grid-column: 1; grid-row: 2; }
-  .bento-grid > :nth-child(4) { grid-column: 2; grid-row: 2; }
-
-  /* Reverse proportions for row 2 */
-  .bento-grid {
-    grid-template-columns: 1.45fr 1fr;
-  }
+.value-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: clamp(2rem, 3.5vw, 3.25rem);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  min-height: 320px;
+  transition: border-color 0.3s ease, transform 0.35s var(--ease-out);
 }
 
-/* Override grid for row 2 proportions */
-@supports (grid-template-rows: subgrid) {
-  .bento-grid { /* progressive enhancement placeholder */ }
-}
-
-.feature-card {
-  padding: 2.25rem;
-  border-radius: var(--radius);
-  transition: transform 0.35s var(--ease-out), border-color 0.25s;
-}
-
-.feature-card:hover {
+.value-panel:hover {
+  border-color: rgba(255, 255, 255, 0.14);
   transform: translateY(-1px);
-  border-color: rgba(255, 255, 255, 0.12);
 }
 
-.feature-icon {
-  font-size: 1.6rem;
-  margin-bottom: 1.5rem;
-  line-height: 1;
-  opacity: 0.85;
+.value-panel-num {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.4);
+  font-variant-numeric: tabular-nums;
 }
 
-.feature-card h3 {
-  font-size: 1.2rem;
+/* Headline-Anker an die Boden-Linie, damit die Claim
+   visuell „landet" — Apple-typisches Tile-Pattern. */
+.value-panel-title {
+  font-size: clamp(1.6rem, 3vw, 2.5rem);
   font-weight: 600;
-  letter-spacing: -0.02em;
-  margin-bottom: 0.6rem;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  margin-top: auto;
+  text-wrap: balance;
 }
 
-.feature-card p {
-  font-size: 0.92rem;
+.value-panel-text {
+  font-size: clamp(0.98rem, 1.25vw, 1.08rem);
   color: rgba(255, 255, 255, 0.62);
-  line-height: 1.6;
+  line-height: 1.55;
+  max-width: 42ch;
 }
 
 @media (max-width: 768px) {
-  .bento-grid {
-    grid-template-columns: 1fr;
-  }
-  .bento-grid > :nth-child(1),
-  .bento-grid > :nth-child(2),
-  .bento-grid > :nth-child(3),
-  .bento-grid > :nth-child(4) {
-    grid-column: 1;
-    grid-row: auto;
+  .value-grid { grid-template-columns: 1fr; }
+  .value-panel {
+    min-height: auto;
+    padding: 2rem 1.75rem;
+    gap: 0.85rem;
   }
 }
 

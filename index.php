@@ -296,34 +296,33 @@ if (!is_array($kpiItems) || !$kpiItems) {
   $w360Cards = visitfy_get($contentConfig, 'warum360.cards', []);
   if (!is_array($w360Cards) || !$w360Cards) {
     $w360Cards = [
-      ['emoji' => '🏛️', 'title' => 'Räume verkaufen', 'text' => 'Virtuelle Rundgänge lassen Kunden Ihre Räume erleben, bevor sie die Tür öffnen. Das senkt die Hemmschwelle und steigert die Konversionsrate von Interessenten zu echten Besuchern.'],
-      ['emoji' => '🤝', 'title' => 'Vertrauen aufbauen', 'text' => 'Transparenz erzeugt Vertrauen. Wer Ihre Location bereits virtuell besucht hat, kommt mit einem positiven Vorurteil und deutlich höherer Kaufbereitschaft.'],
-      ['emoji' => '✨', 'title' => 'Atmosphäre erlebbar machen', 'text' => 'Ein Foto zeigt einen Raum. Ein 360° Rundgang lässt Ihre Gäste Ihre Atmosphäre, Ihr Licht, Ihr Raumgefühl wirklich spüren – rund um die Uhr, von überall.'],
-      ['emoji' => '🔍', 'title' => 'Transparenz schaffen', 'text' => 'Hochwertige 360° Präsenz auf Google Business stärkt Ihre Auffindbarkeit und zeigt potenziellen Kunden genau, was sie erwartet – ehrlich, realistisch, professionell.'],
+      ['title' => 'Mehr Anfragen. Sofort.',                'text' => 'Gäste, die Ihre Location schon kennen, entscheiden schneller. Bis zu 40 % längere Verweildauer auf Ihrer Website — und spürbar höhere Anfragequote.'],
+      ['title' => 'Vertrauen, bevor der Anruf kommt.',     'text' => 'Wer die Atmosphäre virtuell erlebt hat, kommt nicht zum Vergleichen — sondern zur Buchung.'],
+      ['title' => 'Auf jeder Suche sichtbar.',             'text' => 'Direkt eingebunden in Google Business und Maps. Ihr Rundgang erscheint dort, wo Kunden entscheiden.'],
+      ['title' => 'In 3 Tagen live.',                      'text' => 'Briefing, Aufnahme, Integration. Sie liefern den Schlüssel — wir den fertigen iFrame-Code.'],
     ];
   }
-  $bentoClasses = ['bento-wide slide-left', 'bento-square slide-right', 'bento-square slide-left', 'bento-wide slide-right'];
-  $bentoDelays  = ['0s', '0.15s', '0.3s', '0.45s'];
 ?>
-  <section class="section" aria-labelledby="value-heading">
+  <section class="section value-section" aria-labelledby="value-heading">
     <div class="container">
-      <p class="section-eyebrow fade-up"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'warum360.eyebrow', 'Warum 360°?'), ENT_QUOTES, 'UTF-8') ?></p>
+      <p class="section-eyebrow fade-up"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'warum360.eyebrow', 'Warum 360°'), ENT_QUOTES, 'UTF-8') ?></p>
       <h2 class="section-title fade-up delay-1" id="value-heading">
-        <?= nl2br(htmlspecialchars((string)visitfy_get($contentConfig, 'warum360.title', "360° Rundgänge für jede Branche –\nund jede Location"), ENT_QUOTES, 'UTF-8')) ?>
+        <?= nl2br(htmlspecialchars((string)visitfy_get($contentConfig, 'warum360.title', 'Es verändert, wie Kunden entscheiden.'), ENT_QUOTES, 'UTF-8')) ?>
       </h2>
       <p class="section-sub fade-up delay-2">
-        <?= htmlspecialchars((string)visitfy_get($contentConfig, 'warum360.sub', 'Ein virtueller Rundgang schafft unmittelbar Nähe – noch bevor der erste echte Kontakt stattfindet.'), ENT_QUOTES, 'UTF-8') ?>
+        <?= htmlspecialchars((string)visitfy_get($contentConfig, 'warum360.sub', 'Ein 360°-Rundgang ist mehr als Marketing. Er ist die ehrlichste Antwort auf die Frage, die ohnehin im Raum steht.'), ENT_QUOTES, 'UTF-8') ?>
       </p>
 
-      <div class="bento-grid">
-<?php foreach ($w360Cards as $wi => $wCard):
-  $bentoClass = $bentoClasses[$wi % 4] ?? 'bento-wide slide-left';
-  $bentoDelay = $bentoDelays[$wi % 4] ?? '0s';
+      <div class="value-grid">
+<?php foreach (array_slice(array_values($w360Cards), 0, 4) as $wi => $wCard):
+  $slideClass = $wi % 2 === 0 ? 'slide-left' : 'slide-right';
+  $slideDelay = floor($wi / 2) * 0.12;
+  $num = sprintf('%02d', $wi + 1);
 ?>
-        <article class="feature-card glass <?= $bentoClass ?>" style="--slide-delay: <?= $bentoDelay ?>">
-          <div class="feature-icon" aria-hidden="true"><?= htmlspecialchars((string)($wCard['emoji'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
-          <h3><?= htmlspecialchars((string)($wCard['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
-          <p><?= htmlspecialchars((string)($wCard['text'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>
+        <article class="value-panel <?= $slideClass ?>" style="--slide-delay: <?= $slideDelay ?>s">
+          <span class="value-panel-num"><?= $num ?></span>
+          <h3 class="value-panel-title"><?= htmlspecialchars((string)($wCard['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
+          <p class="value-panel-text"><?= htmlspecialchars((string)($wCard['text'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>
         </article>
 <?php endforeach; ?>
       </div>
