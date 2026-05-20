@@ -1437,9 +1437,11 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 .stack-card {
   width: 100%;
   border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.02);
+  /* Solid background — Karten stacken via GSAP übereinander, transparentes
+     Material würde untere Texte durchscheinen lassen. */
+  background: #1a1a1a;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
   overflow: hidden;
   transform-origin: top center;
   will-change: transform;
