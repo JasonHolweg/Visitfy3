@@ -643,15 +643,17 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   box-shadow:
     0 24px 60px rgba(0, 0, 0, 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  transform: rotate(var(--r));
-  transition: transform 0.35s var(--ease-out), opacity 0.25s ease, box-shadow 0.35s ease;
+  rotate: var(--r);
+  translate: 0 0;
+  transition: transform 0.4s var(--ease-out), opacity 0.25s ease, box-shadow 0.4s ease;
   pointer-events: auto;
+  will-change: translate, rotate, transform;
 }
 
 .hero-tour-card:hover {
-  transform: rotate(var(--r)) translateY(-3px);
+  transform: scale(1.025);
   box-shadow:
-    0 30px 70px rgba(0, 0, 0, 0.55),
+    0 32px 76px rgba(0, 0, 0, 0.6),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
@@ -696,12 +698,36 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 }
 
 /* Cluster positions – subtle layered look */
-.hero-tour-1 { --r: 2deg;    width: 58%; top: 8%;  right: 0; }
-.hero-tour-2 { --r: -1.5deg; width: 46%; top: 40%; right: -6%; }
-.hero-tour-3 { --r: 1.5deg;  width: 62%; bottom: 2%; right: 4%; }
+.hero-tour-1 { --r: 2deg;    width: 58%; top: 8%;  right: 0;
+  animation: hero-tour-drift-1 11s ease-in-out -2.4s infinite alternate; }
+.hero-tour-2 { --r: -1.5deg; width: 46%; top: 40%; right: -6%;
+  animation: hero-tour-drift-2 13.5s ease-in-out -5.1s infinite alternate; }
+.hero-tour-3 { --r: 1.5deg;  width: 62%; bottom: 2%; right: 4%;
+  animation: hero-tour-drift-3 16s ease-in-out -7.6s infinite alternate; }
+
+/* Organic drift – translate + slight rotate variation per card.
+   Apple-feel: jede Animation eigene Frequenz, leicht versetzt gestartet,
+   `alternate` läuft sanft zurück statt zu springen. */
+@keyframes hero-tour-drift-1 {
+  from { translate:  0 0;       rotate: 2deg;   }
+  to   { translate:  6px -10px; rotate: 3.4deg; }
+}
+@keyframes hero-tour-drift-2 {
+  from { translate:  0 0;       rotate: -1.5deg; }
+  to   { translate: -7px -7px;  rotate: -2.6deg; }
+}
+@keyframes hero-tour-drift-3 {
+  from { translate:  0 0;       rotate: 1.5deg; }
+  to   { translate:  5px -8px;  rotate: 2.6deg; }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-tour-card { --r: 0deg; }
+  .hero-tour-card {
+    --r: 0deg;
+    animation: none;
+    translate: 0 0;
+    rotate: 0deg;
+  }
   .hero-tour-card:hover { transform: none; }
 }
 
