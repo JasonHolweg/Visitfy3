@@ -45,18 +45,22 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-snap-type: y proximity;
+  scroll-snap-type: y mandatory;
   scroll-padding-top: 56px;
   -webkit-text-size-adjust: 100%;
   overflow-x: clip;
 }
 
-/* Snap targets: Hero → next section. Andere Sections bleiben frei,
-   damit GSAP-Pin (.scroll-stack-section) nicht in Konflikt kommt. */
+/* Snap targets: alle Sections — bis auf .scroll-stack-section
+   (GSAP-Pin per Karte würde mit Snap kollidieren). */
 .hero,
-.mockup-section {
+.section {
   scroll-snap-align: start;
   scroll-snap-stop: normal;
+}
+
+.scroll-stack-section {
+  scroll-snap-align: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

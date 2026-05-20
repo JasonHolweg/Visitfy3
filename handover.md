@@ -71,6 +71,7 @@ Stand: 2026-05-19 · Branch: `claude/elegant-sammet-caa710` (Auto-Deploy aktiv)
   - [x] 13a `scroll-snap-type: y proximity` auf `html`, `scroll-padding-top: 56px` für Nav
   - [x] 13b Snap-Targets: `.hero` + `.mockup-section` (Hero → nächste Section); spätere Sections bleiben frei wegen GSAP-Pin in `.scroll-stack-section`
   - [x] 13c Reduced-Motion: Snap komplett deaktiviert
+  - [x] 13d Auf alle Sections ausgeweitet (`mandatory`, früheres Einrasten); `.scroll-stack-section` per `snap-align: none` ausgenommen damit GSAP-Pin frei läuft
 
 ## Offen / Roadmap
 
