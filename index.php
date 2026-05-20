@@ -192,7 +192,7 @@ if (!is_array($kpiItems) || !$kpiItems) {
         <div class="mockup-laptop mockup-device flyin-item flyin-item--left">
           <div class="mockup-laptop-screen">
 <?php if ($mockupDesktop !== '' && is_file(__DIR__ . '/' . $mockupDesktop)): ?>
-            <img src="<?= htmlspecialchars(visitfy_url($mockupDesktop), ENT_QUOTES, 'UTF-8') ?>" alt="Rundgang auf Laptop" loading="lazy" decoding="async">
+            <img src="<?= htmlspecialchars(visitfy_url($mockupDesktop), ENT_QUOTES, 'UTF-8') ?>" alt="Rundgang auf Laptop" loading="eager" fetchpriority="high" decoding="async">
 <?php else: ?>
             <div class="mockup-placeholder" aria-label="Laptop-Vorschau">
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 17h20"/><path d="M6 21h12"/></svg>
@@ -205,7 +205,7 @@ if (!is_array($kpiItems) || !$kpiItems) {
         <div class="mockup-tablet mockup-device flyin-item flyin-item--bottom">
           <div class="mockup-tablet-screen">
 <?php if ($mockupTablet !== '' && is_file(__DIR__ . '/' . $mockupTablet)): ?>
-            <img src="<?= htmlspecialchars(visitfy_url($mockupTablet), ENT_QUOTES, 'UTF-8') ?>" alt="Rundgang auf Tablet" loading="lazy" decoding="async">
+            <img src="<?= htmlspecialchars(visitfy_url($mockupTablet), ENT_QUOTES, 'UTF-8') ?>" alt="Rundgang auf Tablet" loading="eager" fetchpriority="high" decoding="async">
 <?php else: ?>
             <div class="mockup-placeholder" aria-label="Tablet-Vorschau">
               <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="2" width="16" height="20" rx="2"/><circle cx="12" cy="19" r="1"/></svg>
@@ -218,7 +218,7 @@ if (!is_array($kpiItems) || !$kpiItems) {
         <div class="mockup-phone mockup-device flyin-item flyin-item--right">
           <div class="mockup-phone-screen">
 <?php if ($mockupPhone !== '' && is_file(__DIR__ . '/' . $mockupPhone)): ?>
-            <img src="<?= htmlspecialchars(visitfy_url($mockupPhone), ENT_QUOTES, 'UTF-8') ?>" alt="Rundgang auf Smartphone" loading="lazy" decoding="async">
+            <img src="<?= htmlspecialchars(visitfy_url($mockupPhone), ENT_QUOTES, 'UTF-8') ?>" alt="Rundgang auf Smartphone" loading="eager" fetchpriority="high" decoding="async">
 <?php else: ?>
             <div class="mockup-placeholder" aria-label="Smartphone-Vorschau">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M12 18h.01"/></svg>

@@ -92,6 +92,11 @@ Stand: 2026-05-19 · Branch: `claude/elegant-sammet-caa710` (Auto-Deploy aktiv)
   - [x] 15e CMS-Hinweis: Falls live `content.json` noch alte `warum360.cards` mit Emojis hat, werden die Emojis stillschweigend verworfen; PHP-Defaults zeigen die neue Apple-Copy nur wenn der Key leer ist — ggf. im Admin aktualisieren
   - [x] 15f Sequentieller Reveal (Stagger 0/0.18/0.36/0.54 s) mit Headline-Pop (Scale `0.94 → 1`, cubic-bezier `0.34, 1.32, 0.64, 1` — leichter Overshoot)
   - [x] 15g Nummer (`01`–`04`) mit kontinuierlichem Chrome-Shimmer (220 %-Gradient-Sweep, 5 s linear, `background-clip: text`); Reduced-Motion: statisch
+- [x] **Phase 16 – Mockup-Section („So sieht es aus") Refresh**
+  - [x] 16a Bilder: `loading="lazy"` → `loading="eager" fetchpriority="high"` (Section direkt nach Hero, lazy war Quatsch)
+  - [x] 16b Fake-Laptop-Boden (`::after` Strip) raus — Screenshots haben eigene Browser-/Device-Chrome
+  - [x] 16c Frames vereinheitlicht: 14/22/26 px Radius, satter Drop-Shadow (`0 40px 80px -20px /0.7`), subtiler 0.06-Border
+  - [x] 16d Tablet/Phone größer: Tablet `170-270 px` (war `120-200`), Phone `105-165 px` (war `70-120`) — substantieller Produkt-Showcase-Look
 
 ## Offen / Roadmap
 
