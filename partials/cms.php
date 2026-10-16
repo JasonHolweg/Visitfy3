@@ -42,9 +42,16 @@ if (!function_exists('visitfy_split_lines')) {
     }
 }
 
+require_once __DIR__ . '/urls.php';
+
 if (!function_exists('visitfy_base_path')) {
+    /** Basis-Pfad der Website. Seit den sauberen URLs identisch mit visitfy_site_root(). */
     function visitfy_base_path(): string
     {
+        $siteRoot = visitfy_site_root();
+        if ($siteRoot !== '') {
+            return $siteRoot;
+        }
         $scriptName = (string)($_SERVER['SCRIPT_NAME'] ?? '');
         if ($scriptName === '') {
             return '/';
@@ -74,6 +81,12 @@ if (!function_exists('visitfy_url')) {
 
         if (strpos($path, '#') === 0) {
             return $path;
+        }
+
+        /* Alte Seitenpfade (z. B. 'pages/kontakt.php' aus content.json) direkt auf die saubere URL */
+        $clean = visitfy_clean_url($path);
+        if ($clean !== null) {
+            return $clean;
         }
 
         return visitfy_base_path() . ltrim($path, '/');

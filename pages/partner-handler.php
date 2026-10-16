@@ -159,4 +159,8 @@ if (!$result['ok']) {
     exit;
 }
 
+/* Statistik: erfolgreiche Partner-Bewerbung zählen (cookielos, partials/stats.php) */
+require_once __DIR__ . '/../partials/stats.php';
+visitfy_stats_event('lead_partner');
+
 echo json_encode(['ok' => true]);

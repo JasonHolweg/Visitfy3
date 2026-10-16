@@ -17,13 +17,19 @@ $allowed = [
 
 $page = isset($_GET['page']) ? (string)$_GET['page'] : '';
 
+require __DIR__ . '/partials/cms.php';
+
 if ($page !== '' && isset($allowed[$page])) {
+    /* Alte Adressen wie /index.php?page=faq dauerhaft auf die sauberen URLs umleiten */
+    if (in_array($_SERVER['REQUEST_METHOD'] ?? 'GET', ['GET', 'HEAD'], true)) {
+        header('Location: ' . visitfy_page_url($page), true, 301);
+        exit;
+    }
     require __DIR__ . '/' . $allowed[$page];
     exit;
 }
 
 /* ── Homepage ────────────────────────────────────────────── */
-require __DIR__ . '/partials/cms.php';
 require_once __DIR__ . '/partials/turnstile.php';
 $root      = visitfy_base_path();
 
@@ -31,6 +37,19 @@ $contentConfig = visitfy_load_json(__DIR__ . '/assets/data/content.json', []);
 
 $pageTitle = (string)visitfy_get($contentConfig, 'seo.home_title', 'Visitfy | 360° Rundgänge für moderne Unternehmen');
 $pageDesc  = (string)visitfy_get($contentConfig, 'seo.home_desc', 'Visitfy entwickelt professionelle 360° virtuelle Rundgänge für Unternehmen jeder Branche – realistisch, hochwertig und sofort einsatzbereit für Website und Google Business.');
+
+require_once __DIR__ . '/partials/schema.php';
+$canonicalPath = visitfy_page_url('home');
+$pageOgImg = (string)visitfy_get($contentConfig, 'seo.og_image', '');
+$jsonLd = [[
+    '@context' => 'https://schema.org',
+    '@graph' => [
+        visitfy_schema_organization($contentConfig),
+        visitfy_schema_website(),
+        visitfy_schema_service(),
+        visitfy_schema_webpage(visitfy_page_url('home', true), $pageTitle, $pageDesc),
+    ],
+]];
 
 require __DIR__ . '/partials/head.php';
 require __DIR__ . '/partials/header.php';
@@ -84,6 +103,17 @@ if (!is_array($kpiItems) || !$kpiItems) {
 <!-- ══════════════════════════════════════════════════════════
      INTRO / PRELOADER OVERLAY
 ══════════════════════════════════════════════════════════ -->
+<script>
+/* Intro nur beim Einstieg von außen zeigen – ohne Cookies/Storage, vor dem ersten Rendern entschieden. */
+(function () {
+  try {
+    var r = document.referrer, o = location.origin;
+    if ((r && r.indexOf(o) === 0) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('no-intro');
+    }
+  } catch (e) {}
+})();
+</script>
 <div id="intro" role="presentation" aria-hidden="true">
   <canvas id="intro-canvas"></canvas>
   <div id="intro-text">
@@ -409,7 +439,7 @@ if (!is_array($kpiItems) || !$kpiItems) {
   $label = (string)($kpi['label'] ?? '');
 ?>
         <div class="kpi-card glass fade-up <?= htmlspecialchars($delayClass, ENT_QUOTES, 'UTF-8') ?>">
-          <div class="kpi-number" data-countup data-target="<?= htmlspecialchars($target, ENT_QUOTES, 'UTF-8') ?>" data-suffix="<?= htmlspecialchars($suffix, ENT_QUOTES, 'UTF-8') ?>">0<?= htmlspecialchars($suffix, ENT_QUOTES, 'UTF-8') ?></div>
+          <div class="kpi-number" data-countup data-target="<?= htmlspecialchars($target, ENT_QUOTES, 'UTF-8') ?>" data-suffix="<?= htmlspecialchars($suffix, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($target . $suffix, ENT_QUOTES, 'UTF-8') ?></div>
           <div class="kpi-label"><?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?></div>
         </div>
 <?php endforeach; ?>
@@ -696,6 +726,8 @@ if (!is_array($kpiItems) || !$kpiItems) {
         </div>
 <?php endforeach; ?>
       </div>
+
+      <?php visitfy_schema_print([visitfy_schema_faq($faqItems, visitfy_page_url('home', true) . '#faq')]); ?>
 
       <div class="text-center" style="margin-top:3rem">
         <a href="<?= htmlspecialchars(visitfy_url('pages/faq.php'), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-secondary"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'faq.button_text', 'Alle Fragen ansehen'), ENT_QUOTES, 'UTF-8') ?></a>

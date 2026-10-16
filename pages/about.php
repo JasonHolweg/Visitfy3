@@ -4,12 +4,29 @@
  * About Us page with JSON-driven content.
  */
 require __DIR__ . '/../partials/cms.php';
-$root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? visitfy_base_path() : '../';
+$root = visitfy_site_root();
+$canonicalPath = visitfy_page_url('about');
 
 $contentConfig = visitfy_load_json(__DIR__ . '/../assets/data/content.json', []);
 
-$pageTitle = 'Über uns | Visitfy – 360° Rundgänge';
-$pageDesc  = 'Lerne Visitfy kennen: Mission, Qualitätsanspruch und das Team hinter professionellen 360° Rundgängen.';
+$aboutNetwork = require __DIR__ . '/../partials/partner-network.php';
+$aboutPartners = (int)($aboutNetwork['stats']['partners'] ?? 0);
+$pageTitle = 'Über Visitfy – 360°-Rundgänge aus Flensburg für ganz Deutschland';
+$pageDesc  = 'Visitfy aus Flensburg erstellt virtuelle 360°-Rundgänge für Unternehmen'
+           . ($aboutPartners > 0 ? ' und arbeitet mit ' . $aboutPartners . ' Partnern in ganz Deutschland' : '')
+           . '. Wer wir sind und wie wir arbeiten.';
+require_once __DIR__ . '/../partials/schema.php';
+$aboutUrl = visitfy_page_url('about', true);
+$jsonLd = [[
+    '@context' => 'https://schema.org',
+    '@graph' => [
+        visitfy_schema_organization($contentConfig),
+        array_merge(
+            visitfy_schema_webpage($aboutUrl, $pageTitle, $pageDesc, [['Start', visitfy_page_url('home', true)], ['Über uns', $aboutUrl]]),
+            ['@type' => 'AboutPage']
+        ),
+    ],
+]];
 
 $aboutFeatures = visitfy_get($contentConfig, 'about.features', []);
 if (!is_array($aboutFeatures)) $aboutFeatures = [];

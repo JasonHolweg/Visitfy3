@@ -20,10 +20,23 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(24));
 }
 
-$root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? visitfy_base_path() : '../';
+$root = visitfy_site_root();
+$canonicalPath = visitfy_page_url('kontakt');
 $contentConfig = visitfy_load_json(__DIR__ . '/../assets/data/content.json', []);
-$pageTitle = 'Kontakt | Visitfy – 360° Rundgänge anfragen';
-$pageDesc  = 'Kontaktieren Sie Visitfy für ein unverbindliches Angebot für Ihren 360° Rundgang. Nutzen Sie unser Kontaktformular oder schreiben Sie direkt.';
+$pageTitle = '360°-Rundgang anfragen – kostenloses Angebot | Visitfy';
+$pageDesc  = 'Angebot für Ihren virtuellen 360°-Rundgang anfragen: kostenlos und unverbindlich, Antwort in der Regel innerhalb von 24 Stunden an Werktagen.';
+require_once __DIR__ . '/../partials/schema.php';
+$kontaktUrl = visitfy_page_url('kontakt', true);
+$jsonLd = [[
+    '@context' => 'https://schema.org',
+    '@graph' => [
+        array_merge(
+            visitfy_schema_webpage($kontaktUrl, $pageTitle, $pageDesc, [['Start', visitfy_page_url('home', true)], ['Kontakt', $kontaktUrl]]),
+            ['@type' => 'ContactPage']
+        ),
+        ['@type' => 'Organization', '@id' => visitfy_schema_org_id(), 'name' => 'Visitfy', 'url' => VISITFY_SITE_URL . '/'],
+    ],
+]];
 
 $contactEmail = trim((string)visitfy_get($contentConfig, 'kontakt_text.email', visitfy_get($contentConfig, 'footer.contact_email', 'info@visitfy.de')));
 if ($contactEmail === '') {
@@ -234,6 +247,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $formSent = true;
                 $_SESSION['csrf_token'] = bin2hex(random_bytes(24));
+
+                /* Statistik: erfolgreiche Anfrage zählen (cookielos, partials/stats.php) */
+                require_once __DIR__ . '/../partials/stats.php';
+                visitfy_stats_event('lead_kontakt');
             }
         }
     }
@@ -290,7 +307,7 @@ require __DIR__ . '/../partials/header.php';
           </div>
 <?php endif; ?>
 
-          <form method="post" action="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/kontakt.php" novalidate>
+          <form method="post" action="<?= htmlspecialchars(visitfy_page_url('kontakt'), ENT_QUOTES, 'UTF-8') ?>" novalidate>
             <!-- CSRF token -->
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
             <!-- Honeypot -->
@@ -361,7 +378,7 @@ require __DIR__ . '/../partials/header.php';
             <div class="form-check">
               <input type="checkbox" id="k_dsgvo" name="dsgvo" required<?= !empty($_POST['dsgvo']) ? ' checked' : '' ?>>
               <label for="k_dsgvo">
-                Ich habe die <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/datenschutz.php">Datenschutzerklärung</a> gelesen und bin mit der
+                Ich habe die <a href="<?= htmlspecialchars(visitfy_page_url('datenschutz'), ENT_QUOTES, 'UTF-8') ?>">Datenschutzerklärung</a> gelesen und bin mit der
                 Verarbeitung meiner Daten zur Bearbeitung meiner Anfrage einverstanden. *
               </label>
             </div>

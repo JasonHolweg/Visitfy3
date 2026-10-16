@@ -6,9 +6,11 @@
  * TODO: Alle Platzhalter vor Veröffentlichung mit realen Angaben befüllen.
  */
 require __DIR__ . '/../partials/cms.php';
-$root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? visitfy_base_path() : '../';
+$root = visitfy_site_root();
+$canonicalPath = visitfy_page_url('datenschutz');
 $pageTitle = 'Datenschutzerklärung | Visitfy';
 $pageDesc  = 'Datenschutzerklärung von Visitfy – Informationen zur Verarbeitung personenbezogener Daten gemäß DSGVO.';
+$pageRobots = 'noindex, follow';
 
 require __DIR__ . '/../partials/head.php';
 require __DIR__ . '/../partials/header.php';

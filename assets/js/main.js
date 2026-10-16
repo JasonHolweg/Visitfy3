@@ -39,8 +39,10 @@
     const ctx = heroCanvas.getContext('2d', { willReadFrequently: false });
     let W, H, dpr, particles, animFrame;
 
-    /* Config */
-    const PARTICLE_COUNT    = Number(scriptCfg.particle_count ?? 850);
+    /* Config – particle_count gilt für einen großen Desktop (1440×900);
+       kleinere Bildschirme bekommen anteilig weniger Partikel (Linien kosten O(n²)). */
+    const PARTICLE_COUNT_MAX = Number(scriptCfg.particle_count ?? 850);
+    let PARTICLE_COUNT      = PARTICLE_COUNT_MAX;
     const MAX_SPEED         = Number(scriptCfg.particle_max_speed ?? 0.4);
     const MAX_LINE_DIST     = Number(scriptCfg.particle_max_line_dist ?? 70);
     const MAX_LINE_DIST_SQ  = MAX_LINE_DIST * MAX_LINE_DIST;
@@ -92,9 +94,10 @@
     }
 
     function resize() {
-      dpr = window.devicePixelRatio || 1;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
       W   = heroCanvas.offsetWidth  || window.innerWidth;
       H   = heroCanvas.offsetHeight || window.innerHeight;
+      PARTICLE_COUNT = Math.max(120, Math.round(PARTICLE_COUNT_MAX * Math.min(1, (W * H) / (1440 * 900))));
       heroCanvas.width  = W * dpr;
       heroCanvas.height = H * dpr;
       heroCanvas.style.width  = W + 'px';
@@ -127,17 +130,45 @@
       }
     }
 
+    let running = false;
     function tick() {
+      if (!running) return;
       ctx.clearRect(0, 0, W, H);
       particles.forEach(p => { p.update(); p.draw(); });
       drawLines();
       animFrame = requestAnimationFrame(tick);
     }
+    function start() {
+      if (running) return;
+      running = true;
+      animFrame = requestAnimationFrame(tick);
+    }
+    function stop() {
+      running = false;
+      cancelAnimationFrame(animFrame);
+    }
 
     resize();
     initParticlesList();
-    animFrame = requestAnimationFrame(tick);
-    window.addEventListener('resize', () => { resize(); }, { passive: true });
+    start();
+    window.addEventListener('resize', () => {
+      const widthBefore = W;
+      resize();
+      /* Neu verteilen nur bei echter Breitenänderung (nicht beim Ein-/Ausblenden der mobilen Adressleiste) */
+      if (Math.abs(W - widthBefore) > 40) initParticlesList();
+    }, { passive: true });
+
+    /* Nur rechnen, wenn der Hero sichtbar und der Tab aktiv ist */
+    let heroVisible = true;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(entries => {
+        heroVisible = entries[0].isIntersecting;
+        if (heroVisible && !document.hidden) start(); else stop();
+      }, { threshold: 0 }).observe(heroCanvas);
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && heroVisible) start(); else stop();
+    });
 
     /* Mouse parallax (on hero only) */
     if (heroSection) {
@@ -390,7 +421,14 @@
       });
     }, { threshold: 0.3 });
 
-    counters.forEach(el => io.observe(el));
+    /* Im HTML steht der echte Wert (für Suchmaschinen und KI-Crawler ohne JavaScript).
+       Zahlen unterhalb des sichtbaren Bereichs vor dem Hochzählen auf 0 setzen. */
+    counters.forEach(el => {
+      if (el.getBoundingClientRect().top > window.innerHeight) {
+        el.textContent = (el.getAttribute('data-prefix') || '') + '0' + (el.getAttribute('data-suffix') || '');
+      }
+      io.observe(el);
+    });
   }
 
   function animateCount(el) {

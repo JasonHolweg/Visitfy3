@@ -4,8 +4,8 @@
  * Multi-column footer with brand area, gradient background, links.
  * Design based on Visitfy Web2.0 footer style.
  */
-if (!isset($root)) $root = '';
 require_once __DIR__ . '/cms.php';
+if (!isset($root)) $root = visitfy_site_root();
 require_once __DIR__ . '/turnstile.php';
 
 $contentConfig = visitfy_load_json(__DIR__ . '/../assets/data/content.json', []);
@@ -52,7 +52,7 @@ foreach ($buttonFxTargets as $target) {
 
       <!-- Brand -->
       <div class="footer-brand">
-        <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>index.php" class="nav-logo" aria-label="Visitfy Startseite">
+        <a href="<?= htmlspecialchars(visitfy_page_url('home'), ENT_QUOTES, 'UTF-8') ?>" class="nav-logo" aria-label="Visitfy Startseite">
           <img src="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>assets/img/logo.svg" alt="Visitfy" width="120" height="30">
         </a>
         <p>
@@ -74,25 +74,25 @@ foreach ($buttonFxTargets as $target) {
       <!-- Quick links -->
       <div class="footer-links-group">
         <h4>Navigation</h4>
-        <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>index.php">Startseite</a>
-        <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/about.php">Über uns</a>
-        <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/partner.php">Partner werden</a>
-        <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/faq.php">FAQ</a>
-        <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/kontakt.php">Kontakt</a>
+        <a href="<?= htmlspecialchars(visitfy_page_url('home'), ENT_QUOTES, 'UTF-8') ?>">Startseite</a>
+        <a href="<?= htmlspecialchars(visitfy_page_url('about'), ENT_QUOTES, 'UTF-8') ?>">Über uns</a>
+        <a href="<?= htmlspecialchars(visitfy_page_url('partner'), ENT_QUOTES, 'UTF-8') ?>">Partner werden</a>
+        <a href="<?= htmlspecialchars(visitfy_page_url('faq'), ENT_QUOTES, 'UTF-8') ?>">FAQ</a>
+        <a href="<?= htmlspecialchars(visitfy_page_url('kontakt'), ENT_QUOTES, 'UTF-8') ?>">Kontakt</a>
       </div>
 
       <!-- Legal -->
       <div class="footer-links-group">
         <h4>Rechtliches</h4>
-        <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/impressum.php">Impressum</a>
-        <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/datenschutz.php">Datenschutz</a>
+        <a href="<?= htmlspecialchars(visitfy_page_url('impressum'), ENT_QUOTES, 'UTF-8') ?>">Impressum</a>
+        <a href="<?= htmlspecialchars(visitfy_page_url('datenschutz'), ENT_QUOTES, 'UTF-8') ?>">Datenschutz</a>
       </div>
 
       <!-- Contact -->
       <div class="footer-links-group">
         <h4>Kontakt</h4>
         <a href="mailto:<?= htmlspecialchars((string)visitfy_get($contentConfig, 'footer.contact_email', 'info@visitfy.de'), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'footer.contact_email', 'info@visitfy.de'), ENT_QUOTES, 'UTF-8') ?></a><!-- TODO: verify email -->
-        <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/kontakt.php">Kontaktformular</a>
+        <a href="<?= htmlspecialchars(visitfy_page_url('kontakt'), ENT_QUOTES, 'UTF-8') ?>">Kontaktformular</a>
       </div>
 
     </div><!-- /.footer-inner -->
@@ -100,9 +100,9 @@ foreach ($buttonFxTargets as $target) {
     <div class="footer-bottom">
       <span>&copy; <?= (int)date('Y') ?> Visitfy. Alle Rechte vorbehalten.</span>
       <span>
-        <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/impressum.php">Impressum</a>
+        <a href="<?= htmlspecialchars(visitfy_page_url('impressum'), ENT_QUOTES, 'UTF-8') ?>">Impressum</a>
         &nbsp;·&nbsp;
-        <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/datenschutz.php">Datenschutz</a>
+        <a href="<?= htmlspecialchars(visitfy_page_url('datenschutz'), ENT_QUOTES, 'UTF-8') ?>">Datenschutz</a>
       </span>
       <span>
         <?= htmlspecialchars((string)visitfy_get($contentConfig, 'footer.website_by_prefix', 'Webseite von'), ENT_QUOTES, 'UTF-8') ?>
@@ -195,7 +195,7 @@ window.VISITFY_SCRIPT_CONFIG = <?= json_encode($scriptConfig, JSON_UNESCAPED_UNI
 <div id="cookie-banner" role="dialog" aria-label="Cookie-Einstellungen" hidden>
   <p class="cookie-banner-text">
     Für die beste Nutzererfahrung verwenden wir Cookies.
-    <a href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>pages/datenschutz.php">Mehr erfahren</a>
+    <a href="<?= htmlspecialchars(visitfy_page_url('datenschutz'), ENT_QUOTES, 'UTF-8') ?>">Mehr erfahren</a>
   </p>
   <div class="cookie-banner-actions">
     <button class="cookie-btn-accept" id="cookie-accept">Alle akzeptieren</button>
@@ -253,6 +253,19 @@ window.VISITFY_SCRIPT_CONFIG = <?= json_encode($scriptConfig, JSON_UNESCAPED_UNI
     hideBanner(banner);
   });
 }());
+</script>
+<script>
+/* Cookielose Besucherstatistik (partials/stats.php): Pfad, Herkunft, Bildschirmbreite – keine Cookies, kein Storage. */
+(function () {
+  try {
+    if (navigator.webdriver) return;
+    var m = location.search.match(/[?&]utm_source=([^&#]+)/);
+    var body = JSON.stringify({ p: location.pathname, r: document.referrer || '', w: window.innerWidth || 0, u: m ? decodeURIComponent(m[1]) : '' });
+    var url = <?= json_encode(visitfy_site_root() . 'ping') ?>;
+    if (navigator.sendBeacon) navigator.sendBeacon(url, new Blob([body], { type: 'text/plain' }));
+    else fetch(url, { method: 'POST', body: body, keepalive: true });
+  } catch (e) {}
+})();
 </script>
 </body>
 </html>

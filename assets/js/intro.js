@@ -13,8 +13,8 @@
   const ASSEMBLE_DURATION = 2200;
   const SHINE_DURATION    = 800;
   const TEXT_DELAY        = Number(scriptCfg.text_delay ?? 200);
-  const INTRO_HOLD        = Number(scriptCfg.intro_hold ?? 1500);
-  const FADE_OUT_DURATION = Number(scriptCfg.fade_out_duration ?? 1100);
+  const INTRO_HOLD        = Number(scriptCfg.intro_hold ?? 900);
+  const FADE_OUT_DURATION = Number(scriptCfg.fade_out_duration ?? 600);
   const SHOW_TEXT_DELAY   = Number(scriptCfg.show_text_delay ?? 120);
   const SKIP_CLICK_DELAY  = Number(scriptCfg.skip_click_delay ?? 300);
 
@@ -33,6 +33,18 @@
 
   /* ── Init ───────────────────────────────────────────────── */
   function init() {
+    var introEl = document.getElementById('intro');
+    if (!introEl) return;
+
+    /* Intro nur beim Einstieg von außen: bei Klicks innerhalb der Seite oder
+       reduzierter Bewegung ist es per Inline-Script (index.php) schon ausgeblendet. */
+    if (document.documentElement.classList.contains('no-intro')) {
+      introEl.style.display = 'none';
+      revealMain(true);
+      return;
+    }
+    introEl.style.transitionDuration = FADE_OUT_DURATION + 'ms';
+
     canvas = document.getElementById('intro-canvas');
     if (!canvas) return;
 
@@ -268,10 +280,10 @@
     }, FADE_OUT_DURATION);
   }
 
-  function revealMain() {
+  function revealMain(instant) {
     var main = document.getElementById('main-content');
     if (main) {
-      main.style.transition = 'opacity 0.6s';
+      main.style.transition = instant ? 'none' : 'opacity 0.5s';
       main.style.opacity = '1';
     }
     triggerFadeUps();

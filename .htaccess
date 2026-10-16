@@ -1,43 +1,138 @@
 # ══════════════════════════════════════════════════════════════
-#  Visitfy3 – Apache configuration & security hardening
+#  Visitfy3 – Apache-Konfiguration, Weiterleitungen & Sicherheit
+#  Seitenliste/URLs: partials/routes.php (muss zum Block „Saubere URLs“ passen)
 # ══════════════════════════════════════════════════════════════
 
-# ── Prevent directory listing ────────────────────────────────
 Options -Indexes
+DirectoryIndex index.php
+AddDefaultCharset UTF-8
+ErrorDocument 404 /404.php
 
-# ── Deny direct access to sensitive files ────────────────────
-<FilesMatch "(\.env|\.git|\.gitignore|deploy\.env|bootstrap\.php)$">
+# ── Zugriff auf interne Dateien sperren ──────────────────────
+<FilesMatch "(\.env|\.git|\.gitignore|deploy\.env|bootstrap\.php|\.sh|\.md|\.example|\.bak|\.jsonl|\.sql)$">
   Require all denied
 </FilesMatch>
-
-# ── Deny direct access to personal inquiry data ──────────────
+<FilesMatch "^config\.[a-z]+\.php$">
+  Require all denied
+</FilesMatch>
 <Files "inquiries.json">
   Require all denied
 </Files>
 
-# ── Security headers ─────────────────────────────────────────
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Ziel für Weiterleitungen: live immer https://visitfy.de, lokal der aktuelle Host
+  RewriteRule ^ - [E=CANON:%{REQUEST_SCHEME}://%{HTTP_HOST}]
+  RewriteCond %{HTTP_HOST} ^(www\.)?visitfy\.de$ [NC]
+  RewriteRule ^ - [E=CANON:https://visitfy.de]
+
+  # ── 1) Interne Ordner nicht ausliefern ───────────────────────
+  RewriteRule ^(partials|tools|assets/data|\.github|\.git)(/|$) - [R=404,L]
+
+  # ── 2) Alte Adressen → saubere URLs (ein einziger 301-Sprung) ─
+  # Startseite nur unter /
+  RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
+  RewriteCond %{THE_REQUEST} \s/index\.php[\s?] [NC]
+  RewriteCond %{QUERY_STRING} !(^|&)page= [NC]
+  RewriteRule ^index\.php$ %{ENV:CANON}/ [R=301,L]
+
+  # Alter Router /?page=… bzw. /index.php?page=…
+  RewriteCond %{QUERY_STRING} (^|&)page=partner(&|$) [NC]
+  RewriteRule ^(index\.php)?$ %{ENV:CANON}/partner-werden [R=301,L,QSD]
+  RewriteCond %{QUERY_STRING} (^|&)page=kontakt(&|$) [NC]
+  RewriteRule ^(index\.php)?$ %{ENV:CANON}/kontakt [R=301,L,QSD]
+  RewriteCond %{QUERY_STRING} (^|&)page=faq(&|$) [NC]
+  RewriteRule ^(index\.php)?$ %{ENV:CANON}/faq [R=301,L,QSD]
+  RewriteCond %{QUERY_STRING} (^|&)page=about(&|$) [NC]
+  RewriteRule ^(index\.php)?$ %{ENV:CANON}/ueber-uns [R=301,L,QSD]
+  RewriteCond %{QUERY_STRING} (^|&)page=impressum(&|$) [NC]
+  RewriteRule ^(index\.php)?$ %{ENV:CANON}/impressum [R=301,L,QSD]
+  RewriteCond %{QUERY_STRING} (^|&)page=datenschutz(&|$) [NC]
+  RewriteRule ^(index\.php)?$ %{ENV:CANON}/datenschutz [R=301,L,QSD]
+
+  # /pages/*.php (nur GET/HEAD – Formulare posten weiter an die Datei)
+  RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
+  RewriteCond %{THE_REQUEST} \s/pages/partner\.php[\s?] [NC]
+  RewriteRule ^pages/partner\.php$ %{ENV:CANON}/partner-werden [R=301,L,QSD]
+  RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
+  RewriteCond %{THE_REQUEST} \s/pages/kontakt\.php[\s?] [NC]
+  RewriteRule ^pages/kontakt\.php$ %{ENV:CANON}/kontakt [R=301,L,QSD]
+  RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
+  RewriteCond %{THE_REQUEST} \s/pages/faq\.php[\s?] [NC]
+  RewriteRule ^pages/faq\.php$ %{ENV:CANON}/faq [R=301,L,QSD]
+  RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
+  RewriteCond %{THE_REQUEST} \s/pages/about\.php[\s?] [NC]
+  RewriteRule ^pages/about\.php$ %{ENV:CANON}/ueber-uns [R=301,L,QSD]
+  RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
+  RewriteCond %{THE_REQUEST} \s/pages/impressum\.php[\s?] [NC]
+  RewriteRule ^pages/impressum\.php$ %{ENV:CANON}/impressum [R=301,L,QSD]
+  RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
+  RewriteCond %{THE_REQUEST} \s/pages/datenschutz\.php[\s?] [NC]
+  RewriteRule ^pages/datenschutz\.php$ %{ENV:CANON}/datenschutz [R=301,L,QSD]
+
+  # Ältere Adressen aus früheren Website-Versionen
+  RewriteRule ^(de|en)/?$ %{ENV:CANON}/ [R=301,L,NC]
+  RewriteRule ^(partner|partnerschaft)/?$ %{ENV:CANON}/partner-werden [R=301,L,NC]
+  RewriteRule ^(about|ueber|uber-uns)/?$ %{ENV:CANON}/ueber-uns [R=301,L,NC]
+  RewriteRule ^(contact|anfrage)/?$ %{ENV:CANON}/kontakt [R=301,L,NC]
+
+  # Schrägstrich am Ende entfernen (außer bei echten Ordnern)
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.+)/$ %{ENV:CANON}/$1 [R=301,L]
+
+  # ── 3) Eine Adresse: https://visitfy.de (ohne www) ───────────
+  RewriteCond %{HTTP_HOST} ^www\.visitfy\.de$ [NC]
+  RewriteRule ^ https://visitfy.de%{REQUEST_URI} [R=301,L,NE]
+
+  RewriteCond %{HTTP_HOST} ^visitfy\.de$ [NC]
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+  RewriteRule ^ https://visitfy.de%{REQUEST_URI} [R=301,L,NE]
+
+  # ── 4) Saubere URLs (intern auf die PHP-Datei) ───────────────
+  RewriteRule ^partner-werden$ pages/partner.php [L]
+  RewriteRule ^kontakt$ pages/kontakt.php [L]
+  RewriteRule ^faq$ pages/faq.php [L]
+  RewriteRule ^ueber-uns$ pages/about.php [L]
+  RewriteRule ^impressum$ pages/impressum.php [L]
+  RewriteRule ^datenschutz$ pages/datenschutz.php [L]
+
+  # ── 5) Technische Endpunkte ──────────────────────────────────
+  RewriteRule ^sitemap\.xml$ sitemap.php [L]
+  RewriteRule ^ping$ ping.php [L]
+</IfModule>
+
+# ── Sicherheits-Header ───────────────────────────────────────
 <IfModule mod_headers.c>
-  # Prevent clickjacking
   Header always set X-Frame-Options "SAMEORIGIN"
-
-  # Prevent MIME-type sniffing
   Header always set X-Content-Type-Options "nosniff"
-
-  # Control referrer information
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
-
-  # Restrict browser feature access
   Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), encrypted-media=()"
-
-  # Remove PHP version disclosure
   Header unset X-Powered-By
   Header always unset X-Powered-By
 </IfModule>
 
-# ── Character encoding ───────────────────────────────────────
-AddDefaultCharset UTF-8
+# ── Komprimierung ────────────────────────────────────────────
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml application/xml application/javascript text/javascript application/json image/svg+xml
+</IfModule>
 
-# ── PHP hardening (where PHP is run via mod_php/CGI) ─────────
+# ── Browser-Cache (CSS/JS haben ?v=Zeitstempel, daher lange Laufzeit) ──
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType text/javascript "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 7 days"
+  ExpiresByType image/png "access plus 7 days"
+  ExpiresByType image/jpeg "access plus 7 days"
+  ExpiresByType image/webp "access plus 7 days"
+  ExpiresByType image/avif "access plus 7 days"
+</IfModule>
+
+# ── PHP-Härtung (mod_php) ────────────────────────────────────
 <IfModule mod_php.c>
   php_flag expose_php Off
 </IfModule>

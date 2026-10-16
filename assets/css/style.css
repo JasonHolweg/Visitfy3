@@ -224,6 +224,10 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   visibility: hidden;
 }
 
+/* Intro übersprungen (interne Navigation / reduzierte Bewegung) */
+.no-intro #intro { display: none !important; }
+.no-intro #main-content { opacity: 1 !important; }
+
 #intro-canvas {
   position: absolute;
   inset: 0;

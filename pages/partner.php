@@ -7,7 +7,8 @@
  */
 require __DIR__ . '/../partials/cms.php';
 require_once __DIR__ . '/../partials/turnstile.php';
-$root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? visitfy_base_path() : '../';
+$root = visitfy_site_root();
+$canonicalPath = visitfy_page_url('partner');
 $contentConfig = visitfy_load_json(__DIR__ . '/../assets/data/content.json', []);
 $net = require __DIR__ . '/../partials/partner-network.php';
 $map = require __DIR__ . '/../partials/germany-map-paths.php';
@@ -143,55 +144,23 @@ $faq = [
 
 $pageTitle = 'Partner werden bei Visitfy | 360°-Rundgänge verkaufen';
 $pageDesc  = 'Visitfy-Partner machen im Schnitt ' . $eur($avgRevenue) . ' € Umsatz im Monat mit rund ' . $avgTours . ' 360°-Rundgängen. ' . $partners . ' Partner deutschlandweit, viele Regionen sind noch frei, vor allem im Süden.';
-$canonicalPath = '/pages/partner.php';
 $pageOgImg = 'assets/img/og-partner.png';
 $extraScripts = ['assets/js/partner.js'];
 
-$pageUrl = 'https://visitfy.de' . $canonicalPath;
+$pageUrl = visitfy_page_url('partner', true);
+require_once __DIR__ . '/../partials/schema.php';
+$webPage = visitfy_schema_webpage($pageUrl, $pageTitle, $pageDesc, [
+    ['Start', visitfy_page_url('home', true)],
+    ['Partner werden', $pageUrl],
+]);
+$webPage['primaryImageOfPage'] = VISITFY_SITE_URL . '/' . $pageOgImg;
 $jsonLd = [[
     '@context' => 'https://schema.org',
     '@graph' => [
-        [
-            '@type' => 'Organization',
-            '@id' => 'https://visitfy.de/#organization',
-            'name' => 'Visitfy',
-            'url' => 'https://visitfy.de/',
-            'logo' => 'https://visitfy.de/assets/img/logo.svg',
-            'email' => 'info@visitfy.de',
-            'description' => 'Visitfy erstellt virtuelle 360°-Rundgänge für Unternehmen und vertreibt sie über ein deutschlandweites Partnernetzwerk.',
-            'address' => ['@type' => 'PostalAddress', 'addressLocality' => 'Flensburg', 'addressCountry' => 'DE'],
-            'areaServed' => array_merge(
-                [['@type' => 'Country', 'name' => 'Deutschland']],
-                array_map(static fn($n) => ['@type' => 'City', 'name' => $n], $activeNames)
-            ),
-        ],
-        [
-            '@type' => 'WebPage',
-            '@id' => $pageUrl . '#webpage',
-            'url' => $pageUrl,
-            'name' => $pageTitle,
-            'description' => $pageDesc,
-            'inLanguage' => 'de-DE',
-            'isPartOf' => ['@type' => 'WebSite', '@id' => 'https://visitfy.de/#website', 'url' => 'https://visitfy.de/', 'name' => 'Visitfy'],
-            'about' => ['@id' => 'https://visitfy.de/#organization'],
-            'primaryImageOfPage' => 'https://visitfy.de/' . $pageOgImg,
-            'breadcrumb' => [
-                '@type' => 'BreadcrumbList',
-                'itemListElement' => [
-                    ['@type' => 'ListItem', 'position' => 1, 'name' => 'Start', 'item' => 'https://visitfy.de/'],
-                    ['@type' => 'ListItem', 'position' => 2, 'name' => 'Partner werden', 'item' => $pageUrl],
-                ],
-            ],
-        ],
-        [
-            '@type' => 'FAQPage',
-            '@id' => $pageUrl . '#faq',
-            'mainEntity' => array_map(static fn($f) => [
-                '@type' => 'Question',
-                'name' => $f['q'],
-                'acceptedAnswer' => ['@type' => 'Answer', 'text' => $f['a']],
-            ], $faq),
-        ],
+        visitfy_schema_organization($contentConfig),
+        visitfy_schema_website(),
+        $webPage,
+        visitfy_schema_faq($faq, $pageUrl . '#faq'),
     ],
 ]];
 
@@ -753,7 +722,7 @@ require __DIR__ . '/../partials/header.php';
               <input type="checkbox" id="p_dsgvo" name="dsgvo" required>
               <label for="p_dsgvo">
                 <?= $c('form_privacy_prefix', 'Ich habe die') ?>
-                <a href="<?= $h($root) ?>pages/datenschutz.php"><?= $c('form_privacy_link', 'Datenschutzerklärung') ?></a>
+                <a href="<?= $h(visitfy_page_url('datenschutz')) ?>"><?= $c('form_privacy_link', 'Datenschutzerklärung') ?></a>
                 <?= $c('form_privacy_suffix', 'gelesen und bin mit der Verarbeitung meiner Daten zur Bearbeitung meiner Anfrage einverstanden. *') ?>
               </label>
             </div>

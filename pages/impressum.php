@@ -4,9 +4,11 @@
  * Rechtssicherer Impressumsaufbau (§ 5 TMG) ohne falsche Zusicherungen.
  */
 require __DIR__ . '/../partials/cms.php';
-$root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? visitfy_base_path() : '../';
+$root = visitfy_site_root();
+$canonicalPath = visitfy_page_url('impressum');
 $pageTitle = 'Impressum | Visitfy';
 $pageDesc  = 'Impressum von Visitfy – Angaben gemäß § 5 TMG.';
+$pageRobots = 'noindex, follow';
 
 require __DIR__ . '/../partials/head.php';
 require __DIR__ . '/../partials/header.php';

@@ -6,8 +6,16 @@
  *   $pageTitle   string
  *   $pageDesc    string
  *   $pageOgImg   string (optional)
- *   $root        string (path prefix, e.g. '' or '../')
+ *   $root          string (Pfad-Präfix, i. d. R. visitfy_site_root() = '/')
+ *   $canonicalPath string (optional, z. B. visitfy_page_url('faq'))
+ *   $noCanonical   bool   (optional, z. B. 404-Seite)
+ *   $pageRobots    string (optional)
+ *   $jsonLd        array  (optional, Liste von JSON-LD-Objekten)
  */
+require_once __DIR__ . '/cms.php';
+require_once __DIR__ . '/stats.php';
+visitfy_stats_log_bot_hit();
+
 if (!isset($root))      $root      = '';
 if (!isset($pageTitle)) $pageTitle = 'Visitfy | 360° Rundgänge für moderne Unternehmen';
 if (!isset($pageDesc))  $pageDesc  = 'Visitfy entwickelt professionelle 360° virtuelle Rundgänge für Unternehmen jeder Branche – realistisch, hochwertig und sofort einsatzbereit.';
@@ -16,7 +24,7 @@ if (!isset($pageRobots)) $pageRobots = 'index, follow, max-image-preview:large, 
 if (!isset($jsonLd))    $jsonLd    = [];
 
 /* Kanonische URL: Seiten können $canonicalPath setzen, sonst aus der Request-URI. */
-$siteUrl = 'https://visitfy.de';
+$siteUrl = VISITFY_SITE_URL;
 if (!isset($canonicalPath)) {
     $canonicalPath = (string)parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
     $canonicalPath = preg_replace('#/index\.php$#', '/', $canonicalPath);
@@ -32,7 +40,9 @@ $ogImgAbs = $pageOgImg !== '' ? (preg_match('#^https?://#', $pageOgImg) ? $pageO
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="<?= htmlspecialchars($pageDesc, ENT_QUOTES, 'UTF-8') ?>">
   <meta name="robots" content="<?= htmlspecialchars($pageRobots, ENT_QUOTES, 'UTF-8') ?>">
+<?php if (empty($noCanonical)): ?>
   <link rel="canonical" href="<?= htmlspecialchars($canonicalUrl, ENT_QUOTES, 'UTF-8') ?>">
+<?php endif; ?>
   <meta name="theme-color" content="#0a0a0a">
 
   <!-- Open Graph -->

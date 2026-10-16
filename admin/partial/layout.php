@@ -994,6 +994,17 @@ if (!defined('ADMIN_LAYOUT_GUARD')) define('ADMIN_LAYOUT_GUARD', true);
       </div>
 
       <div class="nav-group">
+        <div class="nav-label">Auswertung</div>
+        <a href="?p=statistik" class="nav-item <?= ($currentPage ?? '') === 'statistik' ? 'active' : '' ?>">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 14h12"/>
+            <path d="M4 11V8M8 11V4M12 11V6"/>
+          </svg>
+          Statistik
+        </a>
+      </div>
+
+      <div class="nav-group">
         <div class="nav-label">Anfragen</div>
         <a href="?p=anfragen" class="nav-item <?= ($currentPage ?? '') === 'anfragen' ? 'active' : '' ?>">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
