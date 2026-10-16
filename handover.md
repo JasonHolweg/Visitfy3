@@ -98,6 +98,13 @@ Stand: 2026-05-19 · Branch: `claude/elegant-sammet-caa710` (Auto-Deploy aktiv)
   - [x] 16c Frames vereinheitlicht: 14/22/26 px Radius, satter Drop-Shadow (`0 40px 80px -20px /0.7`), subtiler 0.06-Border
   - [x] 16d Tablet/Phone größer: Tablet `170-270 px` (war `120-200`), Phone `105-165 px` (war `70-120`) — substantieller Produkt-Showcase-Look
 
+- [x] **Phase 17 – Partner-werden-Seite v2**
+  - [x] 17a Hero mit Ø-Monatsumsatz (Count-up + Chrome-Shimmer), Stats-Leiste, Fußnote „Umsatz, nicht Gewinn“
+  - [x] 17b Deutschlandkarte (Dot-Matrix, inline SVG, `partials/germany-map-paths.php`) mit Pins, Netzwerk-Bögen ab Flensburg, offenen Süd-Gebieten + Süden-CTA
+  - [x] 17c Verdienst-Rechner (Range-Slider), Dashboard-Mockup, Empfehlungsprogramm (35 %-Ring + Stepper)
+  - [x] 17d Formular: Pflichtfeld „Stadt / Region“ (Handler + Mail), `$extraScripts`-Hook im Footer, `assets/js/partner.js`
+  - [x] 17e Zahlen & Standorte zentral in `partials/partner-network.php` (Hero-/Proof-Copy nicht mehr über Admin-Hero-Felder)
+
 ## Offen / Roadmap
 
 - [ ] Visuelles QA des Apple-Refactors live (Hero ≥1024 px, Nav-Blur, Partikel-Dichte, Mobile)

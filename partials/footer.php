@@ -187,6 +187,9 @@ window.VISITFY_SCRIPT_CONFIG = <?= json_encode($scriptConfig, JSON_UNESCAPED_UNI
 
 <script src="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>assets/js/main.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/main.js') ?>"></script>
 <script src="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>assets/js/intro.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/intro.js') ?>"></script>
+<?php foreach (($extraScripts ?? []) as $extraScript): ?>
+<script src="<?= htmlspecialchars($root . $extraScript, ENT_QUOTES, 'UTF-8') ?>?v=<?= (int)@filemtime(dirname(__DIR__) . '/' . $extraScript) ?>"></script>
+<?php endforeach; ?>
 
 <!-- Cookie Consent Banner -->
 <div id="cookie-banner" role="dialog" aria-label="Cookie-Einstellungen" hidden>

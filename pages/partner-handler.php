@@ -38,6 +38,7 @@ $name      = trim(strip_tags($_POST['name']      ?? ''));
 $firma     = trim(strip_tags($_POST['firma']     ?? ''));
 $email     = trim(strip_tags($_POST['email']     ?? ''));
 $rolle     = trim(strip_tags($_POST['rolle']     ?? ''));
+$stadt     = trim(strip_tags($_POST['stadt']     ?? ''));
 $nachricht = trim(strip_tags($_POST['nachricht'] ?? ''));
 $dsgvo     = !empty($_POST['dsgvo']);
 
@@ -45,6 +46,10 @@ $allowedRollen = ['sales', 'agency', 'self-employed', 'other', ''];
 
 if (empty($name) || strlen($name) > 120) {
     echo json_encode(['ok' => false, 'error' => 'Bitte geben Sie einen gültigen Namen an.']);
+    exit;
+}
+if ($stadt === '' || mb_strlen($stadt) > 120) {
+    echo json_encode(['ok' => false, 'error' => 'Bitte gib deine Stadt oder Region an.']);
     exit;
 }
 if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 200) {
@@ -83,11 +88,13 @@ $safeName      = str_replace(["\r", "\n"], '', $name);
 $safeFirma     = str_replace(["\r", "\n"], '', $firma);
 $safeEmail     = str_replace(["\r", "\n"], '', $email);
 $safeRolle     = str_replace(["\r", "\n"], '', $rolle);
+$safeStadt     = str_replace(["\r", "\n"], '', $stadt);
 
-$subject = '[Visitfy Partner] Neue Anfrage von ' . $safeName;
+$subject = '[Visitfy Partner] Neue Anfrage von ' . $safeName . ' (' . $safeStadt . ')';
 $body = "Name: $safeName\n"
     . "Firma: $safeFirma\n"
     . "E-Mail: $safeEmail\n"
+    . "Stadt / Region: $safeStadt\n"
     . "Rolle: $safeRolle\n\n"
     . "Nachricht:\n$nachricht\n";
 
@@ -114,6 +121,7 @@ $inner =
     . $row('Firma',  htmlspecialchars($safeFirma !== '' ? $safeFirma : '—', ENT_QUOTES, 'UTF-8'))
     . $row('E-Mail', '<a href="mailto:' . htmlspecialchars($safeEmail, ENT_QUOTES, 'UTF-8') . '"'
         . ' style="color:#ffffff;">' . htmlspecialchars($safeEmail, ENT_QUOTES, 'UTF-8') . '</a>')
+    . $row('Region', htmlspecialchars($safeStadt, ENT_QUOTES, 'UTF-8'))
     . $row('Rolle',  htmlspecialchars($safeRolle !== '' ? $safeRolle : '—', ENT_QUOTES, 'UTF-8'))
     . '</table>'
     . '<table width="100%" cellpadding="0" cellspacing="0" role="presentation">'
