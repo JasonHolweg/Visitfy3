@@ -19,7 +19,7 @@ visitfy_stats_log_bot_hit();
 if (!isset($root))      $root      = '';
 if (!isset($pageTitle)) $pageTitle = 'Visitfy | 360° Rundgänge für moderne Unternehmen';
 if (!isset($pageDesc))  $pageDesc  = 'Visitfy entwickelt professionelle 360° virtuelle Rundgänge für Unternehmen jeder Branche – realistisch, hochwertig und sofort einsatzbereit.';
-if (!isset($pageOgImg)) $pageOgImg = '';
+if (!isset($pageOgImg) || $pageOgImg === '') $pageOgImg = 'assets/img/og-home.png';
 if (!isset($pageRobots)) $pageRobots = 'index, follow, max-image-preview:large, max-snippet:-1';
 if (!isset($jsonLd))    $jsonLd    = [];
 

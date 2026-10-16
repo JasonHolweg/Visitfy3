@@ -99,13 +99,13 @@ foreach (['impressum', 'datenschutz'] as $key) {
     }
     $src = (string)file_get_contents($file);
     $new = preg_replace(
-        '/^\$root = \(realpath\(\$_SERVER\[\'SCRIPT_FILENAME\'\] \?\? \'\'\) !== __FILE__\) \? visitfy_base_path\(\) : \'\.\.\/\';\s*$/m',
+        '/^\$root = \(realpath\(\$_SERVER\[\'SCRIPT_FILENAME\'\] \?\? \'\'\) !== __FILE__\) \? visitfy_base_path\(\) : \'\.\.\/\';[ \t]*$/m',
         "\$root = visitfy_site_root();\n\$canonicalPath = visitfy_page_url('$key');",
         $src,
         1
     );
     if (strpos($new, '$pageRobots') === false) {
-        $new = preg_replace('/^(\$pageDesc\s*=.*;)\s*$/m', "$1\n\$pageRobots = 'noindex, follow';", $new, 1);
+        $new = preg_replace('/^(\$pageDesc\s*=.*;)[ \t]*$/m', "$1\n\$pageRobots = 'noindex, follow';", $new, 1);
     }
     if ($new !== null && $new !== $src) {
         file_put_contents($file, $new, LOCK_EX);

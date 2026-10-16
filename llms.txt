@@ -13,11 +13,11 @@
 
 ## Seiten
 
-- [Partner werden](https://visitfy.de/pages/partner.php): Zahlen, Partner-Karte, Verdienst-Rechner, Dashboard, Empfehlungsprogramm, FAQ und Bewerbungsformular
+- [Partner werden](https://visitfy.de/partner-werden): Zahlen, Partner-Karte, Verdienst-Rechner, Dashboard, Empfehlungsprogramm, FAQ und Bewerbungsformular
 - [Startseite](https://visitfy.de/): 360°-Rundgänge für Unternehmen, Beispiele und Vorteile
-- [FAQ](https://visitfy.de/pages/faq.php): Fragen zu 360°-Rundgängen, Ablauf und Kosten
-- [Über uns](https://visitfy.de/pages/about.php)
-- [Kontakt](https://visitfy.de/pages/kontakt.php): Angebot für einen 360°-Rundgang anfragen
+- [FAQ](https://visitfy.de/faq): Fragen zu 360°-Rundgängen, Ablauf und Kosten
+- [Über uns](https://visitfy.de/ueber-uns)
+- [Kontakt](https://visitfy.de/kontakt): Angebot für einen 360°-Rundgang anfragen
 
 ## Kontakt
 

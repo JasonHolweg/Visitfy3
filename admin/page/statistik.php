@@ -58,6 +58,9 @@ foreach (array_keys($months) as $month) {
         }
         $kind = (string)($row['k'] ?? '');
         $path = (string)($row['p'] ?? '/');
+        if (strpos($path, '/__') === 0) {
+            continue; /* technische Testaufrufe (Deploy-Prüfung) */
+        }
         if ($kind === 'pv') {
             $v = (string)($row['v'] ?? '');
             $pageViews++;

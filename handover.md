@@ -120,14 +120,31 @@ Stand: 2026-05-19 · Branch: `claude/elegant-sammet-caa710` (Auto-Deploy aktiv)
   - [x] 20c Platzhalter nur lokal mit `VISITFY_PREVIEW=1 php -S localhost:8000`; Fotos nach `assets/img/partner/` (4:5, ≥ 800 × 1000 px)
   - [x] 20d `tabRotator()` in `partner.js` treibt Dashboard-Tour und Partnerstimmen
 
+- [x] **Phase 21 – SEO/GEO Phase 0 (Fundament)**
+  - [x] 21a Saubere URLs aus `partials/routes.php` (/partner-werden, /kontakt, /faq, /ueber-uns, /impressum, /datenschutz); `.htaccess` leitet /pages/*.php, ?page=…, /index.php, /de, www und http per 301 in einem Sprung um; Formulare (POST) bleiben unberührt
+  - [x] 21b 404-Seite, interne Ordner (partials, tools, ops, assets/data) per 404 gesperrt, .md/.sh/.bak/.jsonl gesperrt, Komprimierung + Browser-Cache
+  - [x] 21c `/sitemap.xml` dynamisch (`sitemap.php`), IndexNow-Schlüssel + `php tools/indexnow.php`
+  - [x] 21d JSON-LD über `partials/schema.php` (Organization, WebSite, Service, WebPage/Breadcrumb, FAQPage, About/ContactPage); FAQ-Seite datengetrieben
+  - [x] 21e Titel/Beschreibungen geschärft; Startseiten-Titel in content.json (seo.*) setzt das Deploy; KPI-Zahlen stehen im HTML
+  - [x] 21f Intro nur beim Einstieg von außen (Inline-Script, kein Storage) und kürzer (900/600 ms); Partikel nach Bildschirmfläche skaliert, pausieren unsichtbar
+  - [x] 21g Inter lokal (`assets/fonts/`), keine Google-Fonts-Verbindung mehr
+  - [x] 21h Cookielose Statistik: `ping.php` + `partials/stats.php` → `assets/data/stats/*.jsonl`, Admin › Statistik (Quellen inkl. KI-Suchen, Crawler, Anfragen, Bewerbungen)
+  - [x] 21i Deploy-Werkzeug `ops/`: `build-package.py` (Paket gegen Live-Stand), `visitfy-deploy.sh` (Mac) → `remote-apply.sh` (Server: Konfliktprüfung, Sicherung, Einspielen, `patch-data.php`, Live-Test, Rollback)
+
+## SEO/GEO-Plan (Stand 17.10.2026)
+
+- [ ] Phase 0 live: Sitemap in Google Search Console einreichen, Bing Webmaster Tools (Import aus GSC), Datenschutz-Absatz zur Statistik
+- [ ] Phase 1: Stadtseiten für Partnerstandorte (mit echtem Partner, Referenzen, lokalen FAQ), Branchenseiten, Preisseite „Was kostet ein 360°-Rundgang?“, Referenzseite
+- [ ] Phase 2: Ratgeber (2–4/Monat) für Kunden und Partner – Antwort im ersten Absatz, Tabellen, FAQ, Datum/Autor
+- [ ] Phase 3: Google-Unternehmensprofile (Visitfy + Partner), Credit-Link „360°-Rundgang: Visitfy“ bei Kunden, einheitliche Verzeichniseinträge, Regionalpresse
+- [ ] Zahlen vereinheitlichen (Rundgänge gesamt, „3 vs. 5 Werktage“, Case-Prozente belegen), Flora als eigenes Café kennzeichnen
+
 ## Offen / Roadmap
 
 - [ ] Visuelles QA des Apple-Refactors live (Hero ≥1024 px, Nav-Blur, Partikel-Dichte, Mobile)
 - [ ] FPS-Throttling in Partikel-Render-Loop (falls < 50 fps auf schwachen Geräten)
 - [ ] Critical CSS inline für above-the-fold (Hero+Nav)
 - [ ] Interaktive 360°-Demo-Einbindung
-- [ ] SEO-Optimierung
-- [ ] Analytics / Conversion-Tracking
 - [ ] Echtes CI/CD-Deploy (GitHub Actions → SSH)
 - [ ] Dynamische Content-Erweiterung im Admin
 
