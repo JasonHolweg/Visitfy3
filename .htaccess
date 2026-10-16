@@ -28,7 +28,7 @@ ErrorDocument 404 /404.php
   RewriteRule ^ - [E=CANON:https://visitfy.de]
 
   # ── 1) Interne Ordner nicht ausliefern ───────────────────────
-  RewriteRule ^(partials|tools|assets/data|\.github|\.git)(/|$) - [R=404,L]
+  RewriteRule ^(partials|tools|ops|assets/data|\.github|\.git)(/|$) - [R=404,L]
 
   # ── 2) Alte Adressen → saubere URLs (ein einziger 301-Sprung) ─
   # Startseite nur unter /
