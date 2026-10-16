@@ -109,11 +109,12 @@ sleep 1
 
 # ── 4) Live-Prüfung ─────────────────────────────────────────
 fails=0
-check() { # name url erwarteter_code [muster|ziel-url] [methode]
-  local name="$1" url="$2" want="$3" pattern="${4:-}" method="${5:-GET}" body code redirect ok
+check() { # name url erwarteter_code [muster|ziel-url] [browser]
+  local name="$1" url="$2" want="$3" pattern="${4:-}" as="${5:-curl}" body code redirect ok
   body="$(mktemp)"
-  if [ "$method" = "POST" ]; then
-    code="$(curl -s -o "$body" -w '%{http_code}' --max-time 20 -X POST -A 'Mozilla/5.0 (Deploy-Check) Chrome/141' -H 'Content-Type: text/plain' --data '{"p":"/__deploy-check","r":"","w":1440}' "$url")"
+  if [ "$as" = "browser" ]; then
+    # als Browser, damit die Statistik den Aufruf zählt (Pfad wird als /__deploy-check gespeichert)
+    code="$(curl -s -o "$body" -w '%{http_code}' --max-time 20 -A 'Mozilla/5.0 (Macintosh; Deploy-Check) AppleWebKit/537.36 Chrome/141.0 Safari/537.36' "$url")"
   else
     code="$(curl -s -o "$body" -w '%{http_code}' --max-time 20 -H 'Cache-Control: no-cache' "$url")"
   fi
@@ -150,7 +151,7 @@ check "CSS"                   "$SITE/assets/css/style.css" 200
 check "Alte FAQ-Adresse"      "$SITE/pages/faq.php"     301 "$SITE/faq"
 check "Alte Partner-Adresse"  "$SITE/pages/partner.php" 301 "$SITE/partner-werden"
 check "Nicht vorhandene Seite" "$SITE/gibt-es-nicht-$TS" 404
-check "Statistik-Endpunkt"    "$SITE/ping"              204 '' POST
+check "Statistik-Testaufruf"  "$SITE/?__deploy=check"   200 'application/ld+json' browser
 
 if [ "$fails" -gt 0 ]; then
   red "✗ $fails Prüfung(en) fehlgeschlagen."

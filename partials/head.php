@@ -14,7 +14,7 @@
  */
 require_once __DIR__ . '/cms.php';
 require_once __DIR__ . '/stats.php';
-visitfy_stats_log_bot_hit();
+visitfy_stats_log_request();
 
 if (!isset($root))      $root      = '';
 if (!isset($pageTitle)) $pageTitle = 'Visitfy | 360° Rundgänge für moderne Unternehmen';

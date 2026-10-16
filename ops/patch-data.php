@@ -77,18 +77,14 @@ if (is_file($scriptFile)) {
     }
 }
 
-/* ── 3) robots.txt: Sitemap-Zeile und /ping ausschließen, Rest bleibt ── */
+/* ── 3) robots.txt: genau eine Sitemap-Zeile, Rest bleibt ── */
 $robotsFile = $root . '/robots.txt';
 $robots = is_file($robotsFile) ? (string)file_get_contents($robotsFile) : "User-agent: *\nDisallow: /admin/\nAllow: /\n";
-$robotsNew = $robots;
-if (stripos($robotsNew, 'Disallow: /ping') === false) {
-    $robotsNew = preg_replace('/^(User-agent:\s*\*\s*\R)/mi', "$1Disallow: /ping\n", $robotsNew, 1);
-}
-$robotsNew = preg_replace('/^Sitemap:.*$/mi', '', $robotsNew);
+$robotsNew = preg_replace('/^Sitemap:.*$/mi', '', $robots);
 $robotsNew = rtrim(preg_replace("/\n{3,}/", "\n\n", $robotsNew)) . "\n\nSitemap: https://visitfy.de/sitemap.xml\n";
 if ($robotsNew !== $robots) {
     file_put_contents($robotsFile, $robotsNew, LOCK_EX);
-    out('robots.txt: /ping ausgeschlossen, Sitemap-Zeile gesetzt');
+    out('robots.txt: Sitemap-Zeile gesetzt');
 }
 
 /* ── 4) Rechtsseiten: neue URL-Helfer + noindex (Inhalt bleibt unangetastet) ── */

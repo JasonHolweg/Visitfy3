@@ -29,6 +29,7 @@ $sources = [];        // source => visits (Einstiege)
 $devices = [];        // m/t/d => visitor-day-set
 $events = [];         // name => count
 $bots = [];           // name => [count, last, paths]
+$notFound = [];       // path => count (Aufrufe nicht vorhandener Seiten)
 $aiSources = visitfy_stats_ai_sources();
 
 /* Monatsdateien im Zeitraum lesen */
@@ -66,8 +67,12 @@ foreach (array_keys($months) as $month) {
             $pageViews++;
             $daily[$day]['pv']++;
             $daily[$day]['visitors'][$v] = true;
-            $pages[$path]['pv'] = ($pages[$path]['pv'] ?? 0) + 1;
-            $pages[$path]['v'][$day . $v] = true;
+            if ((int)($row['c'] ?? 200) === 404) {
+                $notFound[$path] = ($notFound[$path] ?? 0) + 1;
+            } else {
+                $pages[$path]['pv'] = ($pages[$path]['pv'] ?? 0) + 1;
+                $pages[$path]['v'][$day . $v] = true;
+            }
             $src = (string)($row['s'] ?? 'Direkt');
             if ($src !== 'Intern') {
                 $sources[$src] = ($sources[$src] ?? 0) + 1;
@@ -107,6 +112,7 @@ $leadsPartner = $events['lead_partner'] ?? 0;
 
 uasort($pages, static fn($a, $b) => $b['pv'] <=> $a['pv']);
 arsort($sources);
+arsort($notFound);
 uasort($bots, static fn($a, $b) => $b['n'] <=> $a['n']);
 $entries = array_sum($sources);
 $deviceNames = ['m' => 'Smartphone', 't' => 'Tablet', 'd' => 'Desktop', '?' => 'Unbekannt'];
@@ -251,8 +257,22 @@ ob_start();
           <?php endforeach; ?>
         </div>
       <?php endif; ?>
-      <p style="color:var(--text-2);font-size:12px;margin-top:14px;line-height:1.5">Ohne Cookies und ohne gespeicherte IP-Adressen. Besucher werden pro Tag gezählt; wer an zwei Tagen kommt, zählt zweimal.</p>
+      <p style="color:var(--text-2);font-size:12px;margin-top:14px;line-height:1.5">Ohne Cookies, ohne JavaScript, ohne gespeicherte IP-Adressen. Besucher werden pro Tag gezählt; wer an zwei Tagen kommt, zählt zweimal.</p>
     </div>
+
+    <?php if ($notFound): ?>
+    <div class="card" style="margin-top:0">
+      <div class="card-header"><div class="card-header-left"><div class="card-title">Nicht gefundene Adressen</div><div class="card-desc" style="margin-bottom:0">Links, die ins Leere führen – lohnt eine Weiterleitung</div></div></div>
+      <div class="status-list">
+        <?php foreach (array_slice($notFound, 0, 15, true) as $path => $cnt): ?>
+          <div class="status-row">
+            <span class="status-row-label" style="max-width:75%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><?= $e($path) ?></span>
+            <span><?= $n($cnt) ?></span>
+          </div>
+        <?php endforeach; ?>
+      </div>
+    </div>
+    <?php endif; ?>
   </div>
 
 </div>

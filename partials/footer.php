@@ -254,18 +254,5 @@ window.VISITFY_SCRIPT_CONFIG = <?= json_encode($scriptConfig, JSON_UNESCAPED_UNI
   });
 }());
 </script>
-<script>
-/* Cookielose Besucherstatistik (partials/stats.php): Pfad, Herkunft, Bildschirmbreite – keine Cookies, kein Storage. */
-(function () {
-  try {
-    if (navigator.webdriver) return;
-    var m = location.search.match(/[?&]utm_source=([^&#]+)/);
-    var body = JSON.stringify({ p: location.pathname, r: document.referrer || '', w: window.innerWidth || 0, u: m ? decodeURIComponent(m[1]) : '' });
-    var url = <?= json_encode(visitfy_site_root() . 'ping') ?>;
-    if (navigator.sendBeacon) navigator.sendBeacon(url, new Blob([body], { type: 'text/plain' }));
-    else fetch(url, { method: 'POST', body: body, keepalive: true });
-  } catch (e) {}
-})();
-</script>
 </body>
 </html>

@@ -7,10 +7,12 @@
  * Besucher werden über einen Tages-Hash aus Salt + IP + User-Agent gezählt. Das Salt wird jeden Tag
  * neu erzeugt und nach zwei Tagen gelöscht – Besuche sind dadurch nicht über Tage hinweg verknüpfbar.
  *
+ * Alles wird serverseitig beim Ausliefern der Seite erfasst – ohne JavaScript, ohne Zugriff auf das Endgerät.
+ *
  * Ereignisse (Feld k):
- *   pv   Seitenaufruf (vom Browser per /ping gemeldet)
- *   bot  Aufruf durch einen bekannten Crawler (Google, Bing, ChatGPT, Claude, Perplexity …), serverseitig
- *   ev   Ziel-Ereignis, z. B. lead_kontakt oder lead_partner (serverseitig im Formular-Handler)
+ *   pv   Seitenaufruf durch einen Menschen (Pfad, Quelle aus dem Referer, Gerät aus dem User-Agent, HTTP-Status)
+ *   bot  Aufruf durch einen bekannten Crawler (Google, Bing, ChatGPT, Claude, Perplexity …)
+ *   ev   Ziel-Ereignis, z. B. lead_kontakt oder lead_partner (im Formular-Handler)
  */
 
 if (!function_exists('visitfy_stats_dir')) {
@@ -168,16 +170,62 @@ if (!function_exists('visitfy_stats_dir')) {
         return substr($path, 0, 200);
     }
 
-    /** Serverseitig: Crawler-Aufruf zählen (wird in partials/head.php aufgerufen). */
-    function visitfy_stats_log_bot_hit(): void
+    /** Gerätetyp aus dem User-Agent (wird ohnehin mit jeder Anfrage gesendet). */
+    function visitfy_stats_device(string $ua): string
     {
-        $ua = (string)($_SERVER['HTTP_USER_AGENT'] ?? '');
-        $name = $ua !== '' ? visitfy_stats_bot_name($ua) : null;
-        if ($name === null) {
+        if (preg_match('/iPad|Tablet|PlayBook|Silk|Kindle/i', $ua) || (stripos($ua, 'Android') !== false && stripos($ua, 'Mobile') === false)) {
+            return 't';
+        }
+        if (preg_match('/Mobi|iPhone|iPod|Android|Windows Phone/i', $ua)) {
+            return 'm';
+        }
+        return 'd';
+    }
+
+    /**
+     * Aufruf der aktuellen Seite zählen (wird in partials/head.php aufgerufen):
+     * bekannte Crawler als „bot“, Menschen als „pv“. Nur GET, keine Vorab-Ladevorgänge des Browsers.
+     */
+    function visitfy_stats_log_request(): void
+    {
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
             return;
         }
-        $path = visitfy_stats_clean_path((string)($_SERVER['REQUEST_URI'] ?? '/'));
-        visitfy_stats_append(['k' => 'bot', 'b' => $name, 'p' => $path, 'c' => http_response_code() ?: 200]);
+        $purpose = strtolower((string)($_SERVER['HTTP_SEC_PURPOSE'] ?? $_SERVER['HTTP_PURPOSE'] ?? $_SERVER['HTTP_X_MOZ'] ?? ''));
+        if (strpos($purpose, 'prefetch') !== false || strpos($purpose, 'prerender') !== false) {
+            return;
+        }
+        $ua = (string)($_SERVER['HTTP_USER_AGENT'] ?? '');
+        $uri = (string)($_SERVER['REQUEST_URI'] ?? '/');
+        $path = visitfy_stats_clean_path($uri);
+        $status = http_response_code() ?: 200;
+
+        $bot = $ua !== '' ? visitfy_stats_bot_name($ua) : null;
+        if ($bot !== null) {
+            visitfy_stats_append(['k' => 'bot', 'b' => $bot, 'p' => $path, 'c' => $status]);
+            return;
+        }
+        if (visitfy_stats_is_bot($ua)) {
+            return;
+        }
+
+        $query = [];
+        parse_str((string)parse_url($uri, PHP_URL_QUERY), $query);
+        if (($query['__deploy'] ?? '') === 'check') {
+            $path = '/__deploy-check';
+        }
+
+        $ref = (string)($_SERVER['HTTP_REFERER'] ?? '');
+        $refHost = $ref !== '' ? strtolower((string)parse_url($ref, PHP_URL_HOST)) : '';
+        $ownHost = strtolower(preg_replace(['/^www\./', '/:\d+$/'], '', (string)($_SERVER['HTTP_HOST'] ?? '')));
+        $internal = $refHost !== '' && preg_replace('/^www\./', '', $refHost) === $ownHost;
+        $source = $internal ? 'Intern' : visitfy_stats_source($refHost, (string)($query['utm_source'] ?? ''));
+
+        $row = ['k' => 'pv', 'p' => $path, 's' => $source, 'v' => visitfy_stats_visitor(), 'd' => visitfy_stats_device($ua)];
+        if ($status !== 200) {
+            $row['c'] = $status;
+        }
+        visitfy_stats_append($row);
     }
 
     /** Serverseitig: Ziel-Ereignis zählen (z. B. erfolgreich abgeschickte Anfrage). */

@@ -100,7 +100,6 @@ ErrorDocument 404 /404.php
 
   # ── 5) Technische Endpunkte ──────────────────────────────────
   RewriteRule ^sitemap\.xml$ sitemap.php [L]
-  RewriteRule ^ping$ ping.php [L]
 </IfModule>
 
 # ── Sicherheits-Header ───────────────────────────────────────
