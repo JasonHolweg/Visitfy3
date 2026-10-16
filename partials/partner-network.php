@@ -39,15 +39,55 @@ return [
         ['name' => 'Stuttgart',   'region' => 'Baden-Württemberg',  'x' => 202.5, 'y' => 602.8],
     ],
 
-    // Gebiete, in denen aktiv Partner gesucht werden (Fokus Süden)
+    // Fokus-Gebiete: freie Städte im Süden, auf der Karte beschriftet (wichtigste zuerst)
     'open' => [
-        ['name' => 'Würzburg',   'x' => 250.5, 'y' => 508.6],
-        ['name' => 'Nürnberg',   'x' => 318.4, 'y' => 540.1],
-        ['name' => 'Karlsruhe',  'x' => 155.1, 'y' => 580.2],
-        ['name' => 'Regensburg', 'x' => 381.5, 'y' => 580.1],
-        ['name' => 'Ulm',        'x' => 251.8, 'y' => 638.4],
-        ['name' => 'Augsburg',   'x' => 308.2, 'y' => 641.2],
         ['name' => 'München',    'x' => 350.6, 'y' => 662.5],
+        ['name' => 'Nürnberg',   'x' => 318.4, 'y' => 540.1],
+        ['name' => 'Augsburg',   'x' => 308.2, 'y' => 641.2],
+        ['name' => 'Karlsruhe',  'x' => 155.1, 'y' => 580.2],
         ['name' => 'Freiburg',   'x' => 117.5, 'y' => 673.2],
+        ['name' => 'Regensburg', 'x' => 381.5, 'y' => 580.1],
+        ['name' => 'Würzburg',   'x' => 250.5, 'y' => 508.6],
+        ['name' => 'Ulm',        'x' => 251.8, 'y' => 638.4],
     ],
+
+    // Weitere freie Regionen: auf der Karte als kleine Punkte ohne Beschriftung
+    'free' => [
+        ['name' => 'Oldenburg', 'x' => 155.0, 'y' => 194.2],
+        ['name' => 'Bremen', 'x' => 187.8, 'y' => 201.0],
+        ['name' => 'Münster', 'x' => 118.0, 'y' => 303.3],
+        ['name' => 'Bielefeld', 'x' => 170.2, 'y' => 298.5],
+        ['name' => 'Dortmund', 'x' => 107.1, 'y' => 344.6],
+        ['name' => 'Düsseldorf', 'x' => 65.6, 'y' => 369.5],
+        ['name' => 'Köln', 'x' => 75.3, 'y' => 397.0],
+        ['name' => 'Aachen', 'x' => 22.9, 'y' => 409.4],
+        ['name' => 'Kassel', 'x' => 223.7, 'y' => 366.4],
+        ['name' => 'Göttingen', 'x' => 249.3, 'y' => 345.4],
+        ['name' => 'Braunschweig', 'x' => 284.6, 'y' => 277.6],
+        ['name' => 'Magdeburg', 'x' => 347.7, 'y' => 290.8],
+        ['name' => 'Leipzig', 'x' => 392.3, 'y' => 362.7],
+        ['name' => 'Dresden', 'x' => 473.0, 'y' => 386.8],
+        ['name' => 'Chemnitz', 'x' => 425.9, 'y' => 409.5],
+        ['name' => 'Erfurt', 'x' => 314.3, 'y' => 397.2],
+        ['name' => 'Rostock', 'x' => 370.4, 'y' => 106.3],
+        ['name' => 'Schwerin', 'x' => 332.8, 'y' => 149.7],
+        ['name' => 'Koblenz', 'x' => 110.1, 'y' => 452.7],
+        ['name' => 'Trier', 'x' => 50.6, 'y' => 506.7],
+        ['name' => 'Saarbrücken', 'x' => 70.1, 'y' => 555.3],
+        ['name' => 'Mannheim', 'x' => 160.1, 'y' => 535.5],
+        ['name' => 'Bayreuth', 'x' => 347.7, 'y' => 493.7],
+        ['name' => 'Ingolstadt', 'x' => 340.5, 'y' => 603.9],
+        ['name' => 'Passau', 'x' => 464.6, 'y' => 619.1],
+        ['name' => 'Konstanz', 'x' => 200.2, 'y' => 705.3],
+    ],
+
+    // Alle Bundesländer – daraus berechnet die Seite, wo es noch keinen Partner gibt.
+    // 'region' bei den aktiven Partnern muss exakt einem dieser Namen entsprechen.
+    'states' => [
+        'Baden-Württemberg', 'Bayern', 'Berlin', 'Brandenburg', 'Bremen', 'Hamburg', 'Hessen',
+        'Mecklenburg-Vorpommern', 'Niedersachsen', 'Nordrhein-Westfalen', 'Rheinland-Pfalz',
+        'Saarland', 'Sachsen', 'Sachsen-Anhalt', 'Schleswig-Holstein', 'Thüringen',
+    ],
+    // Reihenfolge, in der freie Bundesländer genannt werden (Süden zuerst)
+    'states_priority' => ['Bayern', 'Nordrhein-Westfalen', 'Sachsen', 'Thüringen', 'Sachsen-Anhalt', 'Mecklenburg-Vorpommern', 'Saarland', 'Bremen'],
 ];

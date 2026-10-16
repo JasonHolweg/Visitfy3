@@ -108,6 +108,12 @@ Stand: 2026-05-19 · Branch: `claude/elegant-sammet-caa710` (Auto-Deploy aktiv)
   - [x] 18a `head.php`: Canonical pro Seite (vorher nie ausgegeben), `og:url`/`og:locale`/`og:image` absolut, `twitter:image`, `theme-color`, `$jsonLd`/`$pageRobots`/`$canonicalPath`-Hooks
   - [x] 18b Partner-Seite: neuer Title/Description, JSON-LD (Organization + WebPage/Breadcrumb + FAQPage), sichtbare FAQ (7 Fragen, identisch mit Schema), OG-Bild `assets/img/og-partner.png`
   - [x] 18c `robots.txt` (Admin + Handler gesperrt), `sitemap.xml`, `llms.txt` (GEO-Faktenblatt), Admin `noindex`
+- [x] **Phase 19 – Partner-Seite Feinschliff**
+  - [x] 19a KI-Optik raus: grüne Live-Pille, Aurora/Grid-Hintergrund, Scroll-Maus, Süd-Glow, Scan-Linie, Emoji, Icon-Kacheln, ✓-Trust-Zeile; Stats als Haarlinien-Spalten
+  - [x] 19b Karte: freie Regionen bundesweit (`free` in `partner-network.php`, unbeschriftet) + Box „8 von 16 Bundesländern“ (automatisch aus `states` vs. aktiven Regionen)
+  - [x] 19c Dashboard-Tour: echtes Logo, 3 Ansichten (Rechnungen/Firmen/Empfehlungen) als Tabs mit Autoplay, Fortschrittslinie und Toast
+  - [x] 19d Empfehlung: 35 % zählt von 1 hoch (Ring synchron), Gutschrift-Tabelle statt 01/02/03-Karten, Stepper integriert
+  - [x] 19e Leistungen als Zeilen statt Karten (Kicker entfallen), Fit-Panel ins Formular gezogen (zweispaltig); ungenutzte Admin-Felder: `card_*_kicker`, `fit_eyebrow`, `fit_title`, `form_sub`, `hero_*`
 
 ## Offen / Roadmap
 
