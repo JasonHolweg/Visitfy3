@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /pages/partner-handler.php
+Allow: /
+
+Sitemap: https://visitfy.de/sitemap.xml

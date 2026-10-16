@@ -8,6 +8,7 @@ if (!defined('ADMIN_LAYOUT_GUARD')) define('ADMIN_LAYOUT_GUARD', true);
 ?><!DOCTYPE html>
 <html lang="de">
 <head>
+  <meta name="robots" content="noindex, nofollow">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title><?= htmlspecialchars($pageTitle ?? 'Admin', ENT_QUOTES, 'UTF-8') ?> · Visitfy Admin</title>

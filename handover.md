@@ -104,6 +104,10 @@ Stand: 2026-05-19 · Branch: `claude/elegant-sammet-caa710` (Auto-Deploy aktiv)
   - [x] 17c Verdienst-Rechner (Range-Slider), Dashboard-Mockup, Empfehlungsprogramm (35 %-Ring + Stepper)
   - [x] 17d Formular: Pflichtfeld „Stadt / Region“ (Handler + Mail), `$extraScripts`-Hook im Footer, `assets/js/partner.js`
   - [x] 17e Zahlen & Standorte zentral in `partials/partner-network.php` (Hero-/Proof-Copy nicht mehr über Admin-Hero-Felder)
+- [x] **Phase 18 – SEO / GEO**
+  - [x] 18a `head.php`: Canonical pro Seite (vorher nie ausgegeben), `og:url`/`og:locale`/`og:image` absolut, `twitter:image`, `theme-color`, `$jsonLd`/`$pageRobots`/`$canonicalPath`-Hooks
+  - [x] 18b Partner-Seite: neuer Title/Description, JSON-LD (Organization + WebPage/Breadcrumb + FAQPage), sichtbare FAQ (7 Fragen, identisch mit Schema), OG-Bild `assets/img/og-partner.png`
+  - [x] 18c `robots.txt` (Admin + Handler gesperrt), `sitemap.xml`, `llms.txt` (GEO-Faktenblatt), Admin `noindex`
 
 ## Offen / Roadmap
 

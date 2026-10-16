@@ -43,9 +43,98 @@ $arc = static function (array $from, array $to): string {
     return sprintf('M%.1f %.1fQ%.1f %.1f %.1f %.1f', $from['x'], $from['y'], $cx, $cy, $to['x'], $to['y']);
 };
 
-$pageTitle = 'Partner werden | Visitfy – 360° Rundgänge';
-$pageDesc  = 'Visitfy-Partner machen im Schnitt ' . $eur($avgRevenue) . ' € Umsatz im Monat. ' . $partners . ' Partner deutschlandweit – werde Partner für virtuelle 360°-Rundgänge in deiner Region.';
+$activeNames = array_column($net['active'], 'name');
+$listDe = static function (array $items): string {
+    if (count($items) < 2) return implode('', $items);
+    $last = array_pop($items);
+    return implode(', ', $items) . ' und ' . $last;
+};
+
+/* FAQ: sichtbar auf der Seite UND als FAQPage-Schema (beides muss identisch sein) */
+$faq = [
+    [
+        'q' => 'Wie viel verdienen Visitfy-Partner?',
+        'a' => 'Unsere ' . $partners . ' aktiven Partner machen im Schnitt ' . $eur($avgRevenue) . ' € Umsatz pro Monat (Stand ' . $net['stand'] . '). Das entspricht rund ' . $avgTours . ' verkauften 360°-Rundgängen im Monat bzw. ca. ' . $eur($perTour) . ' € Umsatz pro Rundgang. Einige Partner liegen deutlich darüber. Es handelt sich um Umsatz, nicht um Gewinn – das Ergebnis hängt von deinem Einsatz und deiner Region ab.',
+    ],
+    [
+        'q' => 'In welchen Städten gibt es schon Visitfy-Partner?',
+        'a' => 'Aktuell gibt es Visitfy-Partner in ' . $listDe($activeNames) . '. Das sind ' . $partners . ' Standorte in ' . $regions . ' Bundesländern.',
+    ],
+    [
+        'q' => 'Wo sucht Visitfy neue Partner?',
+        'a' => 'Wir suchen deutschlandweit, mit besonderem Fokus auf Süddeutschland. In Bayern und Baden-Württemberg sind Regionen wie ' . $listDe($openNames) . ' noch frei. Wer dort startet, ist in seiner Region der erste Visitfy-Partner.',
+    ],
+    [
+        'q' => 'Brauche ich viel Startkapital?',
+        'a' => 'Nein. Du brauchst kein Büro, kein Lager und keine teure Ausstattung. Was zählt, sind dein Einsatz und dein Wille, wirklich loszulegen.',
+    ],
+    [
+        'q' => 'Was ist das Visitfy Partner-Dashboard?',
+        'a' => 'Jeder Partner erhält ein eigenes Dashboard mit Buchhaltungsfunktionen: Du schreibst dort deine Rechnungen, legst Firmen bzw. Kunden an und empfiehlst weitere Partner.',
+    ],
+    [
+        'q' => 'Wie funktioniert das Empfehlungsprogramm?',
+        'a' => 'Wenn du einen neuen Partner für Visitfy gewinnst, erhältst du ' . $refPct . ' % vom Umsatz seiner ersten ' . $refSales . ' Verkäufe. Bei einem durchschnittlichen Rundgangswert sind das rund ' . $eur($refBonus) . ' € pro geworbenem Partner.',
+    ],
+    [
+        'q' => 'Wie werde ich Visitfy-Partner?',
+        'a' => 'Fülle das Formular auf dieser Seite aus und nenne uns deine Stadt oder Region. Wir melden uns persönlich bei dir und vereinbaren ein unverbindliches Erstgespräch.',
+    ],
+];
+
+$pageTitle = 'Partner werden bei Visitfy | 360°-Rundgänge verkaufen';
+$pageDesc  = 'Visitfy-Partner machen im Schnitt ' . $eur($avgRevenue) . ' € Umsatz im Monat mit rund ' . $avgTours . ' virtuellen 360°-Rundgängen. ' . $partners . ' Partner in ' . $regions . ' Bundesländern – Gebiete in Bayern und Baden-Württemberg noch frei.';
+$canonicalPath = '/pages/partner.php';
+$pageOgImg = 'assets/img/og-partner.png';
 $extraScripts = ['assets/js/partner.js'];
+
+$pageUrl = 'https://visitfy.de' . $canonicalPath;
+$jsonLd = [[
+    '@context' => 'https://schema.org',
+    '@graph' => [
+        [
+            '@type' => 'Organization',
+            '@id' => 'https://visitfy.de/#organization',
+            'name' => 'Visitfy',
+            'url' => 'https://visitfy.de/',
+            'logo' => 'https://visitfy.de/assets/img/logo.svg',
+            'email' => 'info@visitfy.de',
+            'description' => 'Visitfy erstellt virtuelle 360°-Rundgänge für Unternehmen und vertreibt sie über ein deutschlandweites Partnernetzwerk.',
+            'address' => ['@type' => 'PostalAddress', 'addressLocality' => 'Flensburg', 'addressCountry' => 'DE'],
+            'areaServed' => array_merge(
+                [['@type' => 'Country', 'name' => 'Deutschland']],
+                array_map(static fn($n) => ['@type' => 'City', 'name' => $n], $activeNames)
+            ),
+        ],
+        [
+            '@type' => 'WebPage',
+            '@id' => $pageUrl . '#webpage',
+            'url' => $pageUrl,
+            'name' => $pageTitle,
+            'description' => $pageDesc,
+            'inLanguage' => 'de-DE',
+            'isPartOf' => ['@type' => 'WebSite', '@id' => 'https://visitfy.de/#website', 'url' => 'https://visitfy.de/', 'name' => 'Visitfy'],
+            'about' => ['@id' => 'https://visitfy.de/#organization'],
+            'primaryImageOfPage' => 'https://visitfy.de/' . $pageOgImg,
+            'breadcrumb' => [
+                '@type' => 'BreadcrumbList',
+                'itemListElement' => [
+                    ['@type' => 'ListItem', 'position' => 1, 'name' => 'Start', 'item' => 'https://visitfy.de/'],
+                    ['@type' => 'ListItem', 'position' => 2, 'name' => 'Partner werden', 'item' => $pageUrl],
+                ],
+            ],
+        ],
+        [
+            '@type' => 'FAQPage',
+            '@id' => $pageUrl . '#faq',
+            'mainEntity' => array_map(static fn($f) => [
+                '@type' => 'Question',
+                'name' => $f['q'],
+                'acceptedAnswer' => ['@type' => 'Answer', 'text' => $f['a']],
+            ], $faq),
+        ],
+    ],
+]];
 
 require __DIR__ . '/../partials/head.php';
 require __DIR__ . '/../partials/header.php';
@@ -410,6 +499,27 @@ require __DIR__ . '/../partials/header.php';
           <p><?= $c('fit_text', 'Du bist zuverlässig, kommunikativ und willst dir was Eigenes aufbauen? Dann bist du hier richtig. Fülle jetzt das kurze Formular aus – wir melden uns persönlich bei dir.') ?></p>
           <p class="partner-fit-note"><?= $c('fit_note', 'Unverbindlich. Ohne Risiko. Nur echtes Interesse zählt.') ?></p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FAQ (identisch mit FAQPage-Schema) ───────────────── -->
+  <section class="section pw-faq-section" id="partner-faq" aria-labelledby="pw-faq-title">
+    <div class="container">
+      <p class="section-eyebrow fade-up">Häufige Fragen</p>
+      <h2 class="section-title fade-up delay-1" id="pw-faq-title">Alles zur Visitfy-Partnerschaft</h2>
+      <div class="faq-list fade-up delay-2">
+        <?php foreach ($faq as $i => $f): ?>
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false" aria-controls="pw-faq-a<?= $i ?>" id="pw-faq-q<?= $i ?>">
+              <?= $h($f['q']) ?>
+              <span class="faq-arrow" aria-hidden="true">▼</span>
+            </button>
+            <div class="faq-answer" role="region" id="pw-faq-a<?= $i ?>" aria-labelledby="pw-faq-q<?= $i ?>">
+              <div class="faq-answer-inner"><p><?= $h($f['a']) ?></p></div>
+            </div>
+          </div>
+        <?php endforeach; ?>
       </div>
     </div>
   </section>

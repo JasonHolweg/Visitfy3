@@ -3473,6 +3473,10 @@ hr {
 .pw-ref-sum { font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 600; color: #fff; letter-spacing: -0.035em; font-variant-numeric: tabular-nums; }
 .pw-ref-note { flex-basis: 100%; text-align: center; font-size: 12px; color: var(--text-muted); }
 
+/* ── FAQ ─────────────────────────────────────────────── */
+.pw-faq-section { background: var(--bg); border-top: 1px solid var(--line); }
+.pw-faq-section .faq-list { margin: 3rem auto 0; }
+
 /* ── Formular / Trust ────────────────────────────────── */
 .pw-form-wrap { max-width: 700px; margin: 0 auto; }
 .pw-trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem 1.5rem; margin-top: 2rem; font-size: 13px; color: var(--text-dim); }
