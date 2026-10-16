@@ -11,6 +11,7 @@ $root = (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) ? visitfy_bas
 $contentConfig = visitfy_load_json(__DIR__ . '/../assets/data/content.json', []);
 $net = require __DIR__ . '/../partials/partner-network.php';
 $map = require __DIR__ . '/../partials/germany-map-paths.php';
+$voicesRaw = require __DIR__ . '/../partials/partner-testimonials.php';
 
 $h = static fn($v): string => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 $c = static fn(string $key, string $default): string => htmlspecialchars((string)visitfy_get($contentConfig, 'partner.' . $key, $default), ENT_QUOTES, 'UTF-8');
@@ -72,6 +73,41 @@ $rangePos = static function (int $v) use ($rangeMin, $rangeMax): string {
     // Daumen ist 22 px breit: Position entspricht der Daumenmitte
     return sprintf('calc(%.3f%% + %.2fpx)', $f * 100, 11 - $f * 22);
 };
+
+/* Partnerstimmen: live nur vollständige, freigegebene Einträge.
+   Platzhalter erscheinen ausschließlich in der lokalen Vorschau (Umgebungsvariable VISITFY_PREVIEW=1). */
+$voicePreview = getenv('VISITFY_PREVIEW') === '1';
+$voicePrompts = [
+    'Wie bist du zu Visitfy gekommen, und was hat sich seitdem verändert?',
+    'Wie schnell hattest du deine ersten Kunden?',
+    'Was gefällt dir an der Arbeit als Partner am meisten?',
+    'Wie erlebst du den Support und das Dashboard im Alltag?',
+    'Was würdest du jemandem sagen, der überlegt, Partner zu werden?',
+];
+$voices = [];
+$voicesReal = 0;
+foreach ($voicesRaw as $i => $v) {
+    $foto = trim((string)($v['foto'] ?? ''));
+    $complete = !empty($v['freigegeben'])
+        && trim((string)($v['name'] ?? '')) !== ''
+        && trim((string)($v['zitat'] ?? '')) !== ''
+        && (int)($v['umsatz'] ?? 0) > 0
+        && $foto !== '' && is_file(__DIR__ . '/../' . ltrim($foto, '/'));
+    if ($complete) {
+        $voices[] = [
+            'name' => trim((string)$v['name']), 'stadt' => trim((string)($v['stadt'] ?? '')), 'seit' => trim((string)($v['seit'] ?? '')),
+            'zitat' => trim((string)$v['zitat']), 'umsatz' => (int)round((int)$v['umsatz'], -2), 'foto' => ltrim($foto, '/'), 'platzhalter' => false,
+        ];
+        $voicesReal++;
+    } elseif ($voicePreview) {
+        $voices[] = [
+            'name' => 'Name folgt', 'stadt' => trim((string)($v['stadt'] ?? '')) ?: 'Stadt folgt', 'seit' => 'Partner seit …',
+            'zitat' => 'Platzhalter für das Zitat. Frage dazu: ' . $voicePrompts[$i % count($voicePrompts)],
+            'umsatz' => 0, 'foto' => '', 'platzhalter' => true,
+        ];
+    }
+}
+$voiceSilhouette = '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="32" cy="24" r="11"/><path d="M12 58c1.5-11 9.5-18 20-18s18.5 7 20 18z"/></svg>';
 
 /* FAQ: sichtbar auf der Seite UND als FAQPage-Schema (beides muss identisch sein) */
 $faq = [
@@ -542,6 +578,73 @@ require __DIR__ . '/../partials/header.php';
     </div>
   </section>
 
+<?php if ($voices): ?>
+  <!-- ── PARTNERSTIMMEN (partials/partner-testimonials.php) ── -->
+  <section class="section pw-voices" aria-labelledby="pw-voices-title">
+    <div class="container">
+      <div class="pw-voices-head">
+        <p class="section-eyebrow pw-left fade-up">Stimmen aus dem Netzwerk</p>
+        <h2 class="section-title pw-left fade-up delay-1" id="pw-voices-title">Das sagen unsere Partner.</h2>
+      </div>
+
+      <div class="pw-voices-stage fade-up delay-2" data-pw-voices>
+        <div class="pw-voices-panels">
+          <?php foreach ($voices as $i => $v): $on = $i === 0; ?>
+            <figure class="pw-voice<?= $on ? ' is-active' : '' ?><?= $v['platzhalter'] ? ' is-placeholder' : '' ?>" id="pw-voice-<?= $i ?>" role="tabpanel" aria-labelledby="pw-voice-tab-<?= $i ?>">
+              <div class="pw-voice-photo">
+                <?php if ($v['foto'] !== ''): ?>
+                  <img src="<?= $h($root . $v['foto']) ?>" alt="<?= $h($v['name']) ?>, Visitfy-Partner in <?= $h($v['stadt']) ?>" width="800" height="1000" loading="lazy" decoding="async">
+                <?php else: ?>
+                  <span class="pw-voice-ph"><?= $voiceSilhouette ?><small>Foto folgt</small></span>
+                <?php endif; ?>
+              </div>
+              <div class="pw-voice-body">
+                <blockquote class="pw-voice-quote"><p>„<?= $h($v['zitat']) ?>“</p></blockquote>
+                <div class="pw-voice-foot">
+                  <figcaption class="pw-voice-meta">
+                    <b><?= $h($v['name']) ?></b>
+                    <span><?= $h(implode(' · ', array_filter([$v['seit'], $v['stadt']]))) ?></span>
+                  </figcaption>
+                  <p class="pw-voice-figure">
+                    <?php if ($v['umsatz'] > 0): ?>
+                      <span class="pw-voice-num">ca. <span data-voice-num data-target="<?= $v['umsatz'] ?>"><?= $eur($v['umsatz']) ?></span>&nbsp;€</span>
+                    <?php else: ?>
+                      <span class="pw-voice-num">x.xxx&nbsp;€</span>
+                    <?php endif; ?>
+                    <small>Ø Umsatz pro Monat<sup><a href="#pw-footnote" aria-label="Hinweis zu den Zahlen">*</a></sup></small>
+                  </p>
+                </div>
+              </div>
+            </figure>
+          <?php endforeach; ?>
+        </div>
+
+        <div class="pw-voices-nav">
+          <div class="pw-voices-tabs" role="tablist" aria-label="Partnerstimmen" data-pw-voice-tabs style="--pw-voice-n:<?= count($voices) ?>">
+            <?php foreach ($voices as $i => $v): $on = $i === 0; ?>
+              <button type="button" class="pw-voice-tab<?= $on ? ' is-active' : '' ?>" role="tab" id="pw-voice-tab-<?= $i ?>" aria-controls="pw-voice-<?= $i ?>" aria-selected="<?= $on ? 'true' : 'false' ?>"<?= $on ? '' : ' tabindex="-1"' ?> aria-label="<?= $h($v['name'] . ', ' . $v['stadt']) ?>">
+                <span class="pw-voice-tab-progress" aria-hidden="true"></span>
+                <span class="pw-voice-thumb" aria-hidden="true">
+                  <?php if ($v['foto'] !== ''): ?><img src="<?= $h($root . $v['foto']) ?>" alt="" width="72" height="72" loading="lazy" decoding="async"><?php else: ?><?= $voiceSilhouette ?><?php endif; ?>
+                </span>
+                <span class="pw-voice-tab-label" aria-hidden="true"><?= $h($v['stadt']) ?></span>
+              </button>
+            <?php endforeach; ?>
+          </div>
+        </div>
+      </div>
+
+      <p class="pw-voices-note">
+        <?php if ($voicesReal === count($voices)): ?>
+          Echte Partner, eigene Angaben: Zitate und Umsätze stammen von den Partnern selbst und sind gerundet. Umsatz, nicht Gewinn.
+        <?php else: ?>
+          Vorschau mit Platzhaltern. Live erscheinen nur Partnerstimmen, die in partials/partner-testimonials.php freigegeben sind.
+        <?php endif; ?>
+      </p>
+    </div>
+  </section>
+<?php endif; ?>
+
   <!-- ── WARUM VISITFY (Texte aus dem Admin) ──────────────── -->
   <section class="section pw-model" aria-labelledby="partner-proof-heading">
     <div class="container">
@@ -666,6 +769,7 @@ require __DIR__ . '/../partials/header.php';
         * Durchschnittswerte aller <?= $partners ?> aktiven Visitfy-Partner, Stand <?= $h($net['stand']) ?>.
         Angegeben ist Umsatz, nicht Gewinn. Einzelne Partner liegen darüber oder darunter;
         das Ergebnis hängt von persönlichem Einsatz und Region ab. Keine Verdienstgarantie.
+        <?php if ($voicesReal > 0): ?>Umsätze in den Partnerstimmen: eigene Angaben der jeweiligen Partner, gerundet.<?php endif; ?>
       </p>
     </div>
   </section>

@@ -4,6 +4,7 @@
    - Karte: Reveal beim Reinscrollen, Stadt-Liste ↔ Pin-Hover
    - Verdienst-Rechner (Range-Slider)
    - Dashboard-Tour (Tabs mit Autoplay + Toast)
+   - Partnerstimmen (Tabs mit Autoplay, Pause bei Hover)
    - Empfehlung: 35 %-Ring zählt von 1 hoch, Gutschrift-Stepper
    - Reveal-Trigger ([data-pw-reveal] → .is-live)
    ============================================================ */
@@ -40,6 +41,79 @@
       });
     }, { threshold: threshold || 0.3 });
     io.observe(el);
+  }
+
+  /* Tabs mit Autoplay: rotiert, solange sichtbar; nach Klick oder Tastatur übernimmt der Nutzer.
+     Fortschritt wird per CSS über .is-playing und --pw-tab-ms animiert. */
+  function tabRotator(o) {
+    var tabs = Array.prototype.slice.call(o.tabs);
+    var current = 0;
+    var timer = null;
+    var manual = false;
+    var inView = false;
+    var hovered = false;
+    if (!tabs.length) return { current: function () { return 0; } };
+    o.wrap.style.setProperty('--pw-tab-ms', o.ms + 'ms');
+
+    function show(i, focus) {
+      current = (i + tabs.length) % tabs.length;
+      tabs.forEach(function (t, k) {
+        var on = k === current;
+        t.classList.toggle('is-active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
+      });
+      if (focus) tabs[current].focus();
+      o.onShow(current, tabs[current]);
+    }
+    function schedule() {
+      clearTimeout(timer);
+      if (manual || reduced || !inView || hovered) return;
+      timer = setTimeout(function () { show(current + 1); schedule(); }, o.ms);
+    }
+    function play() {
+      if (manual || reduced || hovered) return;
+      o.wrap.classList.remove('is-playing');
+      void o.wrap.offsetWidth; /* Fortschritt neu starten */
+      o.wrap.classList.add('is-playing');
+      schedule();
+    }
+    function pause() {
+      clearTimeout(timer);
+      o.wrap.classList.remove('is-playing');
+    }
+    function takeOver() {
+      manual = true;
+      pause();
+      o.wrap.classList.add('is-manual');
+    }
+
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener('click', function () { takeOver(); show(i); });
+      tab.addEventListener('keydown', function (e) {
+        var k = e.key;
+        if (k === 'ArrowDown' || k === 'ArrowRight') { e.preventDefault(); takeOver(); show(current + 1, true); }
+        if (k === 'ArrowUp' || k === 'ArrowLeft') { e.preventDefault(); takeOver(); show(current - 1, true); }
+        if (k === 'Home') { e.preventDefault(); takeOver(); show(0, true); }
+        if (k === 'End') { e.preventDefault(); takeOver(); show(tabs.length - 1, true); }
+      });
+    });
+
+    if (o.pauseOnHover && o.stage) {
+      o.stage.addEventListener('mouseenter', function () { hovered = true; pause(); });
+      o.stage.addEventListener('mouseleave', function () { hovered = false; if (inView) play(); });
+    }
+
+    if (o.stage && 'IntersectionObserver' in window && !reduced) {
+      new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          inView = entry.isIntersecting;
+          if (inView) play(); else pause();
+        });
+      }, { threshold: 0.45 }).observe(o.stage);
+    }
+
+    return { current: function () { return current; }, show: show };
   }
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -104,24 +178,16 @@
     }
 
     /* ── Dashboard-Tour ──────────────────────────────── */
-    var tabsWrap = document.querySelector('[data-pw-tabs]');
+    var dashTabs = document.querySelector('[data-pw-tabs]');
     var stage = document.querySelector('[data-pw-dash]');
-    if (tabsWrap && stage) {
-      var TAB_MS = 6000;
-      var tabs = Array.prototype.slice.call(tabsWrap.querySelectorAll('.pw-tab'));
+    if (dashTabs && stage) {
       var views = stage.querySelectorAll('.pw-view');
       var navItems = stage.querySelectorAll('[data-nav]');
       var panel = stage.querySelector('[role="tabpanel"]');
       var toast = stage.querySelector('[data-toast]');
       var toastTitle = stage.querySelector('[data-toast-out="title"]');
       var toastText = stage.querySelector('[data-toast-out="text"]');
-      var current = 0;
-      var timer = null;
-      var manual = false;
-      var live = false;
-      var inView = false;
-
-      tabsWrap.style.setProperty('--pw-tab-ms', TAB_MS + 'ms');
+      var dashLive = false;
 
       var popToast = function (view) {
         if (!toast || !view) return;
@@ -132,79 +198,61 @@
         toast.classList.add('is-pop');
       };
 
-      var show = function (index, focus) {
-        current = (index + tabs.length) % tabs.length;
-        var key = tabs[current].getAttribute('data-view');
-        var activeView = null;
-        tabs.forEach(function (t, i) {
-          var on = i === current;
-          t.classList.toggle('is-active', on);
-          t.setAttribute('aria-selected', on ? 'true' : 'false');
-          t.tabIndex = on ? 0 : -1;
-        });
-        Array.prototype.forEach.call(views, function (v) {
-          var on = v.getAttribute('data-view') === key;
-          v.classList.toggle('is-active', on);
-          v.setAttribute('aria-hidden', on ? 'false' : 'true');
-          if (on) activeView = v;
-        });
-        Array.prototype.forEach.call(navItems, function (n) {
-          n.classList.toggle('is-active', n.getAttribute('data-nav') === key);
-        });
-        if (panel) panel.setAttribute('aria-labelledby', tabs[current].id);
-        if (focus) tabs[current].focus();
-        if (live) setTimeout(function () { popToast(activeView); }, 650);
-      };
-
-      var schedule = function () {
-        clearTimeout(timer);
-        if (manual || reduced || !inView) return;
-        timer = setTimeout(function () { show(current + 1); schedule(); }, TAB_MS);
-      };
-      var play = function () {
-        if (manual || reduced) return;
-        tabsWrap.classList.remove('is-playing');
-        void tabsWrap.offsetWidth; /* Fortschrittsbalken neu starten */
-        tabsWrap.classList.add('is-playing');
-        schedule();
-      };
-      var pause = function () {
-        clearTimeout(timer);
-        tabsWrap.classList.remove('is-playing');
-      };
-      var takeOver = function () {
-        manual = true;
-        pause();
-        tabsWrap.classList.add('is-manual');
-      };
-
-      tabs.forEach(function (tab, i) {
-        tab.addEventListener('click', function () { takeOver(); show(i); });
-        tab.addEventListener('keydown', function (e) {
-          var k = e.key;
-          if (k === 'ArrowDown' || k === 'ArrowRight') { e.preventDefault(); takeOver(); show(current + 1, true); }
-          if (k === 'ArrowUp' || k === 'ArrowLeft') { e.preventDefault(); takeOver(); show(current - 1, true); }
-          if (k === 'Home') { e.preventDefault(); takeOver(); show(0, true); }
-          if (k === 'End') { e.preventDefault(); takeOver(); show(tabs.length - 1, true); }
-        });
+      var dash = tabRotator({
+        wrap: dashTabs,
+        tabs: dashTabs.querySelectorAll('.pw-tab'),
+        stage: stage,
+        ms: 6000,
+        onShow: function (i, tab) {
+          var key = tab.getAttribute('data-view');
+          var activeView = null;
+          Array.prototype.forEach.call(views, function (v) {
+            var on = v.getAttribute('data-view') === key;
+            v.classList.toggle('is-active', on);
+            v.setAttribute('aria-hidden', on ? 'false' : 'true');
+            if (on) activeView = v;
+          });
+          Array.prototype.forEach.call(navItems, function (n) {
+            n.classList.toggle('is-active', n.getAttribute('data-nav') === key);
+          });
+          if (panel) panel.setAttribute('aria-labelledby', tab.id);
+          if (dashLive) setTimeout(function () { popToast(activeView); }, 650);
+        }
       });
 
-      /* Erster Auftritt: Dashboard kippt rein, danach Toast + Autoplay */
+      /* Erster Auftritt: Dashboard kippt rein, danach Toast */
       onVisible(stage, function () {
-        live = true;
+        dashLive = true;
         stage.classList.add('is-live');
-        setTimeout(function () { popToast(views[current]); }, reduced ? 0 : 2200);
+        setTimeout(function () { popToast(views[dash.current()]); }, reduced ? 0 : 2200);
       }, 0.3);
+    }
 
-      /* Autoplay nur, solange die Tour sichtbar ist */
-      if ('IntersectionObserver' in window && !reduced) {
-        new IntersectionObserver(function (entries) {
-          entries.forEach(function (entry) {
-            inView = entry.isIntersecting;
-            if (inView) play(); else pause();
+    /* ── Partnerstimmen ──────────────────────────────── */
+    var voiceStage = document.querySelector('[data-pw-voices]');
+    var voiceTabs = document.querySelector('[data-pw-voice-tabs]');
+    if (voiceStage && voiceTabs) {
+      var voicePanels = voiceStage.querySelectorAll('.pw-voice');
+      tabRotator({
+        wrap: voiceTabs,
+        tabs: voiceTabs.querySelectorAll('.pw-voice-tab'),
+        stage: voiceStage,
+        ms: 8000,
+        pauseOnHover: true,
+        onShow: function (i) {
+          Array.prototype.forEach.call(voicePanels, function (panelEl, k) {
+            var on = k === i;
+            panelEl.classList.toggle('is-active', on);
+            if (on) {
+              var num = panelEl.querySelector('[data-voice-num]');
+              if (num) {
+                var to = parseInt(num.getAttribute('data-target'), 10) || 0;
+                tween(num, Math.round(to * 0.6), to, 900);
+              }
+            }
           });
-        }, { threshold: 0.45 }).observe(stage);
-      }
+        }
+      });
     }
 
     /* ── Empfehlung: Ring + Prozentzahl 1 → 35 ───────── */

@@ -114,6 +114,11 @@ Stand: 2026-05-19 · Branch: `claude/elegant-sammet-caa710` (Auto-Deploy aktiv)
   - [x] 19c Dashboard-Tour: echtes Logo, 3 Ansichten (Rechnungen/Firmen/Empfehlungen) als Tabs mit Autoplay, Fortschrittslinie und Toast
   - [x] 19d Empfehlung: 35 % zählt von 1 hoch (Ring synchron), Gutschrift-Tabelle statt 01/02/03-Karten, Stepper integriert
   - [x] 19e Leistungen als Zeilen statt Karten (Kicker entfallen), Fit-Panel ins Formular gezogen (zweispaltig); ungenutzte Admin-Felder: `card_*_kicker`, `fit_eyebrow`, `fit_title`, `form_sub`, `hero_*`
+- [x] **Phase 20 – Partnerstimmen**
+  - [x] 20a Sektion unter dem Empfehlungsprogramm: großes Foto, Zitat, Ø-Monatsumsatz, 5 Umschalter mit Autoplay (Pause bei Hover)
+  - [x] 20b Inhalte in `partials/partner-testimonials.php`; live nur Einträge mit `freigegeben => true` + Name, Zitat, Foto (Datei muss existieren) und Umsatz; sonst ist die Sektion unsichtbar
+  - [x] 20c Platzhalter nur lokal mit `VISITFY_PREVIEW=1 php -S localhost:8000`; Fotos nach `assets/img/partner/` (4:5, ≥ 800 × 1000 px)
+  - [x] 20d `tabRotator()` in `partner.js` treibt Dashboard-Tour und Partnerstimmen
 
 ## Offen / Roadmap
 
