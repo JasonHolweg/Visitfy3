@@ -97,12 +97,14 @@ foreach ($voicesRaw as $i => $v) {
     if ($complete) {
         $voices[] = [
             'name' => trim((string)$v['name']), 'stadt' => trim((string)($v['stadt'] ?? '')), 'seit' => trim((string)($v['seit'] ?? '')),
-            'zitat' => trim((string)$v['zitat']), 'umsatz' => (int)round((int)$v['umsatz'], -2), 'foto' => ltrim($foto, '/'), 'platzhalter' => false,
+            'alter' => (int)($v['alter'] ?? 0),
+            'zitat' => trim((string)$v['zitat']), 'umsatz' => (int)round((int)$v['umsatz'], -2),
+            'foto' => ltrim($foto, '/') . '?v=' . (int)@filemtime(__DIR__ . '/../' . ltrim($foto, '/')), 'platzhalter' => false,
         ];
         $voicesReal++;
     } elseif ($voicePreview) {
         $voices[] = [
-            'name' => 'Name folgt', 'stadt' => trim((string)($v['stadt'] ?? '')) ?: 'Stadt folgt', 'seit' => 'Partner seit …',
+            'name' => 'Name folgt', 'stadt' => trim((string)($v['stadt'] ?? '')) ?: 'Stadt folgt', 'seit' => 'Partner seit …', 'alter' => 0,
             'zitat' => 'Platzhalter für das Zitat. Frage dazu: ' . $voicePrompts[$i % count($voicePrompts)],
             'umsatz' => 0, 'foto' => '', 'platzhalter' => true,
         ];
@@ -562,7 +564,7 @@ require __DIR__ . '/../partials/header.php';
             <figure class="pw-voice<?= $on ? ' is-active' : '' ?><?= $v['platzhalter'] ? ' is-placeholder' : '' ?>" id="pw-voice-<?= $i ?>" role="tabpanel" aria-labelledby="pw-voice-tab-<?= $i ?>">
               <div class="pw-voice-photo">
                 <?php if ($v['foto'] !== ''): ?>
-                  <img src="<?= $h($root . $v['foto']) ?>" alt="<?= $h($v['name']) ?>, Visitfy-Partner in <?= $h($v['stadt']) ?>" width="800" height="1000" loading="lazy" decoding="async">
+                  <img src="<?= $h($root . $v['foto']) ?>" alt="<?= $h($v['name']) ?>, Visitfy-Partner<?= $v['stadt'] !== '' ? ' in ' . $h($v['stadt']) : '' ?>" width="800" height="1000" loading="lazy" decoding="async">
                 <?php else: ?>
                   <span class="pw-voice-ph"><?= $voiceSilhouette ?><small>Foto folgt</small></span>
                 <?php endif; ?>
@@ -572,7 +574,7 @@ require __DIR__ . '/../partials/header.php';
                 <div class="pw-voice-foot">
                   <figcaption class="pw-voice-meta">
                     <b><?= $h($v['name']) ?></b>
-                    <span><?= $h(implode(' · ', array_filter([$v['seit'], $v['stadt']]))) ?></span>
+                    <span><?= $h(implode(' · ', array_filter([$v['alter'] > 0 ? $v['alter'] . ' Jahre' : '', $v['seit'], $v['stadt']]))) ?></span>
                   </figcaption>
                   <p class="pw-voice-figure">
                     <?php if ($v['umsatz'] > 0): ?>
@@ -591,12 +593,12 @@ require __DIR__ . '/../partials/header.php';
         <div class="pw-voices-nav">
           <div class="pw-voices-tabs" role="tablist" aria-label="Partnerstimmen" data-pw-voice-tabs style="--pw-voice-n:<?= count($voices) ?>">
             <?php foreach ($voices as $i => $v): $on = $i === 0; ?>
-              <button type="button" class="pw-voice-tab<?= $on ? ' is-active' : '' ?>" role="tab" id="pw-voice-tab-<?= $i ?>" aria-controls="pw-voice-<?= $i ?>" aria-selected="<?= $on ? 'true' : 'false' ?>"<?= $on ? '' : ' tabindex="-1"' ?> aria-label="<?= $h($v['name'] . ', ' . $v['stadt']) ?>">
+              <button type="button" class="pw-voice-tab<?= $on ? ' is-active' : '' ?>" role="tab" id="pw-voice-tab-<?= $i ?>" aria-controls="pw-voice-<?= $i ?>" aria-selected="<?= $on ? 'true' : 'false' ?>"<?= $on ? '' : ' tabindex="-1"' ?> aria-label="<?= $h(implode(', ', array_filter([$v['name'], $v['stadt']]))) ?>">
                 <span class="pw-voice-tab-progress" aria-hidden="true"></span>
                 <span class="pw-voice-thumb" aria-hidden="true">
                   <?php if ($v['foto'] !== ''): ?><img src="<?= $h($root . $v['foto']) ?>" alt="" width="72" height="72" loading="lazy" decoding="async"><?php else: ?><?= $voiceSilhouette ?><?php endif; ?>
                 </span>
-                <span class="pw-voice-tab-label" aria-hidden="true"><?= $h($v['stadt']) ?></span>
+                <span class="pw-voice-tab-label" aria-hidden="true"><?= $h($v['stadt'] !== '' ? $v['stadt'] : strtok($v['name'], ' ')) ?></span>
               </button>
             <?php endforeach; ?>
           </div>

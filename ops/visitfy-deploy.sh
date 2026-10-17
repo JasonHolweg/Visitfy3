@@ -14,7 +14,7 @@
 # ══════════════════════════════════════════════════════════════
 set -euo pipefail
 
-PKG="${PKG:-$HOME/scratch/visitfy-phase0.tgz}"
+PKG="${PKG:-$HOME/scratch/visitfy-update.tgz}"
 MODE="${MODE:-apply}"
 ROOT="${ROOT:-}"
 
