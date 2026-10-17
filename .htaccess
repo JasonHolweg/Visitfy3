@@ -100,6 +100,7 @@ ErrorDocument 404 /404.php
 
   # ── 5) Technische Endpunkte ──────────────────────────────────
   RewriteRule ^sitemap\.xml$ sitemap.php [L]
+  RewriteRule ^llms\.txt$ llms.php [L]
 </IfModule>
 
 # ── Sicherheits-Header ───────────────────────────────────────

@@ -92,8 +92,8 @@ $kpiItems = visitfy_get($contentConfig, 'kpi.items', []);
 if (!is_array($kpiItems) || !$kpiItems) {
   $kpiItems = [
     ['target' => '40', 'suffix' => '%', 'label' => '+ längere Verweildauer auf Ihrer Website'],
-    ['target' => '5', 'suffix' => ' Tage', 'label' => 'Ø bis Ihr Rundgang live geht'],
-    ['target' => '420', 'suffix' => '+', 'label' => 'umgesetzte Rundgänge'],
+    ['target' => '5', 'suffix' => 'Tage', 'label' => 'maximal, bis Ihr Rundgang online ist'],
+    ['target' => '{rundgaenge}', 'suffix' => '', 'label' => 'umgesetzte Rundgänge'],
     ['target' => '98', 'suffix' => '%', 'label' => 'zufriedene Kunden'],
   ];
 }
@@ -149,13 +149,13 @@ if (!is_array($kpiItems) || !$kpiItems) {
 
         <!-- Subline: Mechanismus + Geschwindigkeit als Differenzierungsmerkmal -->
         <p class="hero-subline fade-up delay-3">
-          <?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.subline', 'Visitfy digitalisiert Ihre Location – professionell, in unter 3 Tagen live.'), ENT_QUOTES, 'UTF-8') ?>
+          <?= htmlspecialchars((string)visitfy_get($contentConfig, 'hero.subline', 'Visitfy digitalisiert Ihre Location – professionell, in maximal 5 Tagen online.'), ENT_QUOTES, 'UTF-8') ?>
         </p>
 
         <!-- Trust-Row: Einwände abbauen, bevor der Besucher abspringt -->
 <?php
-  $heroTrustItems = visitfy_get($contentConfig, 'hero.trust_items', ['Kostenlos & unverbindlich', 'In 3 Werktagen live', 'Antwort in unter 24h']);
-  if (!is_array($heroTrustItems) || !$heroTrustItems) $heroTrustItems = ['Kostenlos & unverbindlich', 'In 3 Werktagen live', 'Antwort in unter 24h'];
+  $heroTrustItems = visitfy_get($contentConfig, 'hero.trust_items', ['Kostenlos & unverbindlich', 'In max. 5 Tagen online', 'Antwort in unter 24h']);
+  if (!is_array($heroTrustItems) || !$heroTrustItems) $heroTrustItems = ['Kostenlos & unverbindlich', 'In max. 5 Tagen online', 'Antwort in unter 24h'];
 ?>
         <div class="hero-trust-row fade-up delay-4">
 <?php foreach ($heroTrustItems as $heroTrustItem): ?>
@@ -329,7 +329,7 @@ if (!is_array($kpiItems) || !$kpiItems) {
       ['title' => 'Mehr Anfragen. Sofort.',                'text' => 'Gäste, die Ihre Location schon kennen, entscheiden schneller. Bis zu 40 % längere Verweildauer auf Ihrer Website — und spürbar höhere Anfragequote.'],
       ['title' => 'Vertrauen, bevor der Anruf kommt.',     'text' => 'Wer die Atmosphäre virtuell erlebt hat, kommt nicht zum Vergleichen — sondern zur Buchung.'],
       ['title' => 'Auf jeder Suche sichtbar.',             'text' => 'Direkt eingebunden in Google Business und Maps. Ihr Rundgang erscheint dort, wo Kunden entscheiden.'],
-      ['title' => 'In 3 Tagen live.',                      'text' => 'Briefing, Aufnahme, Integration. Sie liefern den Schlüssel — wir den fertigen iFrame-Code.'],
+      ['title' => 'In max. 5 Tagen online.',               'text' => 'Briefing, Aufnahme, Integration. Sie liefern den Schlüssel — wir den fertigen iFrame-Code.'],
     ];
   }
 ?>
@@ -434,12 +434,18 @@ if (!is_array($kpiItems) || !$kpiItems) {
       <div class="kpi-grid">
 <?php foreach ($kpiItems as $i => $kpi):
   $delayClass = 'delay-' . (($i % 4) + 1);
-  $target = (string)($kpi['target'] ?? '0');
+  /* {rundgaenge} kommt live aus dem CRM (partials/crm.php); ohne Wert wird die Kachel ausgeblendet */
+  $target = visitfy_fill((string)($kpi['target'] ?? '0'), false);
+  if (trim($target) === '') continue;
+  $prefix = (string)($kpi['prefix'] ?? '');
   $suffix = (string)($kpi['suffix'] ?? '');
-  $label = (string)($kpi['label'] ?? '');
+  /* Wort-Einheiten („Tage“) mit geschütztem Leerzeichen absetzen, Zeichen wie % und + direkt anhängen */
+  if (preg_match('/^\p{L}/u', $suffix)) $suffix = "\u{00A0}" . $suffix;
+  $label = visitfy_fill((string)($kpi['label'] ?? ''));
+  $display = $prefix . (ctype_digit($target) ? number_format((int)$target, 0, ',', '.') : $target) . $suffix;
 ?>
         <div class="kpi-card glass fade-up <?= htmlspecialchars($delayClass, ENT_QUOTES, 'UTF-8') ?>">
-          <div class="kpi-number" data-countup data-target="<?= htmlspecialchars($target, ENT_QUOTES, 'UTF-8') ?>" data-suffix="<?= htmlspecialchars($suffix, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($target . $suffix, ENT_QUOTES, 'UTF-8') ?></div>
+          <div class="kpi-number" data-countup data-target="<?= htmlspecialchars($target, ENT_QUOTES, 'UTF-8') ?>" data-prefix="<?= htmlspecialchars($prefix, ENT_QUOTES, 'UTF-8') ?>" data-suffix="<?= htmlspecialchars($suffix, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($display, ENT_QUOTES, 'UTF-8') ?></div>
           <div class="kpi-label"><?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?></div>
         </div>
 <?php endforeach; ?>
@@ -698,7 +704,7 @@ if (!is_array($kpiItems) || !$kpiItems) {
       ['question' => 'Welche Vorteile bietet ein 360° Rundgang?', 'answer' => '<p>Ein 360° Rundgang bietet Ihrem Unternehmen messbare Mehrwerte:</p><ul><li>Stärkeres Vertrauen bei potenziellen Kunden noch vor dem ersten Besuch</li><li>Höhere Sichtbarkeit auf Google Maps und in der organischen Suche</li><li>Mehr qualifizierte Anfragen durch Interessenten, die bereits überzeugt sind</li><li>24/7 verfügbares, interaktives Schaufenster für Ihre Location</li></ul>'],
       ['question' => 'Für welche Branchen eignet sich ein 360° Rundgang?', 'answer' => '<p>Grundsätzlich für jede Location, die Kunden physisch besuchen oder vorab erleben sollen: Gastronomie, Hotels, Immobilien, Einzelhandel, Praxen, Fitnessstudios und mehr.</p>'],
       ['question' => 'Was kostet ein 360° Rundgang?', 'answer' => '<p>Die Kosten richten sich nach Größe und Raumanzahl Ihrer Location. Für ein transparentes, individuelles Angebot beraten wir Sie gerne persönlich und unverbindlich.</p>'],
-      ['question' => 'Wie lange dauert die Erstellung?', 'answer' => '<p>Nach Briefing und Aufnahme vor Ort ist Ihr Rundgang im Durchschnitt innerhalb von 5 Werktagen live. Für größere Locations kalkulieren wir gemeinsam den Zeitplan.</p>'],
+      ['question' => 'Wie lange dauert die Erstellung?', 'answer' => '<p>Nach Briefing und Aufnahme vor Ort ist Ihr Rundgang spätestens 5 Tage später online. Für größere Locations kalkulieren wir gemeinsam den Zeitplan.</p>'],
       ['question' => 'Wo kann ich den Rundgang einbinden?', 'answer' => '<p>Überall dort, wo Ihre Kunden sind:</p><ul><li>Auf Ihrer eigenen Website (per iFrame, ein Klick)</li><li>Direkt in Ihrem Google Business Profil</li><li>In Buchungsportalen und auf Social Media</li></ul>'],
     ];
   }

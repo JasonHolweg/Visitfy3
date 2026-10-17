@@ -1,0 +1,29 @@
+<?php
+/**
+ * Vorlage für config.crm.php (im Projekt-Root, nicht ins Git!).
+ * Liefert der Website die Gesamtzahl Rundgänge aus dem CRM – siehe partials/crm.php.
+ *
+ * Variante A: direkt aus der CRM-Datenbank (am besten mit einem Datenbank-Benutzer, der nur lesen darf)
+ */
+return [
+    'driver'        => 'mysql',
+    'dsn'           => 'mysql:unix_socket=/run/mysqld/mysqld.sock;dbname=CRM_DATENBANK;charset=utf8mb4',
+    'user'          => 'visitfy_web',
+    'password'      => '',
+    'tours_sql'     => 'SELECT COUNT(*) FROM TABELLE WHERE status = \'live\'',
+    'cache_seconds' => 3600,
+    'fallback'      => null,   // optional: Zahl, falls das CRM noch nie erreichbar war (sonst bleibt die Kachel weg)
+];
+
+/*
+ * Variante B: über eine API des CRM, die JSON liefert, z. B. {"tours": 1284}
+ *
+ * return [
+ *     'driver'        => 'url',
+ *     'url'           => 'https://crm.example.de/api/stats',
+ *     'token'         => '',
+ *     'tours_field'   => 'tours',
+ *     'cache_seconds' => 3600,
+ *     'fallback'      => null,
+ * ];
+ */

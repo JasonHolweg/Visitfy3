@@ -128,8 +128,10 @@ Stand: 2026-05-19 · Branch: `claude/elegant-sammet-caa710` (Auto-Deploy aktiv)
   - [x] 21e Titel/Beschreibungen geschärft; Startseiten-Titel in content.json (seo.*) setzt das Deploy; KPI-Zahlen stehen im HTML
   - [x] 21f Intro nur beim Einstieg von außen (Inline-Script, kein Storage) und kürzer (900/600 ms); Partikel nach Bildschirmfläche skaliert, pausieren unsichtbar
   - [x] 21g Inter lokal (`assets/fonts/`), keine Google-Fonts-Verbindung mehr
-  - [x] 21h Cookielose Statistik: `ping.php` + `partials/stats.php` → `assets/data/stats/*.jsonl`, Admin › Statistik (Quellen inkl. KI-Suchen, Crawler, Anfragen, Bewerbungen)
-  - [x] 21i Deploy-Werkzeug `ops/`: `build-package.py` (Paket gegen Live-Stand), `visitfy-deploy.sh` (Mac) → `remote-apply.sh` (Server: Konfliktprüfung, Sicherung, Einspielen, `patch-data.php`, Live-Test, Rollback)
+  - [x] 21h Cookielose Statistik komplett serverseitig (kein JavaScript, kein Zugriff aufs Endgerät): `partials/stats.php`, Aufruf in `head.php` → `assets/data/stats/*.jsonl`, Admin › Statistik (Quellen inkl. KI-Suchen, Crawler, Anfragen, Bewerbungen, 404-Liste)
+  - [x] 21i Deploy-Werkzeug `ops/`: `visitfy-sync.sh` (Live-Stand + Server-Infos nur lesend nach ~/scratch), `build-package.py` (Paket gegen Live-Stand), `visitfy-deploy.sh` (Mac) → `remote-apply.sh` (Server: Konfliktprüfung, Sicherung, Einspielen, `patch-data.php`, Live-Test, Rollback)
+  - [x] 21j Rundgänge gesamt aus dem CRM: `partials/crm.php` + `config.crm.php` (nicht im Git, Vorlage `config.crm.php.example`, MySQL oder JSON-URL), 1 h Cache in `assets/data/cache/`, bei Ausfall letzter Wert bzw. `fallback`; Platzhalter `{rundgaenge}` / `{partner}` in content.json-Texten (`visitfy_get()` füllt sie), `patch-data.php` setzt sie, sobald das CRM antwortet
+  - [x] 21k Lieferzeit einheitlich „max. 5 Tage“ (Code-Defaults, FAQ, llms.txt; content.json per `patch-data.php`); `llms.txt` jetzt dynamisch aus `llms.php`
 
 ## SEO/GEO-Plan (Stand 17.10.2026)
 
@@ -137,7 +139,10 @@ Stand: 2026-05-19 · Branch: `claude/elegant-sammet-caa710` (Auto-Deploy aktiv)
 - [ ] Phase 1: Stadtseiten für Partnerstandorte (mit echtem Partner, Referenzen, lokalen FAQ), Branchenseiten, Preisseite „Was kostet ein 360°-Rundgang?“, Referenzseite
 - [ ] Phase 2: Ratgeber (2–4/Monat) für Kunden und Partner – Antwort im ersten Absatz, Tabellen, FAQ, Datum/Autor
 - [ ] Phase 3: Google-Unternehmensprofile (Visitfy + Partner), Credit-Link „360°-Rundgang: Visitfy“ bei Kunden, einheitliche Verzeichniseinträge, Regionalpresse
-- [ ] Zahlen vereinheitlichen (Rundgänge gesamt, „3 vs. 5 Werktage“, Case-Prozente belegen), Flora als eigenes Café kennzeichnen
+- [x] Lieferzeit einheitlich „max. 5 Tage“
+- [ ] Rundgänge gesamt: `config.crm.php` auf dem Server anlegen (Tabelle/Abfrage nach `visitfy-sync.sh` festlegen, DB-Benutzer nur mit Leserecht)
+- [ ] Case-Prozente belegen, Flora als eigenes Café kennzeichnen
+- [ ] Partnerstimmen: nur echte Partner mit schriftlicher Freigabe (Foto, Name, Zitat, Umsatz) – dann `freigegeben => true` in `partials/partner-testimonials.php`
 
 ## Offen / Roadmap
 

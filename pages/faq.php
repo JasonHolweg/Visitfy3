@@ -29,7 +29,7 @@ $faqs = [
     ],
     [
         'q' => 'Wie lange dauert die Erstellung eines Rundgangs?',
-        'a' => '<p>Nach dem Briefing-Gespräch und der Aufnahme vor Ort ist Ihr Rundgang im Durchschnitt innerhalb von 5 Werktagen live. Für größere Locations oder Sonderwünsche kalkulieren wir gemeinsam den Zeitplan.</p>',
+        'a' => '<p>Nach dem Briefing-Gespräch und der Aufnahme vor Ort ist Ihr Rundgang spätestens 5 Tage später online. Für größere Locations oder Sonderwünsche kalkulieren wir gemeinsam den Zeitplan.</p>',
     ],
     [
         'q' => 'Wo kann ich den Rundgang einbinden?',

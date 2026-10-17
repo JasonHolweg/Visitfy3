@@ -25,11 +25,11 @@ if (!function_exists('visitfy_get')) {
         $cursor = $source;
         foreach ($segments as $segment) {
             if (!is_array($cursor) || !array_key_exists($segment, $cursor)) {
-                return $fallback;
+                return is_string($fallback) ? visitfy_fill($fallback) : $fallback;
             }
             $cursor = $cursor[$segment];
         }
-        return $cursor;
+        return is_string($cursor) ? visitfy_fill($cursor) : $cursor;
     }
 }
 
@@ -43,6 +43,7 @@ if (!function_exists('visitfy_split_lines')) {
 }
 
 require_once __DIR__ . '/urls.php';
+require_once __DIR__ . '/crm.php';
 
 if (!function_exists('visitfy_base_path')) {
     /** Basis-Pfad der Website. Seit den sauberen URLs identisch mit visitfy_site_root(). */

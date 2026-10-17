@@ -17,13 +17,13 @@ import argparse, hashlib, io, os, subprocess, sys, tarfile, time
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-NEVER_DEPLOY_PREFIX = ('ops/', '.github/', 'assets/data/stats/')
+NEVER_DEPLOY_PREFIX = ('ops/', '.github/', 'assets/data/stats/', 'assets/data/cache/')
 NEVER_DEPLOY = {
     '.gitignore', 'LICENSE', 'robots.txt',
     'assets/data/content.json', 'assets/data/tours.json', 'assets/data/inquiries.json',
     'assets/data/script-config.json', 'assets/data/content.json.bak',
     'pages/impressum.php', 'pages/datenschutz.php',
-    'config.mail.php', 'config.admin.php', 'config.turnstile.php',
+    'config.mail.php', 'config.admin.php', 'config.turnstile.php', 'config.crm.php',
 }
 NEVER_DEPLOY_SUFFIX = ('.md',)
 

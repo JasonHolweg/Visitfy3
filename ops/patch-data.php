@@ -58,6 +58,89 @@ if (is_file($contentFile)) {
     out('content.json nicht gefunden – SEO-Titel bleiben die Standardwerte aus index.php');
 }
 
+/* ── 1b) Lieferzeit: „max. 5 Tage“ statt „3 Tage“ in allen Texten + KPI ── */
+if (is_file($contentFile)) {
+    $content = json_decode((string)file_get_contents($contentFile), true);
+    $rules = [
+        '/Ø\s*3\s*Tage\s+bis\s+live/u'                                   => 'max. 5 Tage bis online',
+        '/in\s+unter\s+3\s+Tagen\s+live/iu'                               => 'in maximal 5 Tagen online',
+        '/In\s+3\s+Werktagen\s+live/u'                                     => 'In max. 5 Tagen online',
+        '/In\s+nur\s+3\s+Tagen/u'                                          => 'In maximal 5 Tagen',
+        '/In\s+3\s+Tagen\s+live/u'                                         => 'In max. 5 Tagen online',
+        '/im\s+Durchschnitt\s+innerhalb\s+von\s+[35]\s+Werktagen\s+live/u' => 'spätestens 5 Tage später online',
+    ];
+    $changes = 0;
+    $walk = function (&$node) use (&$walk, $rules, &$changes) {
+        if (is_array($node)) {
+            foreach ($node as &$child) {
+                $walk($child);
+            }
+            unset($child);
+        } elseif (is_string($node)) {
+            $new = preg_replace(array_keys($rules), array_values($rules), $node);
+            if (is_string($new) && $new !== $node) {
+                $node = $new;
+                $changes++;
+            }
+        }
+    };
+    $walk($content);
+    foreach ((array)($content['kpi']['items'] ?? []) as $i => $item) {
+        $label = (string)($item['label'] ?? '');
+        $suffix = trim((string)($item['suffix'] ?? ''));
+        if (preg_match('/live\s+geht|online\s+ist/u', $label) || ((string)($item['target'] ?? '') === '3' && preg_match('/^Tag/u', $suffix))) {
+            $content['kpi']['items'][$i] = ['target' => '5', 'suffix' => 'Tage', 'label' => 'maximal, bis Ihr Rundgang online ist'];
+            $changes++;
+        }
+    }
+    if ($changes > 0) {
+        write_json($contentFile, $content);
+        out("content.json: Lieferzeit auf „max. 5 Tage“ angepasst ($changes Stellen)");
+    }
+    $left = [];
+    array_walk_recursive($content, function ($v, $k) use (&$left) {
+        if (is_string($v) && preg_match('/\b3\s*(Werk)?[Tt]age/u', $v)) {
+            $left[] = mb_substr($v, 0, 90);
+        }
+    });
+    foreach ($left as $l) {
+        out("Hinweis – noch „3 Tage“ im Text: „{$l}“");
+    }
+}
+
+/* ── 1c) Gesamtzahl Rundgänge aus dem CRM (nur wenn config.crm.php funktioniert) ── */
+if (is_file($root . '/config.crm.php') && is_file($root . '/partials/crm.php') && is_file($contentFile)) {
+    require_once $root . '/partials/crm.php';
+    $tours = visitfy_crm_fetch_tours();
+    if ($tours === null) {
+        out('CRM: keine Zahl erhalten – Texte bleiben unverändert (config.crm.php prüfen)');
+    } else {
+        out("CRM: $tours Rundgänge");
+        $content = json_decode((string)file_get_contents($contentFile), true);
+        $changes = 0;
+        foreach ((array)($content['kpi']['items'] ?? []) as $i => $item) {
+            $label = (string)($item['label'] ?? '');
+            if (preg_match('/Rundgänge|Projekte/u', $label) && !preg_match('/online|live/u', $label) && ($item['target'] ?? '') !== '{rundgaenge}') {
+                $content['kpi']['items'][$i]['target'] = '{rundgaenge}';
+                $content['kpi']['items'][$i]['suffix'] = '';
+                $changes++;
+            }
+        }
+        foreach (['paragraph_1', 'paragraph_2', 'paragraph_3'] as $key) {
+            $text = (string)($content['about'][$key] ?? '');
+            $new = preg_replace('/über\s+\d+\s+abgeschlossenen\s+Projekten/u', '{rundgaenge} umgesetzten Rundgängen', $text);
+            if (is_string($new) && $new !== $text) {
+                $content['about'][$key] = $new;
+                $changes++;
+            }
+        }
+        if ($changes > 0) {
+            write_json($contentFile, $content);
+            out("content.json: Rundgang-Zahl kommt jetzt aus dem CRM ($changes Stellen)");
+        }
+    }
+}
+
 /* ── 2) Intro kürzer (nur wenn noch die alten Standardwerte gesetzt sind) ── */
 $scriptFile = $root . '/assets/data/script-config.json';
 if (is_file($scriptFile)) {

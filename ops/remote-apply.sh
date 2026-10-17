@@ -87,13 +87,15 @@ for path in "${files[@]}"; do
 done
 green "✓ ${#files[@]} Dateien eingespielt (Besitzer $OWNER)"
 
-# Statistik-Ordner: muss für PHP beschreibbar sein
-mkdir -p "$ROOT/assets/data/stats"
-chown "$PHPUSER" "$ROOT/assets/data/stats" 2>/dev/null || true
-chmod 755 "$ROOT/assets/data/stats"
-printf 'Require all denied\n' > "$ROOT/assets/data/stats/.htaccess"
-chown "$PHPUSER" "$ROOT/assets/data/stats/.htaccess" 2>/dev/null || true
-info "Statistik-Ordner gehört $PHPUSER"
+# Statistik- und Cache-Ordner (CRM-Zahl): müssen für PHP beschreibbar sein
+for dir in "$ROOT/assets/data/stats" "$ROOT/assets/data/cache"; do
+  mkdir -p "$dir"
+  chown "$PHPUSER" "$dir" 2>/dev/null || true
+  chmod 755 "$dir"
+  printf 'Require all denied\n' > "$dir/.htaccess"
+  chown "$PHPUSER" "$dir/.htaccess" 2>/dev/null || true
+done
+info "Statistik- und Cache-Ordner gehören $PHPUSER"
 
 # Daten anpassen (SEO-Titel, Intro-Zeiten, robots.txt, Rechtsseiten)
 if [ -f "$PKG/_deploy/patch-data.php" ]; then
