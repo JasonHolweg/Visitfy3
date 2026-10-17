@@ -11,20 +11,28 @@ $contentConfig = visitfy_load_json(__DIR__ . '/../assets/data/content.json', [])
 
 $aboutNetwork = require __DIR__ . '/../partials/partner-network.php';
 $aboutPartners = (int)($aboutNetwork['stats']['partners'] ?? 0);
-$pageTitle = 'Über Visitfy – 360°-Rundgänge aus Flensburg für ganz Deutschland';
-$pageDesc  = 'Visitfy aus Flensburg erstellt virtuelle 360°-Rundgänge für Unternehmen'
+$pageTitle = 'Über Visitfy – 360°-Rundgänge aus dem Raum Flensburg';
+$pageDesc  = 'Visitfy aus Handewitt bei Flensburg erstellt virtuelle 360°-Rundgänge für Unternehmen'
            . ($aboutPartners > 0 ? ' und arbeitet mit ' . $aboutPartners . ' Partnern in ganz Deutschland' : '')
-           . '. Wer wir sind und wie wir arbeiten.';
+           . '. Wer hinter Visitfy steht und wie wir arbeiten.';
 require_once __DIR__ . '/../partials/schema.php';
 $aboutUrl = visitfy_page_url('about', true);
 $jsonLd = [[
     '@context' => 'https://schema.org',
     '@graph' => [
         visitfy_schema_organization($contentConfig),
+        visitfy_schema_website(),
         array_merge(
             visitfy_schema_webpage($aboutUrl, $pageTitle, $pageDesc, [['Start', visitfy_page_url('home', true)], ['Über uns', $aboutUrl]]),
             ['@type' => 'AboutPage']
         ),
+        [
+            '@type'    => 'Person',
+            '@id'      => VISITFY_SITE_URL . '/#kristian-meister',
+            'name'     => (string)visitfy_get($contentConfig, 'team.kristian_name', 'Kristian Meister'),
+            'jobTitle' => (string)visitfy_get($contentConfig, 'team.kristian_role', 'Geschäftsführer'),
+            'worksFor' => ['@id' => visitfy_schema_org_id()],
+        ],
     ],
 ]];
 
@@ -46,9 +54,8 @@ $perfectionIcons = [
   '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>', /* Schnell */
 ];
 
-/* Team photos */
+/* Team photo */
 $kristianPhoto = (string)visitfy_get($contentConfig, 'team.kristian_photo', '');
-$jasonPhoto    = (string)visitfy_get($contentConfig, 'team.jason_photo', '');
 ?>
 
 <main id="main-content">
@@ -61,9 +68,9 @@ $jasonPhoto    = (string)visitfy_get($contentConfig, 'team.jason_photo', '');
         <p class="hero-eyebrow"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.eyebrow', 'ÜBER UNS'), ENT_QUOTES, 'UTF-8') ?></p>
         <h1 id="about-hero-heading"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.title', 'Über Visitfy'), ENT_QUOTES, 'UTF-8') ?></h1>
         <div class="about-hero-copy">
-          <p class="fade-up delay-1"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.paragraph_1', 'Visitfy ist ein spezialisierter Anbieter für professionelle 360° virtuelle Rundgänge.'), ENT_QUOTES, 'UTF-8') ?></p>
-          <p class="fade-up delay-2"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.paragraph_2', ''), ENT_QUOTES, 'UTF-8') ?></p>
-          <p class="fade-up delay-3"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.paragraph_3', ''), ENT_QUOTES, 'UTF-8') ?></p>
+          <!-- Bewusst nur EIN kurzer Lead-Satz (= "Absatz 1" im Admin).
+               Die ausführlichen Texte stehen in den Sections darunter. -->
+          <p class="fade-up delay-1"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'about.paragraph_1', 'Wir machen Ihre Location digital erlebbar – mit 360° Rundgängen, die Vertrauen schaffen.'), ENT_QUOTES, 'UTF-8') ?></p>
         </div>
       </div>
     </div>
@@ -130,24 +137,6 @@ $jasonPhoto    = (string)visitfy_get($contentConfig, 'team.jason_photo', '');
           <p class="about-team-role"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'team.kristian_role', 'Geschäftsführer'), ENT_QUOTES, 'UTF-8') ?></p>
           <h3><?= htmlspecialchars((string)visitfy_get($contentConfig, 'team.kristian_name', 'Kristian Meister'), ENT_QUOTES, 'UTF-8') ?></h3>
           <p><?= htmlspecialchars((string)visitfy_get($contentConfig, 'team.kristian_text', ''), ENT_QUOTES, 'UTF-8') ?></p>
-        </article>
-
-        <article class="about-team-card glass fade-up delay-2">
-<?php if ($jasonPhoto): ?>
-          <div class="about-team-photo">
-            <img src="<?= htmlspecialchars($root . $jasonPhoto, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars((string)visitfy_get($contentConfig, 'team.jason_name', 'Jason Holweg'), ENT_QUOTES, 'UTF-8') ?>" loading="lazy">
-          </div>
-<?php else: ?>
-          <div class="about-team-avatar" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          </div>
-<?php endif; ?>
-          <p class="about-team-role"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'team.jason_role', 'Entwickler'), ENT_QUOTES, 'UTF-8') ?></p>
-          <h3><?= htmlspecialchars((string)visitfy_get($contentConfig, 'team.jason_name', 'Jason Holweg'), ENT_QUOTES, 'UTF-8') ?></h3>
-          <p><?= htmlspecialchars((string)visitfy_get($contentConfig, 'team.jason_text', ''), ENT_QUOTES, 'UTF-8') ?></p>
-          <p>
-            <a class="jason-gradient-link" href="<?= htmlspecialchars((string)visitfy_get($contentConfig, 'team.jason_link_url', 'https://jasonholweg.de'), ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'team.jason_link_text', 'jasonholweg.de'), ENT_QUOTES, 'UTF-8') ?></a>
-          </p>
         </article>
       </div>
     </div>

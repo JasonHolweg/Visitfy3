@@ -37,6 +37,7 @@ $contentConfig = visitfy_load_json(__DIR__ . '/assets/data/content.json', []);
 
 $pageTitle = (string)visitfy_get($contentConfig, 'seo.home_title', 'Visitfy | 360° Rundgänge für moderne Unternehmen');
 $pageDesc  = (string)visitfy_get($contentConfig, 'seo.home_desc', 'Visitfy entwickelt professionelle 360° virtuelle Rundgänge für Unternehmen jeder Branche – realistisch, hochwertig und sofort einsatzbereit für Website und Google Business.');
+$pageSchemaKey = 'home';
 
 require_once __DIR__ . '/partials/schema.php';
 $canonicalPath = visitfy_page_url('home');
@@ -102,15 +103,21 @@ if (!is_array($kpiItems) || !$kpiItems) {
 
 <!-- ══════════════════════════════════════════════════════════
      INTRO / PRELOADER OVERLAY
+     Nur beim ersten Besuch der Session — Flag wird vor dem
+     Rendern geprüft, damit das Overlay nicht kurz aufblitzt.
 ══════════════════════════════════════════════════════════ -->
 <script>
-/* Intro nur beim Einstieg von außen zeigen – ohne Cookies/Storage, vor dem ersten Rendern entschieden. */
+/* Intro nur beim Einstieg von außen und höchstens einmal pro Sitzung – vor dem ersten Rendern entschieden. */
 (function () {
+  var d = document.documentElement;
   try {
     var r = document.referrer, o = location.origin;
     if ((r && r.indexOf(o) === 0) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      document.documentElement.classList.add('no-intro');
+      d.classList.add('no-intro');
     }
+  } catch (e) {}
+  try {
+    if (sessionStorage.getItem('visitfyIntroSeen') === '1') { d.classList.add('intro-seen', 'no-intro'); }
   } catch (e) {}
 })();
 </script>
@@ -547,7 +554,10 @@ if (!is_array($kpiItems) || !$kpiItems) {
   $prettyName = preg_replace('/\s+/', ' ', (string)$prettyName);
   $prettyName = trim((string)$prettyName);
   $altText = $prettyName !== '' ? $prettyName : 'Kundenlogo';
-  $logoSrc = visitfy_url('assets/img/client-logos/' . rawurlencode($fileName));
+  // Cache-Buster via filemtime: umgeht den langen Cloudflare-Cache (max-age 180d)
+  // bei Logo-Updates, ohne manuellen CF-Purge.
+  $logoVer = @filemtime($logoPath) ?: 1;
+  $logoSrc = visitfy_url('assets/img/client-logos/' . rawurlencode($fileName)) . '?v=' . $logoVer;
 ?>
         <span class="marquee-logo" title="<?= htmlspecialchars($altText, ENT_QUOTES, 'UTF-8') ?>">
           <img src="<?= htmlspecialchars($logoSrc, ENT_QUOTES, 'UTF-8') ?>"

@@ -91,7 +91,14 @@ foreach ($buttonFxTargets as $target) {
       <!-- Contact -->
       <div class="footer-links-group">
         <h4>Kontakt</h4>
-        <a href="mailto:<?= htmlspecialchars((string)visitfy_get($contentConfig, 'footer.contact_email', 'info@visitfy.de'), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'footer.contact_email', 'info@visitfy.de'), ENT_QUOTES, 'UTF-8') ?></a><!-- TODO: verify email -->
+        <address class="footer-address">
+          Visitfy<br>
+          Flensburger Str. 25<br>
+          24976 Handewitt<br>
+          Deutschland
+        </address>
+        <a href="tel:+4915206955260">+49 1520 6955260</a>
+        <a href="mailto:<?= htmlspecialchars((string)visitfy_get($contentConfig, 'footer.contact_email', 'info@visitfy.de'), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string)visitfy_get($contentConfig, 'footer.contact_email', 'info@visitfy.de'), ENT_QUOTES, 'UTF-8') ?></a>
         <a href="<?= htmlspecialchars(visitfy_page_url('kontakt'), ENT_QUOTES, 'UTF-8') ?>">Kontaktformular</a>
       </div>
 

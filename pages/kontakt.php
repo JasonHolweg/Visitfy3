@@ -34,7 +34,8 @@ $jsonLd = [[
             visitfy_schema_webpage($kontaktUrl, $pageTitle, $pageDesc, [['Start', visitfy_page_url('home', true)], ['Kontakt', $kontaktUrl]]),
             ['@type' => 'ContactPage']
         ),
-        ['@type' => 'Organization', '@id' => visitfy_schema_org_id(), 'name' => 'Visitfy', 'url' => VISITFY_SITE_URL . '/'],
+        visitfy_schema_organization($contentConfig),
+        visitfy_schema_website(),
     ],
 ]];
 

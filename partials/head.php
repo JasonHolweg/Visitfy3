@@ -3,14 +3,15 @@
  * Visitfy3 – partials/head.php
  * Outputs <head> content.
  * Variables expected (with defaults):
- *   $pageTitle   string
- *   $pageDesc    string
- *   $pageOgImg   string (optional)
+ *   $pageTitle     string
+ *   $pageDesc      string
+ *   $pageOgImg     string (optional, Standard assets/img/og-home.png)
  *   $root          string (Pfad-Präfix, i. d. R. visitfy_site_root() = '/')
  *   $canonicalPath string (optional, z. B. visitfy_page_url('faq'))
  *   $noCanonical   bool   (optional, z. B. 404-Seite)
  *   $pageRobots    string (optional)
- *   $jsonLd        array  (optional, Liste von JSON-LD-Objekten)
+ *   $jsonLd        array  (optional, Liste von JSON-LD-Objekten aus partials/schema.php)
+ *   $pageSchemaKey string (alt, nur noch Rückfall: 'impressum' | 'datenschutz' … → visitfy_render_jsonld() aus cms.php)
  */
 require_once __DIR__ . '/cms.php';
 require_once __DIR__ . '/stats.php';
@@ -40,42 +41,47 @@ $ogImgAbs = $pageOgImg !== '' ? (preg_match('#^https?://#', $pageOgImg) ? $pageO
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="<?= htmlspecialchars($pageDesc, ENT_QUOTES, 'UTF-8') ?>">
   <meta name="robots" content="<?= htmlspecialchars($pageRobots, ENT_QUOTES, 'UTF-8') ?>">
+  <meta name="author" content="Visitfy">
+  <meta name="publisher" content="Visitfy">
+  <meta name="theme-color" content="#061423">
 <?php if (empty($noCanonical)): ?>
   <link rel="canonical" href="<?= htmlspecialchars($canonicalUrl, ENT_QUOTES, 'UTF-8') ?>">
+  <link rel="alternate" hreflang="de-DE" href="<?= htmlspecialchars($canonicalUrl, ENT_QUOTES, 'UTF-8') ?>">
+  <link rel="alternate" hreflang="x-default" href="<?= htmlspecialchars($canonicalUrl, ENT_QUOTES, 'UTF-8') ?>">
 <?php endif; ?>
-  <meta name="theme-color" content="#0a0a0a">
 
   <!-- Open Graph -->
   <meta property="og:type"        content="website">
-  <meta property="og:title"       content="<?= htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8') ?>">
-  <meta property="og:description" content="<?= htmlspecialchars($pageDesc, ENT_QUOTES, 'UTF-8') ?>">
   <meta property="og:site_name"   content="Visitfy">
   <meta property="og:locale"      content="de_DE">
+  <meta property="og:title"       content="<?= htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8') ?>">
+  <meta property="og:description" content="<?= htmlspecialchars($pageDesc, ENT_QUOTES, 'UTF-8') ?>">
   <meta property="og:url"         content="<?= htmlspecialchars($canonicalUrl, ENT_QUOTES, 'UTF-8') ?>">
 <?php if ($ogImgAbs): ?>
   <meta property="og:image"       content="<?= htmlspecialchars($ogImgAbs, ENT_QUOTES, 'UTF-8') ?>">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta name="twitter:image"      content="<?= htmlspecialchars($ogImgAbs, ENT_QUOTES, 'UTF-8') ?>">
 <?php endif; ?>
 
   <!-- Twitter Card -->
   <meta name="twitter:card"        content="summary_large_image">
   <meta name="twitter:title"       content="<?= htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8') ?>">
   <meta name="twitter:description" content="<?= htmlspecialchars($pageDesc, ENT_QUOTES, 'UTF-8') ?>">
-
-<?php foreach ($jsonLd as $ld): ?>
-  <script type="application/ld+json"><?= json_encode($ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?></script>
-<?php endforeach; ?>
+<?php if ($ogImgAbs): ?>
+  <meta name="twitter:image"       content="<?= htmlspecialchars($ogImgAbs, ENT_QUOTES, 'UTF-8') ?>">
+<?php endif; ?>
 
   <title><?= htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8') ?></title>
 
-  <!-- Favicon -->
+  <!-- Favicon / Touch Icon -->
   <link rel="icon" href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>assets/img/logo.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>assets/img/logo.svg">
+  <link rel="mask-icon" href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>assets/img/logo.svg" color="#061423">
 
   <!-- Schrift Inter (400/500/600) lokal – keine Verbindung zu Google (DSGVO, schneller) -->
   <link rel="preload" href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>assets/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>assets/fonts/inter-latin-600.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" as="image" href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>assets/img/logo.svg" type="image/svg+xml">
   <style>
     @font-face { font-family: 'Inter'; font-style: normal; font-weight: 400; font-display: swap; src: url('<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>assets/fonts/inter-latin-400.woff2') format('woff2'); }
     @font-face { font-family: 'Inter'; font-style: normal; font-weight: 500; font-display: swap; src: url('<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>assets/fonts/inter-latin-500.woff2') format('woff2'); }
@@ -84,4 +90,13 @@ $ogImgAbs = $pageOgImg !== '' ? (preg_match('#^https?://#', $pageOgImg) ? $pageO
 
   <!-- Stylesheet -->
   <link rel="stylesheet" href="<?= htmlspecialchars($root, ENT_QUOTES, 'UTF-8') ?>assets/css/style.css?v=<?= filemtime(dirname(__DIR__) . '/assets/css/style.css') ?>">
+
+  <!-- Strukturierte Daten (Schema.org JSON-LD) -->
+<?php if ($jsonLd): ?>
+<?php foreach ($jsonLd as $ld): ?>
+  <script type="application/ld+json"><?= json_encode($ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?></script>
+<?php endforeach; ?>
+<?php elseif (!empty($pageSchemaKey) && function_exists('visitfy_render_jsonld')): ?>
+<?= visitfy_render_jsonld((string)$pageSchemaKey, (string)$pageTitle, (string)$pageDesc) ?>
+<?php endif; ?>
 </head>

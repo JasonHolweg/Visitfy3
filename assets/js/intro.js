@@ -31,6 +31,8 @@
   let phaseStart = 0;
   let skipCalled = false;
 
+  const INTRO_SEEN_KEY = 'visitfyIntroSeen';
+
   /* ── Init ───────────────────────────────────────────────── */
   function init() {
     var introEl = document.getElementById('intro');
@@ -47,6 +49,16 @@
 
     canvas = document.getElementById('intro-canvas');
     if (!canvas) return;
+
+    // Intro höchstens einmal pro Sitzung (Rückfall, falls das Inline-Script in index.php nicht lief).
+    var introSeen = false;
+    try { introSeen = sessionStorage.getItem(INTRO_SEEN_KEY) === '1'; } catch (e) {}
+    if (introSeen) {
+      introEl.style.display = 'none';
+      revealMain(true);
+      return;
+    }
+    try { sessionStorage.setItem(INTRO_SEEN_KEY, '1'); } catch (e) {}
 
     ctx = canvas.getContext('2d');
     resize();

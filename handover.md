@@ -1,12 +1,15 @@
 # Handover – Visitfy3
 
-Stand: 2026-05-19 · Branch: `claude/elegant-sammet-caa710` (Auto-Deploy aktiv)
+Stand: 2026-10-17 · Branch: `seo/phase-0` – enthält den kompletten Live-Stand vom 17.10.2026 (Phasen 17–23 vom Server übernommen) plus Phasen 24–28
 
 ## Deploy
 
 - **Stack**: PHP (server-rendered) · HTML/CSS/Vanilla JS · GSAP · Mailgun · Cloudflare Turnstile · JSON als Flat-File-CMS (keine DB).
-- **Hosting**: Apache. Hardening + Header über [.htaccess](.htaccess).
-- **Deploy**: `./deploy.sh` im Repo-Root (SSH/rsync, Config in `.deploy.env`). Worktree-Branches müssen vorher nach `main` gemerged sein. Lokal: `php -S localhost:8000`.
+- **Hosting (seit 2026-07-16)**: Eigener Server `178.104.95.146` (Ubuntu, Apache2, mod_php 8.3), DocumentRoot `/var/www/visitfy.de`, vHosts `visitfy.conf`/`visitfy-le-ssl.conf`, Let's-Encrypt-Cert (auto-renew). DNS via Cloudflare (proxied, SSL-Mode Full). Altes Shared Hosting (FTP `92.205.250.36`) ist tot. Hardening + Header über [.htaccess](.htaccess).
+- **Deploy ab Phase 28**: über `ops/` – `bash ~/scratch/visitfy-sync.sh` (Live-Stand holen, nur lesend) → Paket mit `ops/build-package.py` gegen diesen Stand bauen → `bash ~/scratch/visitfy-deploy.sh` (Konfliktprüfung, Sicherung in `/root/visitfy-backups/`, Datenanpassung, Prüfung direkt am Server, automatisches Zurückrollen). SSH geht nur über die IP (Cloudflare davor), gemerkt in `~/scratch/.visitfy-ssh`.
+- ⚠️ **`deploy.sh` (rsync) nur aus einem Stand, der `seo/phase-0` enthält** – ein älterer lokaler `main` überschreibt sonst Phase 24–28 auf dem Server.
+- **Deploy (alt)**: `./deploy.sh` im Repo-Root (SSH/rsync als root, Config in `.deploy.env`, `DEPLOY_CHOWN` setzt danach `www-data`). Excludes schützen Runtime-Daten + Configs auf dem Server. Worktree-Branches müssen vorher nach `main` gemerged sein. Lokal: `php -S localhost:8000`.
+- **Secrets auf dem Server** (`/var/www/visitfy.de`, chmod 600): `config.mail.php` (Mailgun via mg.jasonholweg.de, Anfragen → hallo@jasonholweg.de), `config.admin.php` (Admin-Login). `config.turnstile.php` fehlt bewusst → Turnstile deaktiviert (Keys wären domain-gebunden; bei Bedarf Widget für visitfy.de in Cloudflare anlegen).
 - **Geheimnisse** (alle `.gitignore`): `config.mail.php`, `config.admin.php`, `config.turnstile.php`, `.deploy.env`, `deploy.sh`.
 - **Runtime-Daten** (nicht in Git, nur via Admin): `assets/data/content.json`, `assets/data/tours.json`, `inquiries.json`.
 - **Rechtliche Seiten** (echte Kontaktdaten, nicht in Git): `pages/impressum.php`, `pages/datenschutz.php`.
@@ -68,7 +71,7 @@ Stand: 2026-05-19 · Branch: `claude/elegant-sammet-caa710` (Auto-Deploy aktiv)
   - [x] 12c Klick führt zu `#tours`; Apple-feel: 18 px Border-Radius, `box-shadow`-Hover, `translateY(-3px)`
   - [x] 12d Card 3 nach unten (`bottom: 8%` → `2%`) um Überlappung mit H1 zu vermeiden
   - [x] 12e Sanftes Drift-Loop pro Card (eigene Keyframes, 11/13.5/16 s, negativer `animation-delay` für desynchronen Start). Nutzt CSS-Properties `translate` + `rotate` damit `transform` für Hover frei bleibt
-- [x] **Phase 13 – Snap-Scroll**
+- [x] **Phase 13 – Snap-Scroll** ⚠️ **2026-07-22 komplett entfernt** (Phase 19b) – nicht wieder einbauen
   - [x] 13a `scroll-snap-type: y proximity` auf `html`, `scroll-padding-top: 56px` für Nav
   - [x] 13b Snap-Targets: `.hero` + `.mockup-section` (Hero → nächste Section); spätere Sections bleiben frei wegen GSAP-Pin in `.scroll-stack-section`
   - [x] 13c Reduced-Motion: Snap komplett deaktiviert
@@ -98,41 +101,77 @@ Stand: 2026-05-19 · Branch: `claude/elegant-sammet-caa710` (Auto-Deploy aktiv)
   - [x] 16c Frames vereinheitlicht: 14/22/26 px Radius, satter Drop-Shadow (`0 40px 80px -20px /0.7`), subtiler 0.06-Border
   - [x] 16d Tablet/Phone größer: Tablet `170-270 px` (war `120-200`), Phone `105-165 px` (war `70-120`) — substantieller Produkt-Showcase-Look
 
-- [x] **Phase 17 – Partner-werden-Seite v2**
-  - [x] 17a Hero mit Ø-Monatsumsatz (Count-up + Chrome-Shimmer), Stats-Leiste, Fußnote „Umsatz, nicht Gewinn“
-  - [x] 17b Deutschlandkarte (Dot-Matrix, inline SVG, `partials/germany-map-paths.php`) mit Pins, Netzwerk-Bögen ab Flensburg, offenen Süd-Gebieten + Süden-CTA
-  - [x] 17c Verdienst-Rechner (Range-Slider), Dashboard-Mockup, Empfehlungsprogramm (35 %-Ring + Stepper)
-  - [x] 17d Formular: Pflichtfeld „Stadt / Region“ (Handler + Mail), `$extraScripts`-Hook im Footer, `assets/js/partner.js`
-  - [x] 17e Zahlen & Standorte zentral in `partials/partner-network.php` (Hero-/Proof-Copy nicht mehr über Admin-Hero-Felder)
-- [x] **Phase 18 – SEO / GEO**
-  - [x] 18a `head.php`: Canonical pro Seite (vorher nie ausgegeben), `og:url`/`og:locale`/`og:image` absolut, `twitter:image`, `theme-color`, `$jsonLd`/`$pageRobots`/`$canonicalPath`-Hooks
-  - [x] 18b Partner-Seite: neuer Title/Description, JSON-LD (Organization + WebPage/Breadcrumb + FAQPage), sichtbare FAQ (7 Fragen, identisch mit Schema), OG-Bild `assets/img/og-partner.png`
-  - [x] 18c `robots.txt` (Admin + Handler gesperrt), `sitemap.xml`, `llms.txt` (GEO-Faktenblatt), Admin `noindex`
-- [x] **Phase 19 – Partner-Seite Feinschliff**
-  - [x] 19a KI-Optik raus: grüne Live-Pille, Aurora/Grid-Hintergrund, Scroll-Maus, Süd-Glow, Scan-Linie, Emoji, Icon-Kacheln, ✓-Trust-Zeile; Stats als Haarlinien-Spalten
-  - [x] 19b Karte: freie Regionen bundesweit (`free` in `partner-network.php`, unbeschriftet) + Box „8 von 16 Bundesländern“ (automatisch aus `states` vs. aktiven Regionen)
-  - [x] 19c Dashboard-Tour: echtes Logo, 3 Ansichten (Rechnungen/Firmen/Empfehlungen) als Tabs mit Autoplay, Fortschrittslinie und Toast
-  - [x] 19d Empfehlung: 35 % zählt von 1 hoch (Ring synchron), Gutschrift-Tabelle statt 01/02/03-Karten, Stepper integriert
-  - [x] 19e Leistungen als Zeilen statt Karten (Kicker entfallen), Fit-Panel ins Formular gezogen (zweispaltig); ungenutzte Admin-Felder: `card_*_kicker`, `fit_eyebrow`, `fit_title`, `form_sub`, `hero_*`
-- [x] **Phase 20 – Partnerstimmen**
-  - [x] 20a Sektion unter dem Empfehlungsprogramm: großes Foto, Zitat, Ø-Monatsumsatz, 5 Umschalter mit Autoplay (Pause bei Hover)
-  - [x] 20b Inhalte in `partials/partner-testimonials.php`; live nur Einträge mit `freigegeben => true` + Name, Zitat, Foto (Datei muss existieren) und Umsatz; sonst ist die Sektion unsichtbar
-  - [x] 20c Platzhalter nur lokal mit `VISITFY_PREVIEW=1 php -S localhost:8000`; Fotos nach `assets/img/partner/` (4:5, ≥ 800 × 1000 px)
-  - [x] 20d `tabRotator()` in `partner.js` treibt Dashboard-Tour und Partnerstimmen
+- [x] **Phase 17 – Server-Umzug auf eigenen Server** (2026-07-16)
+  - [x] 17a `/var/www/visitfy.de` + Apache-vHosts (80/443) auf `178.104.95.146`, LE-Cert via webroot, HTTP→HTTPS-Redirect
+  - [x] 17b Configs serverseitig neu erzeugt (Mailgun aus Portfolio-Config übernommen, Admin-Passwort neu — altes FTP-Hosting samt Secrets unerreichbar)
+  - [x] 17c `.htaccess`: Direktzugriff auf `config.*.php` geblockt
+  - [x] 17d `deploy.sh`: SSH-Modus mit `DEPLOY_CHOWN`, Excludes um `inquiries.json`, `config.*.php`, `*.bak` ergänzt; `.deploy.env` auf SSH umgestellt
+  - [x] 17e Verifiziert: alle Seiten 200, Configs/inquiries 403, Sitemap/robots ok, Admin-Login ok
 
-- [x] **Phase 21 – SEO/GEO Phase 0 (Fundament)**
-  - [x] 21a Saubere URLs aus `partials/routes.php` (/partner-werden, /kontakt, /faq, /ueber-uns, /impressum, /datenschutz); `.htaccess` leitet /pages/*.php, ?page=…, /index.php, /de, www und http per 301 in einem Sprung um; Formulare (POST) bleiben unberührt
-  - [x] 21b 404-Seite, interne Ordner (partials, tools, ops, assets/data) per 404 gesperrt, .md/.sh/.bak/.jsonl gesperrt, Komprimierung + Browser-Cache
-  - [x] 21c `/sitemap.xml` dynamisch (`sitemap.php`), IndexNow-Schlüssel + `php tools/indexnow.php`
-  - [x] 21d JSON-LD über `partials/schema.php` (Organization, WebSite, Service, WebPage/Breadcrumb, FAQPage, About/ContactPage); FAQ-Seite datengetrieben
-  - [x] 21e Titel/Beschreibungen geschärft; Startseiten-Titel in content.json (seo.*) setzt das Deploy; KPI-Zahlen stehen im HTML
-  - [x] 21f Intro nur beim Einstieg von außen (Inline-Script, kein Storage) und kürzer (900/600 ms); Partikel nach Bildschirmfläche skaliert, pausieren unsichtbar
-  - [x] 21g Inter lokal (`assets/fonts/`), keine Google-Fonts-Verbindung mehr
-  - [x] 21h Cookielose Statistik komplett serverseitig (kein JavaScript, kein Zugriff aufs Endgerät): `partials/stats.php`, Aufruf in `head.php` → `assets/data/stats/*.jsonl`, Admin › Statistik (Quellen inkl. KI-Suchen, Crawler, Anfragen, Bewerbungen, 404-Liste)
-  - [x] 21i Deploy-Werkzeug `ops/`: `visitfy-sync.sh` (Live-Stand + Server-Infos nur lesend nach ~/scratch), `build-package.py` (Paket gegen Live-Stand), `visitfy-deploy.sh` (Mac) → `remote-apply.sh` (Server: Konfliktprüfung, Sicherung, Einspielen, `patch-data.php`, Live-Test, Rollback)
-  - [x] 21j Rundgänge gesamt aus dem CRM: `partials/crm.php` + `config.crm.php` (nicht im Git, Vorlage `config.crm.php.example`, MySQL oder JSON-URL), 1 h Cache in `assets/data/cache/`, bei Ausfall letzter Wert bzw. `fallback`; Platzhalter `{rundgaenge}` / `{partner}` in content.json-Texten (`visitfy_get()` füllt sie), `patch-data.php` setzt sie, sobald das CRM antwortet
-  - [x] 21k Lieferzeit einheitlich „max. 5 Tage“ (Code-Defaults, FAQ, llms.txt; content.json per `patch-data.php`); `llms.txt` jetzt dynamisch aus `llms.php`
-  - [x] 21l Cloudflare berücksichtigt: visitfy.de läuft über Cloudflare → SSH nur direkt mit der Server-IP (`ops/visitfy-ssh.sh`, fragt einmal nach und merkt sie in `~/scratch/.visitfy-ssh`); Live-Prüfung im Deploy direkt am Server (an Cloudflare-Cache/Bot-Schutz vorbei), Blick von außen nur als Hinweis; Statistik nimmt die echte Besucher-IP (`CF-Connecting-IP`) für den Tages-Hash
+- [x] **Phase 18 – Hero-Tuning** (2026-07-16)
+  - [x] 18a Hero-H1 verkleinert: `clamp(3.5rem, 11vw, 10rem)` → `clamp(3rem, 6vw, 6rem)` (war auf breiten Screens 160 px/Zeile)
+  - [x] 18b Intro nur noch beim ersten Besuch je Browser-Session (`sessionStorage` `visitfyIntroSeen`; Inline-Guard in index.php setzt `html.intro-seen` vor dem Paint → kein Aufblitzen; CSS-Regeln analog Reduced-Motion)
+
+- [x] **Phase 19 – Mobile-Scroll & Section-Symmetrie** (2026-07-22)
+  - [x] 19a Empfänger der Formulare auf `info@visitfy.de` umgestellt (`config.mail.php` auf dem Server). Absender bleibt `noreply@jasonholweg.de` — Mailgun hat **nur `mg.jasonholweg.de`** als aktive Sendedomain, `@visitfy.de` als From würde ohne DKIM im Spam landen
+  - [x] 19b **Scroll-Snap komplett entfernt** (`scroll-snap-type` auf `html` + `scroll-snap-align/-stop` auf Sections + Reduced-Motion-Ausnahme): rastete auf iOS/iPadOS gegen die GSAP-Pins und ruckelte. `scroll-padding-top: 56px` bleibt (nur für Anker-Sprünge unter der Sticky-Nav)
+  - [x] 19c „Warum 360°"-Panels symmetrisch: `margin-top:auto` am Titel raus (drückte Titel+Text nach unten → wandernde Positionen je Textlänge); ab 769 px teilen sich die Panels per **Subgrid** die Zeilen-Tracks. ⚠️ Kein `gap:0` am Panel — es erbt den `row-gap` des Grids als echten Abstand; mit `gap:0` entstand die Lücke nur aus ungenutztem Platz und verschwand bei zweizeiliger Headline. Karte 03 auf „Atmosphäre erleben" gekürzt (einzeilig wie die anderen). Verifiziert: alle 4 Panels identisch (Titel 80 px, Text 134 px, Abstand 17 px, Höhe 270 px)
+
+- [x] **Phase 20 – Über-uns überarbeitet** (2026-07-22)
+  - [x] 20a Jason Holweg als „Team" entfernt: Karte in [pages/about.php](pages/about.php), `team.jason_*` in `content.json` **und** der `Person`-Eintrag mit `worksFor` im JSON-LD ([partials/cms.php](partials/cms.php)) — letzterer deklarierte ihn maschinenlesbar als Visitfy-Mitarbeiter. ⚠️ Der Footer-Credit „Webseite von Jason Holweg" ist bewusst **geblieben** (Dienstleister-Credit, steht auf allen Seiten)
+  - [x] 20b Sektion heißt jetzt „Die Person hinter Visitfy" (Eyebrow) / „Kristian Meister" (Titel); einzelne Karte via `max-width: 560px` + `margin-inline: auto` mittig
+  - [x] 20c Hero: `.about-hero-panel` bekam `margin-inline: auto` — `max-width` ohne auto-Margins ließ den Block trotz `text-align:center` links kleben
+  - [x] 20d Hero-Text von 3 Absätzen auf **einen** Lead-Satz reduziert. Nutzt weiter `about.paragraph_1` (nicht ein neuer Key!), weil der Admin-Save das `about`-Array komplett ersetzt und einen unbekannten Key beim ersten Speichern gelöscht hätte. `paragraph_2/_3` + Jason-Felder aus [admin/page/content.php](admin/page/content.php) entfernt, damit dort nichts gepflegt wird, was nirgends erscheint
+
+- [x] **Phase 21 – Kundenlogos / Marquee** (2026-07-22)
+  - [x] 21a Server-Upload-Limit von 2M → 12M (`php_value upload_max_filesize/post_max_size` in [.htaccess](.htaccess), in `<IfModule php_module>` gekapselt). War die Ursache, warum große Logos im Admin-Media-Tool nicht hochluden. Via Apache verifiziert (CLI zeigt weiter 2M – irrelevant).
+  - [x] 21b `.marquee-logo` bekommt **weißes Chip** (`background:#fff`, radius 14px): viele Kundenlogos sind dunkel-auf-weiß und wären auf dem `#0a0a0a`-Grund sonst unsichtbar. Img `max-height:64px/max-width:150px`, Chip `min-width:180px/height:96px`. `--empty`-Variante setzt Chip zurück.
+  - [x] 21c 5 Kundenlogos optimiert & live (Little Jack's, dan·bo Møbler, Buddha Lounge, W&W/Wüstenrot, Flora): Originale waren 1536×1024-PNGs mit ~80 % leerer Transparenz (das „graue" im Viewer war nur die Alpha-Vorschau). Pipeline: auf Inhalt getrimmt (Alpha-Bbox), auf max 320 px skaliert, Farben quantisiert (FASTOCTREE, Alpha erhalten) → **je 5–17 KB, gesamt 51 KB** (vorher ~8,6 MB). **Flora** war weiß-auf-transparent (auf weißem Chip unsichtbar) → in warmes Braun `#7a5c3e` umgefärbt. Marquee liest den Ordner automatisch; Originale entfernt, damit nur die sauberen Logos globt werden.
+
+- [x] **Phase 22 – Marquee: weiße Logos, kein Chip, langsamer** (2026-07-22)
+  - [x] 22a Logos zu **weißen Silhouetten** konvertiert (Schwellwert-Key: Luminanz < 0.60 → deckendes Weiß, hellere Innen-Details → transparente Aussparung, Original-Alpha für AA). Nötig, weil simples „alles weiß" bei Logos mit Farb-Innendetail (Little Jack's weiße Schrift auf schwarzem Deckel, Buddha helle Schrift auf dunklem Balken, W&W weiße Lettern auf Orange) zum weißen Klumpen würde – der Schwellwert-Key erhält die Details als Aussparung.
+  - [x] 22b `.marquee-logo`: weißes Chip/Border/Radius entfernt → transparent, `opacity: 0.68` (Hover → 1). `img max-height 58px`.
+  - [x] 22c Animation `marquee-scroll` 30s → **48s** (langsamer).
+  - [x] 22d ⚠️ **Cloudflare-Cache-Falle**: statische Assets werden mit `max-age 180d` gecacht (`cf-cache-status: HIT`) → neue Logos kamen trotz Deploy nicht durch. Fix: Logo-`<img>` in [index.php](index.php) bekommt `?v=<filemtime>` Cache-Buster (wie CSS/JS). Löst auch künftige Logo-Updates ohne CF-Purge.
+
+- [x] **Phase 23 – Marquee-Loop nahtlos** (2026-07-22)
+  - [x] 23a Flackern/„Abschneiden" beim Loop-Neustart behoben: Track = 2×25 Logos + `translateX(-50%)`, aber `gap: 3rem` (flex) verschob den Loop-Punkt um einen halben Gap → sichtbarer Sprung alle 48 s. Fix: `gap` raus, Abstand als `margin-right: 3rem` **pro Logo** (gilt auch fürs letzte Item jeder Kopie) → `-50%` trifft exakt die Kopie-Grenze. Verifiziert: 2. Kopie bei x=4292, halbe Track-Breite 4293 → Δ 0 px.
+
+- [x] **Phase 24 – Partner-werden-Seite v2**
+  - [x] 24a Hero mit Ø-Monatsumsatz (Count-up + Chrome-Shimmer), Stats-Leiste, Fußnote „Umsatz, nicht Gewinn“
+  - [x] 24b Deutschlandkarte (Dot-Matrix, inline SVG, `partials/germany-map-paths.php`) mit Pins, Netzwerk-Bögen ab Flensburg, offenen Süd-Gebieten + Süden-CTA
+  - [x] 24c Verdienst-Rechner (Range-Slider), Dashboard-Mockup, Empfehlungsprogramm (35 %-Ring + Stepper)
+  - [x] 24d Formular: Pflichtfeld „Stadt / Region“ (Handler + Mail), `$extraScripts`-Hook im Footer, `assets/js/partner.js`
+  - [x] 24e Zahlen & Standorte zentral in `partials/partner-network.php` (Hero-/Proof-Copy nicht mehr über Admin-Hero-Felder)
+- [x] **Phase 25 – SEO / GEO**
+  - [x] 25a `head.php`: Canonical pro Seite (vorher nie ausgegeben), `og:url`/`og:locale`/`og:image` absolut, `twitter:image`, `theme-color`, `$jsonLd`/`$pageRobots`/`$canonicalPath`-Hooks
+  - [x] 25b Partner-Seite: neuer Title/Description, JSON-LD (Organization + WebPage/Breadcrumb + FAQPage), sichtbare FAQ (7 Fragen, identisch mit Schema), OG-Bild `assets/img/og-partner.png`
+  - [x] 25c `robots.txt` (Admin + Handler gesperrt), `sitemap.xml`, `llms.txt` (GEO-Faktenblatt), Admin `noindex`
+- [x] **Phase 26 – Partner-Seite Feinschliff**
+  - [x] 26a KI-Optik raus: grüne Live-Pille, Aurora/Grid-Hintergrund, Scroll-Maus, Süd-Glow, Scan-Linie, Emoji, Icon-Kacheln, ✓-Trust-Zeile; Stats als Haarlinien-Spalten
+  - [x] 26b Karte: freie Regionen bundesweit (`free` in `partner-network.php`, unbeschriftet) + Box „8 von 16 Bundesländern“ (automatisch aus `states` vs. aktiven Regionen)
+  - [x] 26c Dashboard-Tour: echtes Logo, 3 Ansichten (Rechnungen/Firmen/Empfehlungen) als Tabs mit Autoplay, Fortschrittslinie und Toast
+  - [x] 26d Empfehlung: 35 % zählt von 1 hoch (Ring synchron), Gutschrift-Tabelle statt 01/02/03-Karten, Stepper integriert
+  - [x] 26e Leistungen als Zeilen statt Karten (Kicker entfallen), Fit-Panel ins Formular gezogen (zweispaltig); ungenutzte Admin-Felder: `card_*_kicker`, `fit_eyebrow`, `fit_title`, `form_sub`, `hero_*`
+- [x] **Phase 27 – Partnerstimmen**
+  - [x] 27a Sektion unter dem Empfehlungsprogramm: großes Foto, Zitat, Ø-Monatsumsatz, 5 Umschalter mit Autoplay (Pause bei Hover)
+  - [x] 27b Inhalte in `partials/partner-testimonials.php`; live nur Einträge mit `freigegeben => true` + Name, Zitat, Foto (Datei muss existieren) und Umsatz; sonst ist die Sektion unsichtbar
+  - [x] 27c Platzhalter nur lokal mit `VISITFY_PREVIEW=1 php -S localhost:8000`; Fotos nach `assets/img/partner/` (4:5, ≥ 800 × 1000 px)
+  - [x] 27d `tabRotator()` in `partner.js` treibt Dashboard-Tour und Partnerstimmen
+
+- [x] **Phase 28 – SEO/GEO Phase 0 (Fundament)**
+  - [x] 28a Saubere URLs aus `partials/routes.php` (/partner-werden, /kontakt, /faq, /ueber-uns, /impressum, /datenschutz); `.htaccess` leitet /pages/*.php, ?page=…, /index.php, /de, www und http per 301 in einem Sprung um; Formulare (POST) bleiben unberührt
+  - [x] 28b 404-Seite, interne Ordner (partials, tools, ops, assets/data) per 404 gesperrt, .md/.sh/.bak/.jsonl gesperrt, Komprimierung + Browser-Cache
+  - [x] 28c `/sitemap.xml` dynamisch (`sitemap.php`), IndexNow-Schlüssel + `php tools/indexnow.php`
+  - [x] 28d JSON-LD über `partials/schema.php` (Organization, WebSite, Service, WebPage/Breadcrumb, FAQPage, About/ContactPage); FAQ-Seite datengetrieben
+  - [x] 28e Titel/Beschreibungen geschärft; Startseiten-Titel in content.json (seo.*) setzt das Deploy; KPI-Zahlen stehen im HTML
+  - [x] 28f Intro nur beim Einstieg von außen (Inline-Script, kein Storage) und kürzer (900/600 ms); Partikel nach Bildschirmfläche skaliert, pausieren unsichtbar
+  - [x] 28g Inter lokal (`assets/fonts/`), keine Google-Fonts-Verbindung mehr
+  - [x] 28h Cookielose Statistik komplett serverseitig (kein JavaScript, kein Zugriff aufs Endgerät): `partials/stats.php`, Aufruf in `head.php` → `assets/data/stats/*.jsonl`, Admin › Statistik (Quellen inkl. KI-Suchen, Crawler, Anfragen, Bewerbungen, 404-Liste)
+  - [x] 28i Deploy-Werkzeug `ops/`: `visitfy-sync.sh` (Live-Stand + Server-Infos nur lesend nach ~/scratch), `build-package.py` (Paket gegen Live-Stand), `visitfy-deploy.sh` (Mac) → `remote-apply.sh` (Server: Konfliktprüfung, Sicherung, Einspielen, `patch-data.php`, Live-Test, Rollback)
+  - [x] 28j Rundgänge gesamt aus dem CRM: `partials/crm.php` + `config.crm.php` (nicht im Git, Vorlage `config.crm.php.example`, MySQL oder JSON-URL), 1 h Cache in `assets/data/cache/`, bei Ausfall letzter Wert bzw. `fallback`; Platzhalter `{rundgaenge}` / `{partner}` in content.json-Texten (`visitfy_get()` füllt sie), `patch-data.php` setzt sie, sobald das CRM antwortet
+  - [x] 28k Lieferzeit einheitlich „max. 5 Tage“ (Code-Defaults, FAQ, llms.txt; content.json per `patch-data.php`); `llms.txt` jetzt dynamisch aus `llms.php`
+  - [x] 28l Cloudflare berücksichtigt: visitfy.de läuft über Cloudflare → SSH nur direkt mit der Server-IP (`ops/visitfy-ssh.sh`, fragt einmal nach und merkt sie in `~/scratch/.visitfy-ssh`); Live-Prüfung im Deploy direkt am Server (an Cloudflare-Cache/Bot-Schutz vorbei), Blick von außen nur als Hinweis; Statistik nimmt die echte Besucher-IP (`CF-Connecting-IP`) für den Tages-Hash
 
 ## SEO/GEO-Plan (Stand 17.10.2026)
 

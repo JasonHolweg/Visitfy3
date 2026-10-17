@@ -8,11 +8,17 @@ DirectoryIndex index.php
 AddDefaultCharset UTF-8
 ErrorDocument 404 /404.php
 
+# ── Upload-Limits fürs Admin-Media-Tool (mod_php; Server-Standard ist nur 2M) ──
+<IfModule php_module>
+  php_value upload_max_filesize 12M
+  php_value post_max_size 14M
+</IfModule>
+
 # ── Zugriff auf interne Dateien sperren ──────────────────────
 <FilesMatch "(\.env|\.git|\.gitignore|deploy\.env|bootstrap\.php|\.sh|\.md|\.example|\.bak|\.jsonl|\.sql)$">
   Require all denied
 </FilesMatch>
-<FilesMatch "^config\.[a-z]+\.php$">
+<FilesMatch "^config\..+\.php$">
   Require all denied
 </FilesMatch>
 <Files "inquiries.json">
@@ -72,6 +78,8 @@ ErrorDocument 404 /404.php
   RewriteRule ^pages/datenschutz\.php$ %{ENV:CANON}/datenschutz [R=301,L,QSD]
 
   # Ältere Adressen aus früheren Website-Versionen
+  RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
+  RewriteRule ^sitemap\.xml\.php$ %{ENV:CANON}/sitemap.xml [R=301,L,NC]
   RewriteRule ^(de|en)/?$ %{ENV:CANON}/ [R=301,L,NC]
   RewriteRule ^(partner|partnerschaft)/?$ %{ENV:CANON}/partner-werden [R=301,L,NC]
   RewriteRule ^(about|ueber|uber-uns)/?$ %{ENV:CANON}/ueber-uns [R=301,L,NC]
@@ -113,26 +121,88 @@ ErrorDocument 404 /404.php
   Header always unset X-Powered-By
 </IfModule>
 
-# ── Komprimierung ────────────────────────────────────────────
-<IfModule mod_deflate.c>
-  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml application/xml application/javascript text/javascript application/json image/svg+xml
-</IfModule>
-
-# ── Browser-Cache (CSS/JS haben ?v=Zeitstempel, daher lange Laufzeit) ──
-<IfModule mod_expires.c>
-  ExpiresActive On
-  ExpiresByType text/css "access plus 1 year"
-  ExpiresByType application/javascript "access plus 1 year"
-  ExpiresByType text/javascript "access plus 1 year"
-  ExpiresByType font/woff2 "access plus 1 year"
-  ExpiresByType image/svg+xml "access plus 7 days"
-  ExpiresByType image/png "access plus 7 days"
-  ExpiresByType image/jpeg "access plus 7 days"
-  ExpiresByType image/webp "access plus 7 days"
-  ExpiresByType image/avif "access plus 7 days"
-</IfModule>
-
 # ── PHP-Härtung (mod_php) ────────────────────────────────────
 <IfModule mod_php.c>
   php_flag expose_php Off
+</IfModule>
+
+# ── Compression (Brotli falls verfügbar, sonst Gzip) ─────────
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS \
+    text/html text/plain text/css text/xml text/javascript \
+    application/javascript application/json application/ld+json \
+    application/xml application/rss+xml application/atom+xml \
+    image/svg+xml font/otf font/ttf application/font-woff application/font-woff2
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE \
+    text/html text/plain text/css text/xml text/javascript \
+    application/javascript application/json application/ld+json \
+    application/xml application/rss+xml application/atom+xml \
+    image/svg+xml font/otf font/ttf application/font-woff application/font-woff2
+</IfModule>
+
+# ── Browser-Caching / Expires ────────────────────────────────
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # HTML: kurz, immer revalidieren
+  ExpiresByType text/html "access plus 0 seconds"
+
+  # CSS / JS (mit ?v=…-Cache-Buster aus filemtime())
+  ExpiresByType text/css                  "access plus 1 year"
+  ExpiresByType application/javascript    "access plus 1 year"
+  ExpiresByType text/javascript           "access plus 1 year"
+
+  # Bilder & Icons
+  ExpiresByType image/jpeg                "access plus 6 months"
+  ExpiresByType image/png                 "access plus 6 months"
+  ExpiresByType image/webp                "access plus 6 months"
+  ExpiresByType image/avif                "access plus 6 months"
+  ExpiresByType image/gif                 "access plus 6 months"
+  ExpiresByType image/svg+xml             "access plus 6 months"
+  ExpiresByType image/x-icon              "access plus 1 year"
+
+  # Fonts
+  ExpiresByType font/woff                 "access plus 1 year"
+  ExpiresByType font/woff2                "access plus 1 year"
+  ExpiresByType application/font-woff     "access plus 1 year"
+  ExpiresByType application/font-woff2    "access plus 1 year"
+
+  # JSON / XML
+  ExpiresByType application/json          "access plus 0 seconds"
+  ExpiresByType application/ld+json       "access plus 0 seconds"
+  ExpiresByType application/xml           "access plus 1 day"
+  ExpiresByType text/xml                  "access plus 1 day"
+</IfModule>
+
+# ── Cache-Control via Headers (immutable für hashed assets) ──
+<IfModule mod_headers.c>
+  <FilesMatch "\.(css|js)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(jpe?g|png|gif|webp|avif|svg|ico)$">
+    Header set Cache-Control "public, max-age=15552000"
+  </FilesMatch>
+  <FilesMatch "\.(woff2?|ttf|otf)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(html|php)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+# ── Vary-Header für korrekte Cache-Keys ──────────────────────
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html|php|css|js|json|svg|xml)$">
+    Header append Vary "Accept-Encoding"
+  </FilesMatch>
+</IfModule>
+
+# ── Korrekte MIME-Typen für SEO/GEO-Dateien ──────────────────
+<IfModule mod_mime.c>
+  AddType application/ld+json .jsonld
+  AddType text/markdown        .md
+  AddType text/plain           .txt
 </IfModule>

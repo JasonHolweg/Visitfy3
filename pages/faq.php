@@ -44,7 +44,8 @@ $jsonLd = [[
     '@graph' => [
         visitfy_schema_webpage($faqUrl, $pageTitle, $pageDesc, [['Start', visitfy_page_url('home', true)], ['FAQ', $faqUrl]]),
         visitfy_schema_faq($faqs, $faqUrl . '#faq'),
-        ['@type' => 'Organization', '@id' => visitfy_schema_org_id(), 'name' => 'Visitfy', 'url' => VISITFY_SITE_URL . '/'],
+        visitfy_schema_organization([]),
+        visitfy_schema_website(),
     ],
 ]];
 

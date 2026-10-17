@@ -14,45 +14,42 @@ if (!function_exists('visitfy_schema_org_id')) {
         return VISITFY_SITE_URL . '/#organization';
     }
 
-    /** Organisation „Visitfy“ – Werte aus content.json, wo vorhanden. */
-    function visitfy_schema_organization(array $contentConfig): array
+    /**
+     * Organisation „Visitfy“. Stammdaten (Adresse, Telefon, USt-ID, Gründer, Profile, Leistungen)
+     * kommen aus visitfy_org_node() in partials/cms.php – eine Quelle für alle Seiten.
+     * Ergänzt um die Partnerstädte als Einsatzgebiet und die E-Mail aus content.json.
+     */
+    function visitfy_schema_organization(array $contentConfig = []): array
     {
+        $org = function_exists('visitfy_org_node') ? visitfy_org_node() : [
+            '@type' => ['ProfessionalService', 'LocalBusiness'],
+            'name'  => 'Visitfy',
+        ];
+        $org['@id']         = visitfy_schema_org_id();
+        $org['url']         = VISITFY_SITE_URL . '/';
+        $org['image']       = VISITFY_SITE_URL . '/assets/img/og-home.png';
+        $org['description'] = 'Visitfy erstellt virtuelle 360°-Rundgänge für Unternehmen – für Gastronomie, Hotels, Praxen, Immobilien und Einzelhandel – und arbeitet dafür mit Partnern in ganz Deutschland. Der Rundgang ist spätestens 5 Tage nach der Aufnahme online.';
+
         $email = trim((string)visitfy_get($contentConfig, 'kontakt_text.email', ''));
         if ($email === '') {
-            $email = trim((string)visitfy_get($contentConfig, 'footer.contact_email', 'info@visitfy.de'));
+            $email = trim((string)visitfy_get($contentConfig, 'footer.contact_email', ''));
         }
-        $phone = trim((string)visitfy_get($contentConfig, 'kontakt_text.phone', ''));
+        if ($email !== '') {
+            $org['email'] = $email;
+        }
 
-        $cities = [];
+        /* Einsatzgebiet: Deutschland + alle Partnerstädte */
+        $area = [['@type' => 'Country', 'name' => 'Deutschland']];
         $networkFile = __DIR__ . '/partner-network.php';
         if (is_file($networkFile)) {
             $network = require $networkFile;
             foreach ((array)($network['active'] ?? []) as $p) {
                 if (!empty($p['name'])) {
-                    $cities[] = ['@type' => 'Place', 'name' => (string)$p['name']];
+                    $area[] = ['@type' => 'Place', 'name' => (string)$p['name']];
                 }
             }
         }
-
-        $org = [
-            '@type'       => 'Organization',
-            '@id'         => visitfy_schema_org_id(),
-            'name'        => 'Visitfy',
-            'url'         => VISITFY_SITE_URL . '/',
-            'logo'        => ['@type' => 'ImageObject', 'url' => VISITFY_SITE_URL . '/assets/img/logo.svg'],
-            'description' => 'Visitfy erstellt virtuelle 360°-Rundgänge für Unternehmen – für Gastronomie, Hotels, Praxen, Immobilien und Einzelhandel – und arbeitet dafür mit Partnern in ganz Deutschland.',
-            'email'       => $email,
-            'address'     => ['@type' => 'PostalAddress', 'addressLocality' => 'Flensburg', 'addressRegion' => 'Schleswig-Holstein', 'addressCountry' => 'DE'],
-            'areaServed'  => array_merge([['@type' => 'Country', 'name' => 'Deutschland']], $cities),
-            'knowsAbout'  => ['360-Grad-Rundgänge', 'Virtuelle Rundgänge', 'Matterport'],
-            'sameAs'      => [
-                'https://www.instagram.com/visitfy.de/',
-                'https://www.facebook.com/people/Visitfy/61567271012669/',
-            ],
-        ];
-        if ($phone !== '') {
-            $org['telephone'] = $phone;
-        }
+        $org['areaServed'] = $area;
         return $org;
     }
 

@@ -1,6 +1,89 @@
+# ══════════════════════════════════════════════════════════════
+#  Visitfy – robots.txt
+#  Steuerung von Suchmaschinen- und KI-Crawlern.
+# ══════════════════════════════════════════════════════════════
+
+# ─── Default: alle klassischen Crawler dürfen indexieren ─────
 User-agent: *
 Disallow: /admin/
+Disallow: /partials/
+Disallow: /assets/data/
 Disallow: /pages/partner-handler.php
+Disallow: /pages/datenschutz.php?
+Disallow: /index.php?
 Allow: /
 
+# ─── KI-Trainings-/Antwort-Crawler bewusst erlauben ──────────
+# Diese Crawler liefern Sichtbarkeit in ChatGPT-Suche, Gemini,
+# Perplexity, Apple Intelligence und Google AI Overviews.
+# Ohne ausdrückliche Erlaubnis blocken viele Hoster diese
+# inzwischen per Default.
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: Diffbot
+Allow: /
+
+# ─── Sitemap ────────────────────────────────────────────────
 Sitemap: https://visitfy.de/sitemap.xml
