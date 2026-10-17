@@ -132,10 +132,11 @@ Stand: 2026-05-19 · Branch: `claude/elegant-sammet-caa710` (Auto-Deploy aktiv)
   - [x] 21i Deploy-Werkzeug `ops/`: `visitfy-sync.sh` (Live-Stand + Server-Infos nur lesend nach ~/scratch), `build-package.py` (Paket gegen Live-Stand), `visitfy-deploy.sh` (Mac) → `remote-apply.sh` (Server: Konfliktprüfung, Sicherung, Einspielen, `patch-data.php`, Live-Test, Rollback)
   - [x] 21j Rundgänge gesamt aus dem CRM: `partials/crm.php` + `config.crm.php` (nicht im Git, Vorlage `config.crm.php.example`, MySQL oder JSON-URL), 1 h Cache in `assets/data/cache/`, bei Ausfall letzter Wert bzw. `fallback`; Platzhalter `{rundgaenge}` / `{partner}` in content.json-Texten (`visitfy_get()` füllt sie), `patch-data.php` setzt sie, sobald das CRM antwortet
   - [x] 21k Lieferzeit einheitlich „max. 5 Tage“ (Code-Defaults, FAQ, llms.txt; content.json per `patch-data.php`); `llms.txt` jetzt dynamisch aus `llms.php`
+  - [x] 21l Cloudflare berücksichtigt: visitfy.de läuft über Cloudflare → SSH nur direkt mit der Server-IP (`ops/visitfy-ssh.sh`, fragt einmal nach und merkt sie in `~/scratch/.visitfy-ssh`); Live-Prüfung im Deploy direkt am Server (an Cloudflare-Cache/Bot-Schutz vorbei), Blick von außen nur als Hinweis; Statistik nimmt die echte Besucher-IP (`CF-Connecting-IP`) für den Tages-Hash
 
 ## SEO/GEO-Plan (Stand 17.10.2026)
 
-- [ ] Phase 0 live: Sitemap in Google Search Console einreichen, Bing Webmaster Tools (Import aus GSC), Datenschutz-Absatz zur Statistik
+- [ ] Phase 0 live: Sitemap in Google Search Console einreichen, Bing Webmaster Tools (Import aus GSC), Datenschutz-Absatz zur Statistik; in Cloudflare prüfen, dass KI-Crawler nicht blockiert werden (Sicherheit → Bots / KI-Crawler-Steuerung) – sonst sind robots.txt-Freigaben und llms.txt wirkungslos
 - [ ] Phase 1: Stadtseiten für Partnerstandorte (mit echtem Partner, Referenzen, lokalen FAQ), Branchenseiten, Preisseite „Was kostet ein 360°-Rundgang?“, Referenzseite
 - [ ] Phase 2: Ratgeber (2–4/Monat) für Kunden und Partner – Antwort im ersten Absatz, Tabellen, FAQ, Datum/Autor
 - [ ] Phase 3: Google-Unternehmensprofile (Visitfy + Partner), Credit-Link „360°-Rundgang: Visitfy“ bei Kunden, einheitliche Verzeichniseinträge, Regionalpresse

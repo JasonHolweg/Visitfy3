@@ -3,16 +3,21 @@
 # Nur lesend: auf dem Server wird nichts geändert.
 # Listet zusätzlich Websites sowie Datenbank- und Tabellennamen (keine Inhalte), um die Rundgang-Zahl im CRM zu finden.
 # Zugangsdaten (config.*.php, *.env, .htpasswd) und Kundenanfragen (inquiries.json) werden NICHT kopiert.
-# Aufruf: bash ~/scratch/visitfy-sync.sh [user@host] [/pfad/zum/webroot]
+# Aufruf: bash ~/scratch/visitfy-sync.sh [server-ip | root@ip:port | ssh-kürzel] [/pfad/zum/webroot]
+# Beim ersten Mal wird nach der Server-IP gefragt (visitfy.de läuft über Cloudflare, SSH geht nur direkt).
 set -euo pipefail
 
-HOST="${1:-root@visitfy.de}"
-ROOT="${2:-}"
 OUT="$HOME/scratch"
+HELPER="$(cd "$(dirname "$0")" && pwd)/visitfy-ssh.sh"
+[ -f "$HELPER" ] || { echo "✗ $HELPER fehlt – bitte neben dieses Skript legen."; exit 1; }
+. "$HELPER"
+
+visitfy_ssh_setup "${1:-}"
+ROOT="${2:-}"
 
 if [ -z "$ROOT" ]; then
-  echo "→ Suche das Webverzeichnis von visitfy.de auf $HOST …"
-  ROOT="$(ssh "$HOST" 'bash -s' <<'REMOTE'
+  echo "→ Suche das Webverzeichnis von visitfy.de …"
+  ROOT="$(vssh 'bash -s' <<'REMOTE'
 for f in /etc/apache2/sites-enabled/* /etc/httpd/conf.d/*.conf; do
   [ -f "$f" ] || continue
   grep -hiE '^[[:space:]]*DocumentRoot' "$f" | awk '{print $2}' | tr -d '"'
@@ -25,21 +30,21 @@ REMOTE
   if [ "$COUNT" != "1" ]; then
     echo "✗ Webverzeichnis nicht eindeutig gefunden ($COUNT Treffer):"
     printf '%s\n' "$ROOT"
-    echo "  Bitte mit Pfad aufrufen: bash ~/scratch/visitfy-sync.sh $HOST /pfad/zum/webroot"
+    echo "  Bitte mit Pfad aufrufen: bash ~/scratch/visitfy-sync.sh \"\" /pfad/zum/webroot"
     exit 1
   fi
 fi
 echo "✓ Webverzeichnis: $ROOT"
 
 echo "→ Sammle Server-Infos …"
-ssh "$HOST" "ROOT='$ROOT' bash -s" > "$OUT/visitfy-live-info.txt" 2>&1 <<'REMOTE' || true
+vssh "ROOT='$ROOT' bash -s" > "$OUT/visitfy-live-info.txt" 2>&1 <<'REMOTE' || true
 echo "## Webroot: $ROOT"
 echo "## Stand: $(date -Is)"
 echo; echo "## Apache / PHP"
 (apache2 -v || httpd -v) 2>/dev/null | head -1
 php -v 2>/dev/null | head -1
 echo; echo "## Apache-Module"
-(apache2ctl -M || httpd -M) 2>/dev/null | grep -iE 'rewrite|headers|expires|deflate|brotli|http2|ssl|php' | tr -s ' ' | tr '\n' ' '; echo
+(apache2ctl -M || httpd -M) 2>/dev/null | grep -iE 'rewrite|headers|expires|deflate|brotli|http2|ssl|php|remoteip' | tr -s ' ' | tr '\n' ' '; echo
 echo; echo "## PHP-Erweiterungen"
 php -m 2>/dev/null | grep -iE 'sqlite|pdo|curl|mbstring|intl|gd|imagick|zip|opcache' | tr '\n' ' '; echo
 echo; echo "## VHosts mit visitfy (ohne Kommentare und Umgebungsvariablen)"
@@ -49,10 +54,19 @@ for f in $(grep -rliE 'visitfy' /etc/apache2/sites-enabled/ /etc/httpd/conf.d/ 2
 done
 echo; echo "## Statuscodes (vom Server aus)"
 for u in http://visitfy.de/ http://www.visitfy.de/ https://www.visitfy.de/ https://visitfy.de/ https://visitfy.de/index.php https://visitfy.de/de https://visitfy.de/pages/partner.php http://visitfy.de/pages/kontakt.php https://visitfy.de/robots.txt https://visitfy.de/sitemap.xml https://visitfy.de/gibt-es-nicht; do
-  printf '%-45s ' "$u"; curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' --max-time 10 "$u" || echo "fehler"
+  printf '%-45s ' "$u"; curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' --max-time 10 "$u" || true
 done
+echo; echo "## Statuscodes direkt am Server (an Cloudflare vorbei)"
+for p in / /robots.txt /pages/partner.php /gibt-es-nicht; do
+  printf 'https %-22s ' "$p"; curl -sk -o /dev/null -w '%{http_code} %{redirect_url}\n' --max-time 8 --resolve visitfy.de:443:127.0.0.1 "https://visitfy.de$p" || true
+  printf 'http  %-22s ' "$p"; curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' --max-time 8 --resolve visitfy.de:80:127.0.0.1 "http://visitfy.de$p" || true
+done
+echo; echo "## Cloudflare: echte Besucher-IP an Apache weitergereicht?"
+grep -rhiE '^[[:space:]]*RemoteIP(Header|TrustedProxy|TrustedProxyList)' /etc/apache2/ /etc/httpd/ 2>/dev/null | head -5 || true
 echo; echo "## Response-Header Startseite"
-curl -sI --max-time 10 https://visitfy.de/ | grep -iE '^(server|cf-|x-|content-encoding|cache-control|strict|vary|link)' || true
+curl -sI --max-time 10 https://visitfy.de/ | grep -iE '^(server|cf-|x-|content-encoding|cache-control|strict|vary|link|age)' || true
+echo "### Partner-Seite"
+curl -sI --max-time 10 https://visitfy.de/pages/partner.php | grep -iE '^(cf-cache-status|cache-control|age)' || true
 echo; echo "## Zertifikate"
 (certbot certificates 2>/dev/null | grep -iE -A3 'visitfy') || echo "certbot: keine Angaben"
 echo; echo "## Datenbank / Docker vorhanden?"
@@ -81,6 +95,6 @@ cd "$ROOT" && find . -type f ! -path './.git/*' ! -name 'config.*.php' ! -name '
 REMOTE
 
 echo "→ Lade die Live-Dateien (ohne Zugangsdaten und Kundenanfragen) …"
-ssh "$HOST" "tar czf - -C '$ROOT' --exclude=./.git --exclude='config.*.php' --exclude='inquiries.json' --exclude='*.env' --exclude='.htpasswd' ." > "$OUT/visitfy-live.tgz"
+vssh "tar czf - -C '$ROOT' --exclude=./.git --exclude='config.*.php' --exclude='inquiries.json' --exclude='*.env' --exclude='.htpasswd' --exclude=./assets/data/stats --exclude=./assets/data/cache ." > "$OUT/visitfy-live.tgz"
 echo "✓ Fertig: $(du -h "$OUT/visitfy-live.tgz" | cut -f1) in ~/scratch/visitfy-live.tgz"
 echo "  Infos: ~/scratch/visitfy-live-info.txt – gib Claude jetzt Bescheid."

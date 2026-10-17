@@ -88,8 +88,10 @@ if (is_file($contentFile)) {
     foreach ((array)($content['kpi']['items'] ?? []) as $i => $item) {
         $label = (string)($item['label'] ?? '');
         $suffix = trim((string)($item['suffix'] ?? ''));
-        if (preg_match('/live\s+geht|online\s+ist/u', $label) || ((string)($item['target'] ?? '') === '3' && preg_match('/^Tag/u', $suffix))) {
-            $content['kpi']['items'][$i] = ['target' => '5', 'suffix' => 'Tage', 'label' => 'maximal, bis Ihr Rundgang online ist'];
+        $want = ['target' => '5', 'suffix' => 'Tage', 'label' => 'maximal, bis Ihr Rundgang online ist'];
+        if ((preg_match('/live\s+geht|online\s+ist/u', $label) || ((string)($item['target'] ?? '') === '3' && preg_match('/^Tag/u', $suffix)))
+            && array_intersect_key($item, $want) != $want) {
+            $content['kpi']['items'][$i] = array_merge($item, $want);
             $changes++;
         }
     }

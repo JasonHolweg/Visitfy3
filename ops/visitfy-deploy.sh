@@ -4,6 +4,7 @@
 #
 #  bash ~/scratch/visitfy-deploy.sh            → prüfen, sichern, einspielen, testen
 #  MODE=check bash ~/scratch/visitfy-deploy.sh → nur prüfen, nichts ändern
+#  Server-Ziel wie bei visitfy-sync.sh (gemerkt in ~/scratch/.visitfy-ssh, sonst wird nach der IP gefragt)
 #
 #  Ablauf auf dem Server (ops/remote-apply.sh):
 #   1. Konfliktprüfung gegen den Stand, auf dem das Paket aufbaut
@@ -13,15 +14,19 @@
 # ══════════════════════════════════════════════════════════════
 set -euo pipefail
 
-HOST="${1:-root@visitfy.de}"
 PKG="${PKG:-$HOME/scratch/visitfy-phase0.tgz}"
 MODE="${MODE:-apply}"
 ROOT="${ROOT:-}"
 
 [ -f "$PKG" ] || { echo "✗ Paket nicht gefunden: $PKG"; exit 1; }
 
+HELPER="$(cd "$(dirname "$0")" && pwd)/visitfy-ssh.sh"
+[ -f "$HELPER" ] || { echo "✗ $HELPER fehlt – bitte neben dieses Skript legen."; exit 1; }
+. "$HELPER"
+visitfy_ssh_setup "${1:-}"
+
 if [ -z "$ROOT" ]; then
-  ROOT="$(ssh "$HOST" 'bash -s' <<'REMOTE'
+  ROOT="$(vssh 'bash -s' <<'REMOTE'
 for f in /etc/apache2/sites-enabled/* /etc/httpd/conf.d/*.conf; do
   [ -f "$f" ] || continue
   grep -hiE '^[[:space:]]*DocumentRoot' "$f" | awk '{print $2}' | tr -d '"'
@@ -40,14 +45,14 @@ echo "✓ Webverzeichnis: $ROOT"
 
 TMP="/tmp/visitfy-deploy-$(date +%Y%m%d%H%M%S)"
 echo "→ Lade Paket hoch …"
-ssh "$HOST" "mkdir -p '$TMP' && tar xzf - -C '$TMP'" < "$PKG"
+vssh "mkdir -p '$TMP' && tar xzf - -C '$TMP'" < "$PKG"
 
 echo "→ Starte auf dem Server ($MODE) …"
 set +e
-ssh "$HOST" "bash '$TMP/_deploy/remote-apply.sh' '$ROOT' '$TMP' '$MODE'"
+vssh "bash '$TMP/_deploy/remote-apply.sh' '$ROOT' '$TMP' '$MODE'"
 rc=$?
 set -e
-ssh "$HOST" "rm -rf -- '$TMP'" || true
+vssh "rm -rf -- '$TMP'" || true
 
 case "$rc" in
   0) echo "✓ Erledigt. Gib Claude kurz Bescheid." ;;

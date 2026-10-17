@@ -67,9 +67,21 @@ if (!function_exists('visitfy_stats_dir')) {
         return $salt;
     }
 
+    /** Echte Besucher-IP: visitfy.de läuft über Cloudflare, REMOTE_ADDR ist dort die IP des Cloudflare-Knotens. */
+    function visitfy_stats_client_ip(): string
+    {
+        foreach (['HTTP_CF_CONNECTING_IP', 'REMOTE_ADDR'] as $key) {
+            $ip = trim((string)($_SERVER[$key] ?? ''));
+            if ($ip !== '' && filter_var($ip, FILTER_VALIDATE_IP)) {
+                return $ip;
+            }
+        }
+        return '';
+    }
+
     function visitfy_stats_visitor(): string
     {
-        $ip = (string)($_SERVER['REMOTE_ADDR'] ?? '');
+        $ip = visitfy_stats_client_ip();
         $ua = (string)($_SERVER['HTTP_USER_AGENT'] ?? '');
         return substr(hash('sha256', visitfy_stats_salt() . '|' . $ip . '|' . $ua), 0, 16);
     }
