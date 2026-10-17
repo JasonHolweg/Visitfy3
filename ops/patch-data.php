@@ -196,4 +196,44 @@ foreach (['impressum', 'datenschutz'] as $key) {
     }
 }
 
+/* ── 5) Datenschutz: Absatz zur cookielosen Reichweitenmessung (partials/stats.php), einmalig ── */
+$dsFile = $root . '/pages/datenschutz.php';
+if (is_file($dsFile)) {
+    $ds = (string)file_get_contents($dsFile);
+    $anchor = '<h2>4. Eingebettete Inhalte Dritter</h2>';
+    if (strpos($ds, 'Reichweitenmessung ohne Cookies') !== false) {
+        // schon vorhanden
+    } elseif (substr_count($ds, $anchor) !== 1) {
+        out('pages/datenschutz.php: Abschnitt 4 nicht gefunden – Absatz zur Statistik bitte von Hand ergänzen');
+    } else {
+        $block = <<<'HTML'
+<h2>3.3 Reichweitenmessung ohne Cookies</h2>
+        <p>
+          Um zu verstehen, wie unsere Website genutzt wird, zählt unser eigener Server die Seitenaufrufe.
+          Dafür werden keine Cookies gesetzt, keine Mess-Skripte ausgeführt und keine Informationen auf
+          Ihrem Endgerät gespeichert oder ausgelesen. Es werden keine Daten an Dritte übermittelt.
+        </p>
+        <p>
+          Gespeichert werden je Aufruf nur: die aufgerufene Seite, der Zeitpunkt, die Herkunft (z. B. „Google“,
+          „ChatGPT“, „direkt“ oder die Domain der verweisenden Website, ohne deren genaue Adresse), der
+          Gerätetyp (Computer, Tablet oder Smartphone) sowie
+          ein Kurzwert, mit dem Aufrufe desselben Tages zusammengefasst werden. Dieser Kurzwert wird aus
+          IP-Adresse und Browserkennung zusammen mit einem täglich neu erzeugten Zufallswert berechnet;
+          die IP-Adresse selbst wird dabei nicht gespeichert. Der Zufallswert wird nach spätestens zwei
+          Tagen gelöscht, danach lassen sich die Einträge keiner Person mehr zuordnen. Bei abgeschickten
+          Anfragen wird zusätzlich nur gezählt, dass eine Anfrage eingegangen ist – ohne deren Inhalt.
+        </p>
+        <p>
+          Zweck ist die Verbesserung unseres Angebots. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO
+          (berechtigtes Interesse an einer datensparsamen Reichweitenmessung).
+        </p>
+
+
+HTML;
+        $ds = str_replace($anchor, rtrim($block) . "\n\n        " . $anchor, $ds);
+        file_put_contents($dsFile, $ds, LOCK_EX);
+        out('pages/datenschutz.php: Abschnitt 3.3 „Reichweitenmessung ohne Cookies“ ergänzt');
+    }
+}
+
 exit(0);
