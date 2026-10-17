@@ -158,6 +158,7 @@ Stand: 2026-10-17 · Branch: `seo/phase-0` – enthält den kompletten Live-Stan
   - [x] 27b Inhalte in `partials/partner-testimonials.php`; live nur Einträge mit `freigegeben => true` + Name, Zitat, Foto (Datei muss existieren) und Umsatz; sonst ist die Sektion unsichtbar
   - [x] 27c Platzhalter nur lokal mit `VISITFY_PREVIEW=1 php -S localhost:8000`; Fotos nach `assets/img/partner/` (4:5, ≥ 800 × 1000 px)
   - [x] 27d `tabRotator()` in `partner.js` treibt Dashboard-Tour und Partnerstimmen
+  - [x] 27e Live mit 4 echten Partnern (Daniel R., Sarah K., Lukas M., Ben S.; Fotos von JH als echt bestätigt), Alter in der Meta-Zeile, ohne Stadt Vorname im Umschalter, Bilder mit `?v=` (Cloudflare-Cache)
 
 - [x] **Phase 28 – SEO/GEO Phase 0 (Fundament)**
   - [x] 28a Saubere URLs aus `partials/routes.php` (/partner-werden, /kontakt, /faq, /ueber-uns, /impressum, /datenschutz); `.htaccess` leitet /pages/*.php, ?page=…, /index.php, /de, www und http per 301 in einem Sprung um; Formulare (POST) bleiben unberührt
@@ -172,6 +173,7 @@ Stand: 2026-10-17 · Branch: `seo/phase-0` – enthält den kompletten Live-Stan
   - [x] 28j Rundgänge gesamt aus dem CRM: `partials/crm.php` + `config.crm.php` (nicht im Git, Vorlage `config.crm.php.example`, MySQL oder JSON-URL), 1 h Cache in `assets/data/cache/`, bei Ausfall letzter Wert bzw. `fallback`; Platzhalter `{rundgaenge}` / `{partner}` in content.json-Texten (`visitfy_get()` füllt sie), `patch-data.php` setzt sie, sobald das CRM antwortet
   - [x] 28k Lieferzeit einheitlich „max. 5 Tage“ (Code-Defaults, FAQ, llms.txt; content.json per `patch-data.php`); `llms.txt` jetzt dynamisch aus `llms.php`
   - [x] 28l Cloudflare berücksichtigt: visitfy.de läuft über Cloudflare → SSH nur direkt mit der Server-IP (`ops/visitfy-ssh.sh`, fragt einmal nach und merkt sie in `~/scratch/.visitfy-ssh`); Live-Prüfung im Deploy direkt am Server (an Cloudflare-Cache/Bot-Schutz vorbei), Blick von außen nur als Hinweis; Statistik nimmt die echte Besucher-IP (`CF-Connecting-IP`) für den Tages-Hash
+  - [x] 28m Phase 0 live seit 17.10.2026; Datenschutzerklärung Abschnitt 3.3 „Reichweitenmessung ohne Cookies“ per `patch-data.php`
 
 ## SEO/GEO-Plan (Stand 17.10.2026)
 
@@ -182,7 +184,9 @@ Stand: 2026-10-17 · Branch: `seo/phase-0` – enthält den kompletten Live-Stan
 - [x] Lieferzeit einheitlich „max. 5 Tage“
 - [ ] Rundgänge gesamt: `config.crm.php` auf dem Server anlegen (Tabelle/Abfrage nach `visitfy-sync.sh` festlegen, DB-Benutzer nur mit Leserecht)
 - [ ] Case-Prozente belegen, Flora als eigenes Café kennzeichnen
-- [ ] Partnerstimmen: nur echte Partner mit schriftlicher Freigabe (Foto, Name, Zitat, Umsatz) – dann `freigegeben => true` in `partials/partner-testimonials.php`
+- [x] Partnerstimmen live (4 Partner); weitere nur mit schriftlicher Freigabe (Foto, Name, Zitat, Umsatz)
+- [ ] Partnerstädte zu den Stimmen ergänzen (`stadt` in `partials/partner-testimonials.php`)
+- [ ] Datenschutzerklärung: Cloudflare (vor der ganzen Seite) und Mailgun (Formular-Mails) fehlen noch
 
 ## Offen / Roadmap
 
