@@ -85,6 +85,11 @@ $voicePrompts = [
     'Wie erlebst du den Support und das Dashboard im Alltag?',
     'Was würdest du jemandem sagen, der überlegt, Partner zu werden?',
 ];
+$voiceThumb = static function (array $v, string $foto): string {
+    $thumb = ltrim(trim((string)($v['thumb'] ?? '')), '/');
+    $file = ($thumb !== '' && is_file(__DIR__ . '/../' . $thumb)) ? $thumb : ltrim($foto, '/');
+    return $file . '?v=' . (int)@filemtime(__DIR__ . '/../' . $file);
+};
 $voices = [];
 $voicesReal = 0;
 foreach ($voicesRaw as $i => $v) {
@@ -100,11 +105,13 @@ foreach ($voicesRaw as $i => $v) {
             'alter' => (int)($v['alter'] ?? 0),
             'zitat' => trim((string)$v['zitat']), 'umsatz' => (int)round((int)$v['umsatz'], -2),
             'foto' => ltrim($foto, '/') . '?v=' . (int)@filemtime(__DIR__ . '/../' . ltrim($foto, '/')), 'platzhalter' => false,
+            'thumb' => $voiceThumb($v, $foto),
+            'alt' => trim((string)($v['foto_alt'] ?? '')),
         ];
         $voicesReal++;
     } elseif ($voicePreview) {
         $voices[] = [
-            'name' => 'Name folgt', 'stadt' => trim((string)($v['stadt'] ?? '')) ?: 'Stadt folgt', 'seit' => 'Partner seit …', 'alter' => 0,
+            'name' => 'Name folgt', 'stadt' => trim((string)($v['stadt'] ?? '')) ?: 'Stadt folgt', 'seit' => 'Partner seit …', 'alter' => 0, 'thumb' => '', 'alt' => '',
             'zitat' => 'Platzhalter für das Zitat. Frage dazu: ' . $voicePrompts[$i % count($voicePrompts)],
             'umsatz' => 0, 'foto' => '', 'platzhalter' => true,
         ];
@@ -564,7 +571,7 @@ require __DIR__ . '/../partials/header.php';
             <figure class="pw-voice<?= $on ? ' is-active' : '' ?><?= $v['platzhalter'] ? ' is-placeholder' : '' ?>" id="pw-voice-<?= $i ?>" role="tabpanel" aria-labelledby="pw-voice-tab-<?= $i ?>">
               <div class="pw-voice-photo">
                 <?php if ($v['foto'] !== ''): ?>
-                  <img src="<?= $h($root . $v['foto']) ?>" alt="<?= $h($v['name']) ?>, Visitfy-Partner<?= $v['stadt'] !== '' ? ' in ' . $h($v['stadt']) : '' ?>" width="800" height="1000" loading="lazy" decoding="async">
+                  <img src="<?= $h($root . $v['foto']) ?>" alt="<?= $v['alt'] !== '' ? $h($v['alt']) : $h($v['name']) . ', Visitfy-Partner' . ($v['stadt'] !== '' ? ' in ' . $h($v['stadt']) : '') ?>" width="800" height="1000" loading="lazy" decoding="async">
                 <?php else: ?>
                   <span class="pw-voice-ph"><?= $voiceSilhouette ?><small>Foto folgt</small></span>
                 <?php endif; ?>
@@ -596,7 +603,7 @@ require __DIR__ . '/../partials/header.php';
               <button type="button" class="pw-voice-tab<?= $on ? ' is-active' : '' ?>" role="tab" id="pw-voice-tab-<?= $i ?>" aria-controls="pw-voice-<?= $i ?>" aria-selected="<?= $on ? 'true' : 'false' ?>"<?= $on ? '' : ' tabindex="-1"' ?> aria-label="<?= $h(implode(', ', array_filter([$v['name'], $v['stadt']]))) ?>">
                 <span class="pw-voice-tab-progress" aria-hidden="true"></span>
                 <span class="pw-voice-thumb" aria-hidden="true">
-                  <?php if ($v['foto'] !== ''): ?><img src="<?= $h($root . $v['foto']) ?>" alt="" width="72" height="72" loading="lazy" decoding="async"><?php else: ?><?= $voiceSilhouette ?><?php endif; ?>
+                  <?php if ($v['foto'] !== ''): ?><img src="<?= $h($root . ($v['thumb'] !== '' ? $v['thumb'] : $v['foto'])) ?>" alt="" width="72" height="72" loading="lazy" decoding="async"><?php else: ?><?= $voiceSilhouette ?><?php endif; ?>
                 </span>
                 <span class="pw-voice-tab-label" aria-hidden="true"><?= $h($v['stadt'] !== '' ? $v['stadt'] : strtok($v['name'], ' ')) ?></span>
               </button>

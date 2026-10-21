@@ -20,6 +20,8 @@
  *   umsatz  Ø Monatsumsatz der letzten Monate in €, wird auf volle Hundert gerundet angezeigt
  *   foto    Pfad relativ zum Projekt, z. B. 'assets/img/partner/lena-h.jpg'
  *           Hochformat 4:5, mindestens 800 × 1000 px, JPG oder WebP, möglichst < 200 KB
+ *   foto_alt  Bildbeschreibung (optional, sonst „Name, Visitfy-Partner“) – sinnvoll, wenn weitere Personen im Bild sind
+ *   thumb   Gesichtsausschnitt für den runden Umschalter (optional, quadratisch, z. B. 120 × 120 px)
  */
 return [
     [
@@ -31,6 +33,8 @@ return [
         'zitat'  => 'Ich fotografiere schon seit ein paar Jahren und wollte mein Angebot erweitern. Die virtuellen Rundgänge kamen bei meinen bestehenden Kunden direkt gut an. Mittlerweile machen die sogar einen ziemlich großen Teil meiner Aufträge aus.',
         'umsatz' => 7200,
         'foto'   => 'assets/img/partner/daniel-r.jpg',
+        'thumb'  => 'assets/img/partner/daniel-r-thumb.jpg',
+        'foto_alt' => 'Daniel R. (links) zeigt Kunden in einem Autohaus einen 360°-Rundgang auf dem Tablet',
     ],
     [
         'freigegeben' => true,
@@ -41,6 +45,8 @@ return [
         'zitat'  => 'Ich wollte schon länger mein eigenes Ding machen, wusste aber nie so richtig, womit. Bei Visitfy fand ich gut, dass man nicht komplett auf sich allein gestellt ist. Inzwischen habe ich einige feste Kunden und kann mir meine Zeit ziemlich frei einteilen.',
         'umsatz' => 4600,
         'foto'   => 'assets/img/partner/sarah-k.jpg',
+        'thumb'  => 'assets/img/partner/sarah-k-thumb.jpg',
+        'foto_alt' => 'Sarah K. mit der 360°-Kamera in einem Friseursalon',
     ],
     [
         'freigegeben' => true,
@@ -51,6 +57,7 @@ return [
         'zitat'  => 'Ich hatte vorher absolut nichts mit Fotografie oder virtuellen Rundgängen zu tun. Mein erster Kunde kam nach knapp drei Wochen. Mittlerweile läuft das neben meinem Hauptjob echt gut und ich bekomme sogar Anfragen über Empfehlungen.',
         'umsatz' => 2800,
         'foto'   => 'assets/img/partner/lukas-m.jpg',
+        'thumb'  => 'assets/img/partner/lukas-m-thumb.jpg',
     ],
     [
         'freigegeben' => true,
@@ -61,6 +68,7 @@ return [
         'zitat'  => 'Ich war anfangs schon skeptisch, ob Unternehmen überhaupt Interesse haben. Nach zwei Wochen hatte ich meinen ersten Auftrag. Man muss halt selbst auf die Leute zugehen, aber wenn man dranbleibt, kann sich daraus echt was entwickeln.',
         'umsatz' => 3400,
         'foto'   => 'assets/img/partner/ben-s.jpg',
+        'thumb'  => 'assets/img/partner/ben-s-thumb.jpg',
     ],
     /* Vorlage für weitere Partner:
     [
