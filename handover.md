@@ -159,6 +159,7 @@ Stand: 2026-10-17 · Branch: `seo/phase-0` – enthält den kompletten Live-Stan
   - [x] 27c Platzhalter nur lokal mit `VISITFY_PREVIEW=1 php -S localhost:8000`; Fotos nach `assets/img/partner/` (4:5, ≥ 800 × 1000 px)
   - [x] 27d `tabRotator()` in `partner.js` treibt Dashboard-Tour und Partnerstimmen
   - [x] 27e Live mit 4 echten Partnern (Daniel R., Sarah K., Lukas M., Ben S.; Fotos von JH als echt bestätigt), Alter in der Meta-Zeile, ohne Stadt Vorname im Umschalter, Bilder mit `?v=` (Cloudflare-Cache)
+  - [x] 27f Neue Fotos für Daniel (Kundentermin im Autohaus) und Sarah (Friseursalon) am 21.10.2026; Gesichtsausschnitte `*-thumb.jpg` für die runden Umschalter, optionale Felder `thumb` und `foto_alt`
 
 - [x] **Phase 28 – SEO/GEO Phase 0 (Fundament)**
   - [x] 28a Saubere URLs aus `partials/routes.php` (/partner-werden, /kontakt, /faq, /ueber-uns, /impressum, /datenschutz); `.htaccess` leitet /pages/*.php, ?page=…, /index.php, /de, www und http per 301 in einem Sprung um; Formulare (POST) bleiben unberührt
