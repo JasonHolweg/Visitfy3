@@ -236,6 +236,16 @@ HTML;
     }
 }
 
+/* ── 5b) Partner-Formular: E-Mail-Platzhalter ohne „Firma“ (Partner sind meist Einzelpersonen) ── */
+if (is_file($contentFile)) {
+    $content = json_decode((string)file_get_contents($contentFile), true);
+    if (is_array($content) && (($content['partner']['form_email_placeholder'] ?? '') === 'name@firma.de')) {
+        $content['partner']['form_email_placeholder'] = 'name@beispiel.de';
+        write_json($contentFile, $content);
+        out('content.json: Partner-Formular E-Mail-Platzhalter → name@beispiel.de');
+    }
+}
+
 /* ── 6) Datenschutz: Hinweis zum Spam-Schutz des Partner-Formulars (partials/formguard.php), einmalig ── */
 if (is_file($dsFile)) {
     $ds = (string)file_get_contents($dsFile);
