@@ -236,4 +236,31 @@ HTML;
     }
 }
 
+/* ── 6) Datenschutz: Hinweis zum Spam-Schutz des Partner-Formulars (partials/formguard.php), einmalig ── */
+if (is_file($dsFile)) {
+    $ds = (string)file_get_contents($dsFile);
+    if (strpos($ds, 'Schutz vor Missbrauch') === false) {
+        $anchor = null;
+        foreach (['<h2>3.3 Reichweitenmessung ohne Cookies</h2>', '<h2>4. Eingebettete Inhalte Dritter</h2>'] as $candidate) {
+            if (substr_count($ds, $candidate) === 1) {
+                $anchor = $candidate;
+                break;
+            }
+        }
+        if ($anchor === null) {
+            out('pages/datenschutz.php: Abschnitt 3.3/4 nicht gefunden – Hinweis zum Spam-Schutz bitte von Hand ergänzen');
+        } else {
+            $block = "<p>\n"
+                . "          Zum Schutz vor Missbrauch (Spam) speichert unser Server beim Absenden des Partner-Formulars einen\n"
+                . "          nicht umkehrbaren Kurzwert Ihrer IP-Adresse, um mehr als drei Anfragen pro Stunde vom selben\n"
+                . "          Absender zu verhindern. Der Kurzwert wird nach etwa einer Stunde gelöscht.\n"
+                . "          Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Abwehr von Missbrauch).\n"
+                . "        </p>\n\n        ";
+            $ds = str_replace($anchor, $block . $anchor, $ds);
+            file_put_contents($dsFile, $ds, LOCK_EX);
+            out('pages/datenschutz.php: Hinweis zum Spam-Schutz des Partner-Formulars ergänzt');
+        }
+    }
+}
+
 exit(0);

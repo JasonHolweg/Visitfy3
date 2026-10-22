@@ -593,11 +593,15 @@
           showFormStatus(statusEl, 'success', '✓ Nachricht gesendet. Wir melden uns bald!');
           form.reset();
         } else {
-          throw new Error(json.error || 'Fehler');
+          const err = new Error(json.error || '');
+          err.fromServer = true;
+          throw err;
         }
       })
-      .catch(() => {
-        showFormStatus(statusEl, 'error', 'Fehler beim Senden. Bitte schreibe direkt an info@visitfy.de.');
+      .catch(err => {
+        /* Hinweise vom Server (z. B. fehlende Stadt) direkt anzeigen, sonst allgemeiner Fehler */
+        const msg = err && err.fromServer && err.message ? err.message : 'Fehler beim Senden. Bitte schreibe direkt an info@visitfy.de.';
+        showFormStatus(statusEl, 'error', msg);
       })
       .finally(() => {
         if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = orig; }

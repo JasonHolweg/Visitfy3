@@ -8,6 +8,7 @@
 require __DIR__ . '/../partials/cms.php';
 require __DIR__ . '/../partials/mail.php';
 require_once __DIR__ . '/../partials/turnstile.php';
+require_once __DIR__ . '/../partials/formguard.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -24,6 +25,18 @@ if (!empty($_POST['hp_website'])) {
     exit;
 }
 
+/* Formular-Token (partials/formguard.php): schneller als ein Mensch = Bot → still annehmen.
+   Fehlt das Token oder passt es nicht (z. B. Seite vor einem Update geladen), Hinweis zum Neuladen. */
+$guard = visitfy_formguard_check('partner', (string)($_POST['ft'] ?? ''));
+if ($guard === 'too_fast') {
+    echo json_encode(['ok' => true]);
+    exit;
+}
+if ($guard !== 'ok') {
+    echo json_encode(['ok' => false, 'error' => 'Die Seite war zu lange geöffnet. Bitte lade sie neu und schick das Formular noch einmal ab.']);
+    exit;
+}
+
 /* Turnstile */
 if (visitfy_turnstile_is_enabled()) {
     $token = (string)($_POST['cf-turnstile-response'] ?? '');
@@ -33,43 +46,43 @@ if (visitfy_turnstile_is_enabled()) {
     }
 }
 
-/* Sanitize & validate */
+/* Sanitize & validate – nur Name, E-Mail und Stadt sind Pflicht */
 $name      = trim(strip_tags($_POST['name']      ?? ''));
-$firma     = trim(strip_tags($_POST['firma']     ?? ''));
 $email     = trim(strip_tags($_POST['email']     ?? ''));
-$rolle     = trim(strip_tags($_POST['rolle']     ?? ''));
 $stadt     = trim(strip_tags($_POST['stadt']     ?? ''));
 $nachricht = trim(strip_tags($_POST['nachricht'] ?? ''));
 $dsgvo     = !empty($_POST['dsgvo']);
 
-$allowedRollen = ['sales', 'agency', 'self-employed', 'other', ''];
-
-if (empty($name) || strlen($name) > 120) {
-    echo json_encode(['ok' => false, 'error' => 'Bitte geben Sie einen gültigen Namen an.']);
+if ($name === '' || mb_strlen($name) > 120) {
+    echo json_encode(['ok' => false, 'error' => 'Bitte gib deinen Namen an.']);
+    exit;
+}
+if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 200 || preg_match('/[\r\n]/', $email)) {
+    echo json_encode(['ok' => false, 'error' => 'Bitte gib eine gültige E-Mail-Adresse an.']);
     exit;
 }
 if ($stadt === '' || mb_strlen($stadt) > 120) {
     echo json_encode(['ok' => false, 'error' => 'Bitte gib deine Stadt oder Region an.']);
     exit;
 }
-if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 200) {
-    echo json_encode(['ok' => false, 'error' => 'Bitte geben Sie eine gültige E-Mail-Adresse an.']);
-    exit;
-}
-if (empty($nachricht) || strlen($nachricht) > 3000) {
-    echo json_encode(['ok' => false, 'error' => 'Bitte geben Sie eine Nachricht ein (max. 3000 Zeichen).']);
+if (mb_strlen($nachricht) > 3000) {
+    echo json_encode(['ok' => false, 'error' => 'Deine Nachricht ist zu lang (max. 3.000 Zeichen).']);
     exit;
 }
 if (!$dsgvo) {
-    echo json_encode(['ok' => false, 'error' => 'Bitte akzeptieren Sie die Datenschutzerklärung.']);
+    echo json_encode(['ok' => false, 'error' => 'Bitte bestätige die Datenschutzerklärung.']);
     exit;
 }
-if (!in_array($rolle, $allowedRollen, true)) {
-    echo json_encode(['ok' => false, 'error' => 'Ungültige Rollenauswahl.']);
+
+/* Typischer Link-Spam → still annehmen, nichts senden */
+if (visitfy_formguard_is_spam($nachricht, [$name, $stadt])) {
+    echo json_encode(['ok' => true]);
     exit;
 }
-if (preg_match('/[\r\n]/', $email)) {
-    echo json_encode(['ok' => false, 'error' => 'Ungültige E-Mail-Adresse.']);
+
+/* Höchstens 3 Anfragen pro Stunde vom selben Absender */
+if (!visitfy_formguard_rate('partner')) {
+    echo json_encode(['ok' => false, 'error' => 'Du hast uns gerade schon geschrieben – wir melden uns bei dir. Eilt es? Ruf uns an: +49 1520 6955260.']);
     exit;
 }
 
@@ -85,20 +98,16 @@ if (!visitfy_mail_is_configured($mailConfig)) {
 
 /* Sanitize for email */
 $safeName      = str_replace(["\r", "\n"], '', $name);
-$safeFirma     = str_replace(["\r", "\n"], '', $firma);
 $safeEmail     = str_replace(["\r", "\n"], '', $email);
-$safeRolle     = str_replace(["\r", "\n"], '', $rolle);
 $safeStadt     = str_replace(["\r", "\n"], '', $stadt);
 
 $subject = '[Visitfy Partner] Neue Anfrage von ' . $safeName . ' (' . $safeStadt . ')';
 $body = "Name: $safeName\n"
-    . "Firma: $safeFirma\n"
     . "E-Mail: $safeEmail\n"
-    . "Stadt / Region: $safeStadt\n"
-    . "Rolle: $safeRolle\n\n"
-    . "Nachricht:\n$nachricht\n";
+    . "Stadt / Region: $safeStadt\n\n"
+    . "Nachricht:\n" . ($nachricht !== '' ? $nachricht : '—') . "\n";
 
-$escapedMessage = nl2br(htmlspecialchars($nachricht, ENT_QUOTES, 'UTF-8'));
+$escapedMessage = $nachricht !== '' ? nl2br(htmlspecialchars($nachricht, ENT_QUOTES, 'UTF-8')) : '—';
 
 $row = static function (string $label, string $value): string {
     return '<tr>'
@@ -118,11 +127,9 @@ $inner =
     . '<table cellpadding="0" cellspacing="0" role="presentation" width="100%"'
     .   ' style="border-collapse:collapse;border-top:1px solid rgba(255,255,255,0.08);">'
     . $row('Name',   htmlspecialchars($safeName, ENT_QUOTES, 'UTF-8'))
-    . $row('Firma',  htmlspecialchars($safeFirma !== '' ? $safeFirma : '—', ENT_QUOTES, 'UTF-8'))
     . $row('E-Mail', '<a href="mailto:' . htmlspecialchars($safeEmail, ENT_QUOTES, 'UTF-8') . '"'
         . ' style="color:#ffffff;">' . htmlspecialchars($safeEmail, ENT_QUOTES, 'UTF-8') . '</a>')
     . $row('Region', htmlspecialchars($safeStadt, ENT_QUOTES, 'UTF-8'))
-    . $row('Rolle',  htmlspecialchars($safeRolle !== '' ? $safeRolle : '—', ENT_QUOTES, 'UTF-8'))
     . '</table>'
     . '<table width="100%" cellpadding="0" cellspacing="0" role="presentation">'
     . '<tr><td style="height:1px;background-color:rgba(255,255,255,0.08);padding:0;font-size:0;line-height:0;">&nbsp;</td></tr>'
@@ -158,6 +165,9 @@ if (!$result['ok']) {
     echo json_encode(['ok' => false, 'error' => 'Ihre Anfrage konnte gerade nicht gesendet werden. Bitte versuchen Sie es erneut.']);
     exit;
 }
+
+/* Für die Begrenzung pro Absender zählen (nur erfolgreiche Anfragen) */
+visitfy_formguard_rate('partner', true);
 
 /* Statistik: erfolgreiche Partner-Bewerbung zählen (cookielos, partials/stats.php) */
 require_once __DIR__ . '/../partials/stats.php';

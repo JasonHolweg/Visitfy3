@@ -6,6 +6,7 @@
  * Zahlen + Standorte: partials/partner-network.php
  */
 require __DIR__ . '/../partials/cms.php';
+require_once __DIR__ . '/../partials/formguard.php';
 require_once __DIR__ . '/../partials/turnstile.php';
 $root = visitfy_site_root();
 $canonicalPath = visitfy_page_url('partner');
@@ -688,43 +689,27 @@ require __DIR__ . '/../partials/header.php';
               <label for="hp_website">Website</label>
               <input type="text" id="hp_website" name="hp_website" tabindex="-1" autocomplete="off">
             </div>
+            <input type="hidden" name="ft" value="<?= $h(visitfy_formguard_token('partner')) ?>">
 
             <div class="form-row">
               <div class="form-group">
                 <label for="p_name"><?= $c('form_name_label', 'Name *') ?></label>
-                <input type="text" id="p_name" name="name" required autocomplete="name" placeholder="<?= $c('form_name_placeholder', 'Max Mustermann') ?>">
+                <input type="text" id="p_name" name="name" required autocomplete="name" maxlength="120" placeholder="<?= $c('form_name_placeholder', 'Max Mustermann') ?>">
               </div>
-              <div class="form-group">
-                <label for="p_firma"><?= $c('form_company_label', 'Firma') ?></label>
-                <input type="text" id="p_firma" name="firma" autocomplete="organization" placeholder="<?= $c('form_company_placeholder', 'Muster GmbH') ?>">
-              </div>
-            </div>
-
-            <div class="form-row">
               <div class="form-group">
                 <label for="p_email"><?= $c('form_email_label', 'E-Mail *') ?></label>
-                <input type="email" id="p_email" name="email" required autocomplete="email" placeholder="<?= $c('form_email_placeholder', 'name@firma.de') ?>">
-              </div>
-              <div class="form-group">
-                <label for="p_stadt">Stadt / Region *</label>
-                <input type="text" id="p_stadt" name="stadt" required autocomplete="address-level2" maxlength="120" placeholder="z. B. München">
+                <input type="email" id="p_email" name="email" required autocomplete="email" maxlength="200" placeholder="<?= $c('form_email_placeholder', 'name@beispiel.de') ?>">
               </div>
             </div>
 
             <div class="form-group">
-              <label for="p_rolle"><?= $c('form_role_label', 'Rolle / Bereich') ?></label>
-              <select id="p_rolle" name="rolle">
-                <option value=""><?= $c('form_role_placeholder', 'Bitte wählen…') ?></option>
-                <option value="sales"><?= $c('form_role_option_1', 'Vertrieb / Sales') ?></option>
-                <option value="agency"><?= $c('form_role_option_2', 'Agentur / Marketing') ?></option>
-                <option value="self-employed"><?= $c('form_role_option_3', 'Selbstständig / Unternehmerisch') ?></option>
-                <option value="other"><?= $c('form_role_option_4', 'Sonstiges') ?></option>
-              </select>
+              <label for="p_stadt">Stadt / Region *</label>
+              <input type="text" id="p_stadt" name="stadt" required autocomplete="address-level2" maxlength="120" placeholder="z. B. München">
             </div>
 
             <div class="form-group">
-              <label for="p_nachricht"><?= $c('form_message_label', 'Nachricht *') ?></label>
-              <textarea id="p_nachricht" name="nachricht" required rows="5" placeholder="<?= $c('form_message_placeholder', 'Erzähl uns kurz, warum du Partner werden möchtest…') ?>"></textarea>
+              <label for="p_nachricht">Nachricht <span class="pw-optional">(optional)</span></label>
+              <textarea id="p_nachricht" name="nachricht" rows="4" maxlength="3000" placeholder="Warum möchtest du Partner werden? Ein, zwei Sätze reichen."></textarea>
             </div>
 
             <div class="form-check">
