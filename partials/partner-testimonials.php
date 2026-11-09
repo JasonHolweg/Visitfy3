@@ -51,7 +51,7 @@ return [
     [
         'freigegeben' => true,
         'name'   => 'Lukas M.',
-        'alter'  => 22,
+        'alter'  => 19,
         'stadt'  => '',
         'seit'   => 'Partner seit März 2026',
         'zitat'  => 'Ich hatte vorher absolut nichts mit Fotografie oder virtuellen Rundgängen zu tun. Mein erster Kunde kam nach knapp drei Wochen. Mittlerweile läuft das neben meinem Hauptjob echt gut und ich bekomme sogar Anfragen über Empfehlungen.',
@@ -62,7 +62,7 @@ return [
     [
         'freigegeben' => true,
         'name'   => 'Ben S.',
-        'alter'  => 19,
+        'alter'  => 22,
         'stadt'  => '',
         'seit'   => 'Partner seit Juni 2026',
         'zitat'  => 'Ich war anfangs schon skeptisch, ob Unternehmen überhaupt Interesse haben. Nach zwei Wochen hatte ich meinen ersten Auftrag. Man muss halt selbst auf die Leute zugehen, aber wenn man dranbleibt, kann sich daraus echt was entwickeln.',
